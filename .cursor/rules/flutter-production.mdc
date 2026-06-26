@@ -1,0 +1,31 @@
+---
+description: Flutter production engineering rules for VyapApp
+alwaysApply: true
+---
+
+# VyapApp Flutter Rules
+
+Follow all rules in [AGENTS.md](../../AGENTS.md) at the repository root.
+
+## Project adapters (quick reference)
+
+| Use this in rules/docs | Use this in VyapApp code |
+|------------------------|--------------------------|
+| `FontPalette` / font palette | `lib/res/styles/font_palette.dart` |
+| `PrimaryButton` | `lib/utils/common_widgets/primary_button.dart` |
+| `CommonTextFormField` | `lib/utils/common_widgets/common_text_form_field.dart` |
+| Package imports | `package:vyapapp/...` |
+| Strings / colors | `Strings.` / `ColorPalette.` from `res/` |
+
+## Non-negotiables
+
+- Feature structure: `model/`, `state/`, `notifier/`, `repo/`, `view/`
+- Riverpod code gen with `@Riverpod(keepAlive: false)` by default
+- Freezed `sealed` state classes
+- `LoaderState` for API-backed features; `handleResponseError` on errors
+- Repositories return `Either<ResponseError, T>`
+- Controllers (`TextEditingController`, etc.) live in notifiers
+- `ref.watch(...select(...))` for granular rebuilds
+- No hardcoded strings, colors, or inline `TextStyle` in UI
+- ScreenUtil suffixes: `.h`, `.w`, `.r`, `.verticalSpace`, `.horizontalSpace`
+- Shared widgets from `utils/common_widgets/` — never raw `Scaffold`, `AppBar`, etc.
