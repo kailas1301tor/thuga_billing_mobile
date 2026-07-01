@@ -21,10 +21,12 @@ class AppConstants {
   // CRUD endpoints
   static String dropdowns = "$api/dropdowns";
   static String products = "$api/products";
+  static String productStatus = "$api/product-status";
   static String categories = "$api/categories";
   static String customers = "$api/customers";
   static String categoriesWithProducts = "$api/categories-with-products";
   static String bills = "$api/bills";
+  static String purchase = "$api/purchase";
   static String dashboard = "$api/dashboard";
   static String reports = "$api/reports";
   static const int maxImageSizeMb = 5;

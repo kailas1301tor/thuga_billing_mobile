@@ -1,6 +1,6 @@
 class Strings {
   // General
-  static const String appName = "VyapApp";
+  static const String appName = "Thuka";
   static const String ok = "OK";
   static const String cancel = "Cancel";
   static const String save = "Save";
@@ -128,7 +128,7 @@ class Strings {
   static const String newBillTitle = "New Bill";
   static const String reportsTitle = "Reports";
   static const String settingsTitle = "Settings";
-  static const String homeWelcome = "Welcome to VyapApp";
+  static const String homeWelcome = "Welcome to Thuka";
   static const String homeSubtitle =
       "Track sales, bills, and daily business at a glance.";
   static const String newBillPlaceholder =

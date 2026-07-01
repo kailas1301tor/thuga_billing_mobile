@@ -22,10 +22,11 @@ class NewBillScreen extends ConsumerWidget {
     final notifier = ref.read(newBillNotifierProvider.notifier);
 
     // Compute total amount in cart
-    final totalAmount = state.cart.fold<double>(
+    final subtotal = state.cart.fold<double>(
       0,
-      (sum, item) => sum + item.lineTotal,
+      (sum, item) => sum + item.totalPrice,
     );
+    final totalAmount = (subtotal - state.discountAmount).clamp(0.0, double.infinity);
 
     return CommonScaffold(
       backgroundColor: colors.background,

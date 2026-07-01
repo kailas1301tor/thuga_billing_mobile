@@ -45,8 +45,6 @@ class _ProductRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
-    final accentColor = Color(product.progressColor);
-    final icon = _iconFor(product.iconType);
 
     return CommonContainer(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
@@ -56,26 +54,13 @@ class _ProductRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Container(
+          CommonCachedNetworkImage(
+            imageUrl: product.imageUrl ?? "",
             width: 48.r,
             height: 48.r,
-            decoration: BoxDecoration(
-              color: accentColor.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: (product.imageUrl != null && product.imageUrl!.isNotEmpty)
-                ? CommonCachedNetworkImage(
-                    imageUrl: product.imageUrl!,
-                    width: 48.r,
-                    height: 48.r,
-                    memCacheWidth: 100,
-                    memCacheHeight: 100,
-                    fit: BoxFit.cover,
-                  )
-                : Center(
-                    child: Icon(icon, size: 22.r, color: accentColor),
-                  ),
+            memCacheWidth: 100,
+            memCacheHeight: 100,
+            fit: BoxFit.cover,
           ),
           12.horizontalSpace,
           Expanded(
@@ -111,13 +96,5 @@ class _ProductRow extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  IconData _iconFor(HomeProductIconType type) {
-    return switch (type) {
-      HomeProductIconType.tea => Icons.local_cafe_outlined,
-      HomeProductIconType.coffee => Icons.coffee_outlined,
-      HomeProductIconType.samosa => Icons.change_history_rounded,
-    };
   }
 }

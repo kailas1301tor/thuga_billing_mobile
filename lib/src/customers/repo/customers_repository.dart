@@ -40,11 +40,11 @@ class CustomersRepoImpl implements CustomersRepo {
 
   @override
   Future<Either<ResponseError, CustomerAddResponse>> updateCustomer(int id, Map<String, dynamic> body) async {
+    final updatedBody = Map<String, dynamic>.from(body)..['id'] = id;
     return await _services
         .safe(_services.putRequest(
           endPoint: AppConstants.customers,
-          queryParameters: {'id': id},
-          parameters: body,
+          parameters: updatedBody,
         ))
         .thenRight(_services.checkHttpStatus)
         .thenRight(_services.parseJson)

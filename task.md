@@ -1,0 +1,5 @@
+- [x] Remove product icon from Select Product field in `CreatePurchaseScreen`
+- [x] Implement `SingleSelectBottomSheetBody` stateful widget in `bottomsheet_content.dart`
+- [x] Add `CommonSearchBar` and dynamic filtering inside `SingleSelectBottomSheetBody`
+- [x] Update `showSingleSelectBottomSheet` to use `SingleSelectBottomSheetBody`
+- [x] Run `flutter analyze` to verify correctness

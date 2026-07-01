@@ -7,12 +7,9 @@ import 'package:vyapapp/utils/common_widgets/common_container.dart';
 import '../../model/reports_model.dart';
 
 class ReportsMetricsGrid extends StatelessWidget {
-  const ReportsMetricsGrid({
-    super.key,
-    required this.summary,
-  });
+  const ReportsMetricsGrid({super.key, this.summary});
 
-  final ReportSummaryModel summary;
+  final ReportSummaryModel? summary;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +27,7 @@ class ReportsMetricsGrid extends StatelessWidget {
         _buildMetricCard(
           context: context,
           title: 'Total Sales',
-          value: '₹${summary.totalSales.toStringAsFixed(0)}',
+          value: '₹${summary?.totalSales.toStringAsFixed(0)}',
           icon: Icons.auto_graph_rounded,
           color: colors.primary,
           bgColor: colors.primary.withValues(alpha: 0.08),
@@ -39,7 +36,7 @@ class ReportsMetricsGrid extends StatelessWidget {
         _buildMetricCard(
           context: context,
           title: 'Total Bills',
-          value: '${summary.totalBills}',
+          value: '${summary?.totalBills}',
           icon: Icons.receipt_long_rounded,
           color: colors.primaryText,
           bgColor: colors.inputBackground,
@@ -48,7 +45,7 @@ class ReportsMetricsGrid extends StatelessWidget {
         _buildMetricCard(
           context: context,
           title: 'Avg. Bill Value',
-          value: '₹${summary.avgBillValue.toStringAsFixed(0)}',
+          value: '₹${summary?.avgBillValue.toStringAsFixed(0)}',
           icon: Icons.analytics_outlined,
           color: Colors.blueAccent,
           bgColor: Colors.blueAccent.withValues(alpha: 0.08),
@@ -57,10 +54,12 @@ class ReportsMetricsGrid extends StatelessWidget {
         _buildMetricCard(
           context: context,
           title: 'Pending Bills',
-          value: '${summary.pendingBills}',
+          value: '${summary?.pendingBills}',
           icon: Icons.pending_actions_rounded,
-          color: summary.pendingBills > 0 ? colors.errorText : colors.secondaryText,
-          bgColor: summary.pendingBills > 0
+          color: (summary?.pendingBills ?? 0) > 0
+              ? colors.errorText
+              : colors.secondaryText,
+          bgColor: (summary?.pendingBills ?? 0) > 0
               ? colors.errorText.withValues(alpha: 0.08)
               : colors.inputBackground,
         ),
@@ -98,11 +97,7 @@ class ReportsMetricsGrid extends StatelessWidget {
                   color: bgColor,
                   borderRadius: BorderRadius.circular(8.r),
                 ),
-                child: Icon(
-                  icon,
-                  size: 16.r,
-                  color: color,
-                ),
+                child: Icon(icon, size: 16.r, color: color),
               ),
             ],
           ),

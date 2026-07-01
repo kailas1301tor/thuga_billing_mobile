@@ -35,7 +35,7 @@ class HomeTopProductModel {
       icon = HomeProductIconType.coffee;
     }
 
-    const colors = [0xFF22C55E, 0xFFF97316, 0xFFEAB308, 0xFF8B5CF6, 0xFFEC4899];
+    const colors = [0xFF05B064, 0xFFF97316, 0xFFEAB308, 0xFF8B5CF6, 0xFFEC4899];
     final progressColor = colors[index % colors.length];
 
     return HomeTopProductModel(

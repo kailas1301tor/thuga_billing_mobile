@@ -51,8 +51,7 @@ class CategoriesRepoImpl implements CategoriesRepo {
     return await _services
         .safe(_services.putRequest(
           endPoint: AppConstants.categories,
-          queryParameters: {'id': id},
-          parameters: {'name': name},
+          parameters: {'id': id, 'name': name},
         ))
         .thenRight(_services.checkHttpStatus)
         .thenRight(_services.parseJson)

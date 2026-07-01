@@ -127,8 +127,7 @@ class CustomerCrudScreen extends ConsumerWidget {
       isScrollControlled: true,
       title: isEditing ? Strings.editCustomer : Strings.addCustomer,
       child: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+        child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -177,8 +176,7 @@ class CustomerCrudScreen extends ConsumerWidget {
                     ]),
                     builder: (context, _) {
                       final isValid =
-                          notifier.nameController.text.trim().isNotEmpty &&
-                          notifier.phoneController.text.trim().isNotEmpty;
+                          notifier.nameController.text.trim().isNotEmpty;
 
                       return PrimaryButton(
                         text: Strings.save,

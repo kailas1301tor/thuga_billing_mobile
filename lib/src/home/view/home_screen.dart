@@ -8,7 +8,6 @@ import 'package:vyapapp/utils/common_widgets/common_switch_state.dart';
 
 import '../notifier/home_notifier.dart';
 import 'widget/home_content_widget.dart';
-import 'widget/home_shimmer_widget.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -42,7 +41,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       body: CommonSwitchState(
         loaderState: loaderState,
         reload: () => ref.read(homeNotifierProvider.notifier).fetchDashboard(),
-        loader: const HomeShimmerWidget(),
+        // loader: const HomeShimmerWidget(),
         child: CommonRefreshIndicator(
           onRefresh: () =>
               ref.read(homeNotifierProvider.notifier).fetchDashboard(),

@@ -53,6 +53,7 @@ class ProductCrudScreen extends ConsumerWidget {
         ],
       ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
             padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 8.h),
@@ -105,6 +106,7 @@ class ProductCrudScreen extends ConsumerWidget {
                 scrollDirection: Axis.horizontal,
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     ChoiceChip(
                       label: Text(
@@ -190,10 +192,13 @@ class ProductCrudScreen extends ConsumerWidget {
         itemCount: products.length,
         itemBuilder: (context, index) {
           final product = products[index];
+          final isToggling = state.togglingProductIds.contains(product.id);
           return ProductCardWidget(
             product: product,
+            isToggling: isToggling,
             onEdit: () => _showProductSheet(context, null, notifier, product),
             onDelete: () => _showDeleteDialog(context, notifier, product),
+            onToggleStatus: isToggling ? null : (value) => notifier.toggleProductStatus(product.id, value),
           );
         },
       ),
@@ -210,6 +215,8 @@ class ProductCrudScreen extends ConsumerWidget {
     if (isEditing) {
       notifier.nameController.text = product.name;
       notifier.priceController.text = product.price.toString();
+      notifier.barcodeController.text = product.barcode ?? '';
+      notifier.qtyController.text = product.quantity == 0 ? '' : (product.quantity % 1 == 0 ? product.quantity.toInt().toString() : product.quantity.toString());
       notifier.selectCategory(product.categoryId);
       notifier.initializeEdit(isQuickProduct: product.isQuickProduct);
     } else {
@@ -221,10 +228,7 @@ class ProductCrudScreen extends ConsumerWidget {
       isScrollControlled: true,
       title: isEditing ? Strings.editProduct : Strings.addProduct,
       child: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-          ),
+        child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -424,6 +428,20 @@ class ProductCrudScreen extends ConsumerWidget {
               CommonTextFormField(
                 controller: notifier.priceController,
                 hintText: Strings.price,
+                inputType: const TextInputType.numberWithOptions(decimal: true),
+                inputAction: TextInputAction.next,
+              ),
+              16.verticalSpace,
+              CommonTextFormField(
+                controller: notifier.barcodeController,
+                hintText: 'Barcode',
+                inputType: TextInputType.text,
+                inputAction: TextInputAction.next,
+              ),
+              16.verticalSpace,
+              CommonTextFormField(
+                controller: notifier.qtyController,
+                hintText: 'Quantity',
                 inputType: const TextInputType.numberWithOptions(decimal: true),
                 inputAction: TextInputAction.done,
               ),

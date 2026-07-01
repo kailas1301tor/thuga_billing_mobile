@@ -88,8 +88,6 @@ class _CommonScaffoldState extends State<CommonScaffold>
     super.dispose();
   }
 
-  bool _isNearBlack(Color color) => color.computeLuminance() < 0.05;
-
   Brightness _iconBrightness(Color bg) =>
       bg.computeLuminance() > 0.179 ? Brightness.dark : Brightness.light;
 
@@ -97,7 +95,6 @@ class _CommonScaffoldState extends State<CommonScaffold>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
 
     final resolvedBg = widget.backgroundColor ?? colorScheme.surface;
     final resolvedNavBarColor =
@@ -108,9 +105,7 @@ class _CommonScaffoldState extends State<CommonScaffold>
 
     final statusIconBrightness = widget.forceDarkIcons
         ? Brightness.dark
-        : (_isNearBlack(resolvedBg) || isDark)
-        ? Brightness.light
-        : Brightness.dark;
+        : _iconBrightness(resolvedBg);
 
     final applyTop =
         widget.useSafeArea && widget.safeAreaTop && widget.appBar == null;
@@ -126,7 +121,9 @@ class _CommonScaffoldState extends State<CommonScaffold>
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarColor: widget.statusBarColor ?? Colors.transparent,
-        statusBarBrightness: statusIconBrightness,
+        statusBarBrightness: statusIconBrightness == Brightness.light
+            ? Brightness.dark
+            : Brightness.light,
         statusBarIconBrightness: statusIconBrightness,
         systemNavigationBarColor: resolvedNavBarColor,
         systemNavigationBarIconBrightness: _iconBrightness(resolvedNavBarColor),

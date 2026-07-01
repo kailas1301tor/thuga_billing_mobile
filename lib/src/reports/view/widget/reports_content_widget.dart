@@ -13,17 +13,16 @@ import 'reports_payment_share.dart';
 import 'reports_sales_chart.dart';
 
 class ReportsContentWidget extends ConsumerWidget {
-  const ReportsContentWidget({
-    super.key,
-    required this.data,
-  });
+  const ReportsContentWidget({super.key, this.data});
 
-  final ReportsDataModel data;
+  final ReportsDataModel? data;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
-    final selectedRange = ref.watch(reportsNotifierProvider.select((s) => s.selectedRange));
+    final selectedRange = ref.watch(
+      reportsNotifierProvider.select((s) => s.selectedRange),
+    );
     final notifier = ref.read(reportsNotifierProvider.notifier);
 
     final ranges = ['Today', 'Yesterday', 'Last 7 Days', 'This Month'];
@@ -68,26 +67,29 @@ class ReportsContentWidget extends ConsumerWidget {
           16.verticalSpace,
 
           // 2. Metrics Summary Grid
-          ReportsMetricsGrid(summary: data.summary),
+          ReportsMetricsGrid(summary: data?.summary),
           16.verticalSpace,
 
           // 3. Sales Volume Custom Chart
-          ReportsSalesChart(chartData: data.chartData),
+          ReportsSalesChart(chartData: data?.chartData),
           16.verticalSpace,
 
           // 4. Payment Mode Distribution
-          ReportsPaymentShare(shares: data.paymentShares),
+          ReportsPaymentShare(shares: data?.paymentShares),
           16.verticalSpace,
 
           // 5. Top-Selling Products List
-          _buildTopProductsCard(context, data.topProducts),
+          _buildTopProductsCard(context, data?.topProducts),
           20.verticalSpace,
         ],
       ),
     );
   }
 
-  Widget _buildTopProductsCard(BuildContext context, List<ProductSaleModel> products) {
+  Widget _buildTopProductsCard(
+    BuildContext context,
+    List<ProductSaleModel> ?products,
+  ) {
     final colors = context.appColors;
 
     return CommonContainer(
@@ -101,21 +103,21 @@ class ReportsContentWidget extends ConsumerWidget {
             style: FontPalette.base700(14, color: colors.primaryText),
           ),
           16.verticalSpace,
-          if (products.isEmpty)
+          if ((products??[]).isEmpty)
             Center(
               child: Text(
                 'No product sales recorded',
-                style: FontPalette.base400(12, color: colors.secondaryText),
+                style: FontPalette.base400(13, color: colors.secondaryText),
               ),
             )
           else
             ListView.separated(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: products.length,
+              itemCount: (products??[]).length,
               separatorBuilder: (context, index) => 12.verticalSpace,
               itemBuilder: (context, index) {
-                final prod = products[index];
+                final prod = (products??[])[index];
 
                 return Row(
                   children: [
@@ -130,7 +132,7 @@ class ReportsContentWidget extends ConsumerWidget {
                       clipBehavior: Clip.antiAlias,
                       child: (prod.image != null && prod.image!.isNotEmpty)
                           ? CommonCachedNetworkImage(
-                              imageUrl: prod.image!,
+                              imageUrl: prod.image ?? "",
                               width: 36.r,
                               height: 36.r,
                               memCacheWidth: 80,
@@ -156,18 +158,27 @@ class ReportsContentWidget extends ConsumerWidget {
                             children: [
                               Text(
                                 prod.name,
-                                style: FontPalette.base600(13, color: colors.primaryText),
+                                style: FontPalette.base600(
+                                  13,
+                                  color: colors.primaryText,
+                                ),
                               ),
                               Text(
                                 '₹${prod.revenue.toStringAsFixed(0)}',
-                                style: FontPalette.base700(13, color: colors.primaryText),
+                                style: FontPalette.base700(
+                                  13,
+                                  color: colors.primaryText,
+                                ),
                               ),
                             ],
                           ),
                           4.verticalSpace,
                           Text(
                             '${prod.quantity} sold',
-                            style: FontPalette.base400(11, color: colors.secondaryText),
+                            style: FontPalette.base400(
+                              11,
+                              color: colors.secondaryText,
+                            ),
                           ),
                         ],
                       ),

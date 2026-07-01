@@ -224,4 +224,17 @@ class AuthNotifier extends _$AuthNotifier {
   void clearEmailError() {
     state = state.copyWith(emailErrorText: null);
   }
+
+  /// Log out the user, clear local Sembast DB tokens, and redirect to the login screen.
+  Future<void> logout() async {
+    state = state.copyWith(loaderState: LoaderState.loading);
+
+    // Clear local storage and tokens
+    await ref.read(tokenServiceProvider).clearTokens();
+    
+    state = state.copyWith(loaderState: LoaderState.loaded);
+    
+    // Redirect to login screen
+    navigateAndClearStack(RouteConstants.routeLoginScreen);
+  }
 }

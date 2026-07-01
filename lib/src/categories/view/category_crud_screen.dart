@@ -113,66 +113,64 @@ class CategoryCrudScreen extends ConsumerWidget {
 
     CommonBottomSheet.show(
       context: context,
+      isScrollControlled: true,
       title: isEditing ? Strings.editCategory : Strings.addCategory,
       child: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-          ),
+        child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              CommonTextFormField(
-                controller: notifier.nameController,
-                hintText: Strings.categoryName,
-                inputAction: TextInputAction.done,
-              ),
-              24.verticalSpace,
-              Consumer(
-                builder: (context, ref, _) {
-                  final loaders = ref.watch(
-                    categoriesNotifierProvider.select(
-                      (value) => Tuple2(
-                        value.saveCategoryLoader,
-                        value.updateCategoryLoader,
-                      ),
+            CommonTextFormField(
+              controller: notifier.nameController,
+              hintText: Strings.categoryName,
+              inputAction: TextInputAction.done,
+            ),
+            24.verticalSpace,
+            Consumer(
+              builder: (context, ref, _) {
+                final loaders = ref.watch(
+                  categoriesNotifierProvider.select(
+                    (value) => Tuple2(
+                      value.saveCategoryLoader,
+                      value.updateCategoryLoader,
                     ),
-                  );
-                  final isLoading = isEditing ? loaders.item2 : loaders.item1;
+                  ),
+                );
+                final isLoading = isEditing ? loaders.item2 : loaders.item1;
 
-                  return ValueListenableBuilder<TextEditingValue>(
-                    valueListenable: notifier.nameController,
-                    builder: (context, value, _) {
-                      final isValid = value.text.trim().isNotEmpty;
-                      return PrimaryButton(
-                        text: Strings.save,
-                        isLoading: isLoading,
-                        onPressed: isValid
-                            ? () async {
-                                final nav = Navigator.of(context);
-                                final success = isEditing
-                                    ? await notifier.updateCategory(
-                                        category.id,
-                                        notifier.nameController.text.trim(),
-                                      )
-                                    : await notifier.createCategory();
-                                if (success) {
-                                  nav.pop();
-                                }
+                return ValueListenableBuilder<TextEditingValue>(
+                  valueListenable: notifier.nameController,
+                  builder: (context, value, _) {
+                    final isValid = value.text.trim().isNotEmpty;
+                    return PrimaryButton(
+                      text: Strings.save,
+                      isLoading: isLoading,
+                      onPressed: isValid
+                          ? () async {
+                              final nav = Navigator.of(context);
+                              final success = isEditing
+                                  ? await notifier.updateCategory(
+                                      category.id,
+                                      notifier.nameController.text.trim(),
+                                    )
+                                  : await notifier.createCategory();
+                              if (success) {
+                                nav.pop();
                               }
-                            : null,
-                      );
-                    },
-                  );
-                },
-              ),
-              16.verticalSpace,
-            ],
-          ),
+                            }
+                          : null,
+                    );
+                  },
+                );
+              },
+            ),
+            16.verticalSpace,
+          ],
         ),
       ),
-    );
+    ),
+  );
   }
 
   void _showDeleteDialog(

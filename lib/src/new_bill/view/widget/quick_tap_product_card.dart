@@ -12,12 +12,14 @@ class QuickTapProductCard extends StatefulWidget {
     required this.product,
     required this.quantity,
     required this.onTap,
+    required this.onReduce,
     this.onLongPress,
   });
 
   final ProductModel product;
   final int quantity;
   final VoidCallback onTap;
+  final VoidCallback onReduce;
   final VoidCallback? onLongPress;
 
   @override
@@ -148,6 +150,44 @@ class _QuickTapProductCardState extends State<QuickTapProductCard>
                       '${widget.quantity}',
                       style: FontPalette.base700(
                         8,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Reduce Button with pop-in scale animation
+              Positioned(
+                top: 6.h,
+                left: 6.w,
+                child: AnimatedScale(
+                  scale: isSelected ? 1.0 : 0.0,
+                  duration: const Duration(milliseconds: 150),
+                  curve: Curves.easeOutBack,
+                  child: GestureDetector(
+                    onTap: widget.onReduce,
+                    child: Container(
+                      padding: EdgeInsets.all(4.r),
+                      constraints: BoxConstraints(
+                        minWidth: 20.r,
+                        minHeight: 20.r,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.red.shade600,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.2),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      alignment: Alignment.center,
+                      child: Icon(
+                        Icons.remove_rounded,
+                        size: 12.r,
                         color: Colors.white,
                       ),
                     ),

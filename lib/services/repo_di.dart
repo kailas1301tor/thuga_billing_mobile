@@ -11,6 +11,7 @@ import 'package:vyapapp/src/main/repo/dropdowns_repository.dart';
 import 'package:vyapapp/src/categories/repo/categories_repository.dart';
 import 'package:vyapapp/src/products/repo/products_repository.dart';
 import 'package:vyapapp/src/customers/repo/customers_repository.dart';
+import 'package:vyapapp/src/purchase/repo/purchase_repository.dart';
 
 part 'repo_di.g.dart';
 
@@ -33,7 +34,8 @@ HomeRepo homeRepository(Ref ref) {
 
 @Riverpod(keepAlive: false)
 BillsRepo billsRepository(Ref ref) {
-  return BillsRepoImpl();
+  final services = ref.watch(networkServicesProvider);
+  return BillsRepoImpl(services);
 }
 
 @Riverpod(keepAlive: false)
@@ -54,7 +56,7 @@ NewBillRepo newBillRepository(Ref ref) {
   return NewBillRepoImpl(services);
 }
 
-@Riverpod(keepAlive: true)
+@Riverpod(keepAlive: false)
 DropdownsRepo dropdownsRepository(Ref ref) {
   final services = ref.watch(networkServicesProvider);
   return DropdownsRepoImpl(services);
@@ -78,3 +80,8 @@ CustomersRepo customersRepository(Ref ref) {
   return CustomersRepoImpl(services);
 }
 
+@Riverpod(keepAlive: false)
+PurchasesRepo purchasesRepository(Ref ref) {
+  final services = ref.watch(networkServicesProvider);
+  return PurchasesRepoImpl(services);
+}

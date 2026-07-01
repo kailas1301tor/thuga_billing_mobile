@@ -6,6 +6,7 @@ import 'package:vyapapp/res/styles/font_palette.dart';
 import 'package:vyapapp/src/categories/view/category_crud_screen.dart';
 import 'package:vyapapp/src/products/view/product_crud_screen.dart';
 import 'package:vyapapp/src/customers/view/customer_crud_screen.dart';
+import 'package:vyapapp/src/purchase/view/purchases_screen.dart';
 
 class MainSidebarDrawer extends StatelessWidget {
   const MainSidebarDrawer({super.key});
@@ -32,15 +33,31 @@ class MainSidebarDrawer extends StatelessWidget {
                       color: colors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(14.r),
                     ),
-                    child: Icon(Icons.storefront_rounded, color: colors.primary, size: 24.r),
+                    child: Icon(
+                      Icons.storefront_rounded,
+                      color: colors.primary,
+                      size: 24.r,
+                    ),
                   ),
                   16.horizontalSpace,
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('VyapApp Menu', style: FontPalette.base700(16, color: colors.primaryText)),
-                        Text('Manage business inventory', style: FontPalette.base400(11, color: colors.secondaryText)),
+                        Text(
+                          'Thuka Menu',
+                          style: FontPalette.base700(
+                            16,
+                            color: colors.primaryText,
+                          ),
+                        ),
+                        Text(
+                          'Manage business inventory',
+                          style: FontPalette.base400(
+                            11,
+                            color: colors.secondaryText,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -56,7 +73,10 @@ class MainSidebarDrawer extends StatelessWidget {
               subtitle: 'Manage product divisions',
               onTap: () {
                 Navigator.pop(context);
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const CategoryCrudScreen()));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const CategoryCrudScreen()),
+                );
               },
             ),
             _buildMenuItem(
@@ -66,7 +86,10 @@ class MainSidebarDrawer extends StatelessWidget {
               subtitle: 'Stock lists & pricing',
               onTap: () {
                 Navigator.pop(context);
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const ProductCrudScreen()));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ProductCrudScreen()),
+                );
               },
             ),
             _buildMenuItem(
@@ -76,7 +99,23 @@ class MainSidebarDrawer extends StatelessWidget {
               subtitle: 'Store contacts directory',
               onTap: () {
                 Navigator.pop(context);
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const CustomerCrudScreen()));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const CustomerCrudScreen()),
+                );
+              },
+            ),
+            _buildMenuItem(
+              context: context,
+              icon: Icons.shopping_bag_rounded,
+              title: 'Purchases',
+              subtitle: 'Stock procurement & bills',
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const PurchasesScreen()),
+                );
               },
             ),
           ],
@@ -97,11 +136,23 @@ class MainSidebarDrawer extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
       child: ListTile(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.r),
+        ),
         leading: Icon(icon, color: colors.secondaryText, size: 22.r),
-        title: Text(title, style: FontPalette.base600(14, color: colors.primaryText)),
-        subtitle: Text(subtitle, style: FontPalette.base400(11, color: colors.secondaryText)),
-        trailing: Icon(Icons.chevron_right_rounded, color: colors.secondaryText, size: 20.r),
+        title: Text(
+          title,
+          style: FontPalette.base600(14, color: colors.primaryText),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: FontPalette.base400(11, color: colors.secondaryText),
+        ),
+        trailing: Icon(
+          Icons.chevron_right_rounded,
+          color: colors.secondaryText,
+          size: 20.r,
+        ),
         onTap: onTap,
         hoverColor: colors.inputBackground,
       ),

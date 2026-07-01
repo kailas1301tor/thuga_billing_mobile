@@ -21,8 +21,6 @@ mixin _$BillsState {
   BillsResponseModel? get data => throw _privateConstructorUsedError;
   String get searchQuery => throw _privateConstructorUsedError;
   String get dateRangeFilter => throw _privateConstructorUsedError;
-  String get statusFilter => throw _privateConstructorUsedError;
-  String get paymentFilter => throw _privateConstructorUsedError;
   bool get isNewestFirst => throw _privateConstructorUsedError;
   String? get errorMessage => throw _privateConstructorUsedError;
 
@@ -45,8 +43,6 @@ abstract class $BillsStateCopyWith<$Res> {
     BillsResponseModel? data,
     String searchQuery,
     String dateRangeFilter,
-    String statusFilter,
-    String paymentFilter,
     bool isNewestFirst,
     String? errorMessage,
   });
@@ -71,8 +67,6 @@ class _$BillsStateCopyWithImpl<$Res, $Val extends BillsState>
     Object? data = freezed,
     Object? searchQuery = null,
     Object? dateRangeFilter = null,
-    Object? statusFilter = null,
-    Object? paymentFilter = null,
     Object? isNewestFirst = null,
     Object? errorMessage = freezed,
   }) {
@@ -93,14 +87,6 @@ class _$BillsStateCopyWithImpl<$Res, $Val extends BillsState>
             dateRangeFilter: null == dateRangeFilter
                 ? _value.dateRangeFilter
                 : dateRangeFilter // ignore: cast_nullable_to_non_nullable
-                      as String,
-            statusFilter: null == statusFilter
-                ? _value.statusFilter
-                : statusFilter // ignore: cast_nullable_to_non_nullable
-                      as String,
-            paymentFilter: null == paymentFilter
-                ? _value.paymentFilter
-                : paymentFilter // ignore: cast_nullable_to_non_nullable
                       as String,
             isNewestFirst: null == isNewestFirst
                 ? _value.isNewestFirst
@@ -130,8 +116,6 @@ abstract class _$$BillsStateImplCopyWith<$Res>
     BillsResponseModel? data,
     String searchQuery,
     String dateRangeFilter,
-    String statusFilter,
-    String paymentFilter,
     bool isNewestFirst,
     String? errorMessage,
   });
@@ -155,8 +139,6 @@ class __$$BillsStateImplCopyWithImpl<$Res>
     Object? data = freezed,
     Object? searchQuery = null,
     Object? dateRangeFilter = null,
-    Object? statusFilter = null,
-    Object? paymentFilter = null,
     Object? isNewestFirst = null,
     Object? errorMessage = freezed,
   }) {
@@ -177,14 +159,6 @@ class __$$BillsStateImplCopyWithImpl<$Res>
         dateRangeFilter: null == dateRangeFilter
             ? _value.dateRangeFilter
             : dateRangeFilter // ignore: cast_nullable_to_non_nullable
-                  as String,
-        statusFilter: null == statusFilter
-            ? _value.statusFilter
-            : statusFilter // ignore: cast_nullable_to_non_nullable
-                  as String,
-        paymentFilter: null == paymentFilter
-            ? _value.paymentFilter
-            : paymentFilter // ignore: cast_nullable_to_non_nullable
                   as String,
         isNewestFirst: null == isNewestFirst
             ? _value.isNewestFirst
@@ -207,8 +181,6 @@ class _$BillsStateImpl implements _BillsState {
     this.data,
     this.searchQuery = '',
     this.dateRangeFilter = 'Today',
-    this.statusFilter = 'All',
-    this.paymentFilter = 'All',
     this.isNewestFirst = true,
     this.errorMessage,
   });
@@ -226,19 +198,13 @@ class _$BillsStateImpl implements _BillsState {
   final String dateRangeFilter;
   @override
   @JsonKey()
-  final String statusFilter;
-  @override
-  @JsonKey()
-  final String paymentFilter;
-  @override
-  @JsonKey()
   final bool isNewestFirst;
   @override
   final String? errorMessage;
 
   @override
   String toString() {
-    return 'BillsState(loaderState: $loaderState, data: $data, searchQuery: $searchQuery, dateRangeFilter: $dateRangeFilter, statusFilter: $statusFilter, paymentFilter: $paymentFilter, isNewestFirst: $isNewestFirst, errorMessage: $errorMessage)';
+    return 'BillsState(loaderState: $loaderState, data: $data, searchQuery: $searchQuery, dateRangeFilter: $dateRangeFilter, isNewestFirst: $isNewestFirst, errorMessage: $errorMessage)';
   }
 
   @override
@@ -253,10 +219,6 @@ class _$BillsStateImpl implements _BillsState {
                 other.searchQuery == searchQuery) &&
             (identical(other.dateRangeFilter, dateRangeFilter) ||
                 other.dateRangeFilter == dateRangeFilter) &&
-            (identical(other.statusFilter, statusFilter) ||
-                other.statusFilter == statusFilter) &&
-            (identical(other.paymentFilter, paymentFilter) ||
-                other.paymentFilter == paymentFilter) &&
             (identical(other.isNewestFirst, isNewestFirst) ||
                 other.isNewestFirst == isNewestFirst) &&
             (identical(other.errorMessage, errorMessage) ||
@@ -270,8 +232,6 @@ class _$BillsStateImpl implements _BillsState {
     data,
     searchQuery,
     dateRangeFilter,
-    statusFilter,
-    paymentFilter,
     isNewestFirst,
     errorMessage,
   );
@@ -291,8 +251,6 @@ abstract class _BillsState implements BillsState {
     final BillsResponseModel? data,
     final String searchQuery,
     final String dateRangeFilter,
-    final String statusFilter,
-    final String paymentFilter,
     final bool isNewestFirst,
     final String? errorMessage,
   }) = _$BillsStateImpl;
@@ -305,10 +263,6 @@ abstract class _BillsState implements BillsState {
   String get searchQuery;
   @override
   String get dateRangeFilter;
-  @override
-  String get statusFilter;
-  @override
-  String get paymentFilter;
   @override
   bool get isNewestFirst;
   @override

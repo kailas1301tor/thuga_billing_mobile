@@ -5,6 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:vyapapp/res/enums/enums.dart';
 import 'package:vyapapp/services/repo_di.dart';
 import 'package:vyapapp/utils/helpers/api_error_handler.dart';
+import 'package:vyapapp/src/main/model/dropdown_model.dart';
 import '../model/bill_model.dart';
 import '../repo/bills_repository.dart';
 import '../state/bills_state.dart';
@@ -42,7 +43,7 @@ class BillsNotifier extends _$BillsNotifier {
     state = state.copyWith(loaderState: LoaderState.loading);
 
     return await _billsRepo
-        .getBills()
+        .getBills(dateFilter: state.dateRangeFilter)
         .fold(
           (left) {
             final loader = handleResponseError(left.key);
@@ -54,10 +55,17 @@ class BillsNotifier extends _$BillsNotifier {
           },
           (right) {
             debugPrint("🟢 API SUCCESS: bills fetched");
-            state = state.copyWith(
-              loaderState: LoaderState.loaded,
-              data: right,
-            );
+            if (right.results.data.isEmpty) {
+              state = state.copyWith(
+                loaderState: LoaderState.noData,
+                data: right,
+              );
+            } else {
+              state = state.copyWith(
+                loaderState: LoaderState.loaded,
+                data: right,
+              );
+            }
           },
         )
         .catchError((Object e) {
@@ -71,14 +79,7 @@ class BillsNotifier extends _$BillsNotifier {
 
   void setDateRangeFilter(String value) {
     state = state.copyWith(dateRangeFilter: value);
-  }
-
-  void setStatusFilter(String value) {
-    state = state.copyWith(statusFilter: value);
-  }
-
-  void setPaymentFilter(String value) {
-    state = state.copyWith(paymentFilter: value);
+    fetchBills();
   }
 
   void toggleSort() {
@@ -87,94 +88,44 @@ class BillsNotifier extends _$BillsNotifier {
 
   void clearFilters() {
     searchController.clear();
-    state = state.copyWith(
-      searchQuery: '',
-      dateRangeFilter: 'All Time', // Reset to show all, or 'Today' as default
-      statusFilter: 'All',
-      paymentFilter: 'All',
-    );
+    state = state.copyWith(searchQuery: '', dateRangeFilter: 'Today');
+    fetchBills();
   }
 
   /// Computed method to get filtered bills list based on state filters.
-  List<BillModel> getFilteredBills() {
+  List<BillModel> getFilteredBills(List<DropdownCustomerModel> customers) {
     if (state.data == null) return [];
 
-    final now = DateTime.now();
-    final todayStart = DateTime(now.year, now.month, now.day);
-    final yesterdayStart = todayStart.subtract(const Duration(days: 1));
-    final sevenDaysAgo = todayStart.subtract(const Duration(days: 7));
-
-    var list = List<BillModel>.from(state.data!.bills);
-
-    // Date filtering
-    if (state.dateRangeFilter == 'Today') {
-      list = list.where((b) {
-        final bDate = DateTime(b.date.year, b.date.month, b.date.day);
-        return bDate.isAtSameMomentAs(todayStart);
-      }).toList();
-    } else if (state.dateRangeFilter == 'Yesterday') {
-      list = list.where((b) {
-        final bDate = DateTime(b.date.year, b.date.month, b.date.day);
-        return bDate.isAtSameMomentAs(yesterdayStart);
-      }).toList();
-    } else if (state.dateRangeFilter == 'This Week') {
-      list = list.where((b) {
-        final bDate = DateTime(b.date.year, b.date.month, b.date.day);
-        return bDate.isAfter(sevenDaysAgo) || bDate.isAtSameMomentAs(sevenDaysAgo);
-      }).toList();
-    }
-
-    // Status filtering
-    if (state.statusFilter == 'Paid') {
-      list = list.where((b) => b.isPaid).toList();
-    } else if (state.statusFilter == 'Pending') {
-      list = list.where((b) => !b.isPaid).toList();
-    }
-
-    // Payment filtering
-    if (state.paymentFilter != 'All') {
-      list = list.where((b) =>
-          b.paymentMethod.toLowerCase() == state.paymentFilter.toLowerCase()).toList();
-    }
+    var list = List<BillModel>.from(state.data!.results.data);
 
     // Search query
     if (state.searchQuery.isNotEmpty) {
       final query = state.searchQuery.toLowerCase();
       list = list.where((b) {
-        return b.billNumber.toLowerCase().contains(query) ||
-            b.customerLabel.toLowerCase().contains(query) ||
-            b.amount.toString().contains(query);
+        final customerName = b.customerId != null
+            ? customers
+                  .firstWhere(
+                    (c) => c.id == b.customerId,
+                    orElse: () =>
+                        DropdownCustomerModel(id: b.customerId!, name: ''),
+                  )
+                  .name
+                  .toLowerCase()
+            : 'walk-in customer';
+
+        return b.orderNumber.toLowerCase().contains(query) ||
+            customerName.contains(query) ||
+            b.totalAmount.toString().contains(query);
       }).toList();
     }
 
     // Sorting
     if (state.isNewestFirst) {
-      list.sort((a, b) => b.date.compareTo(a.date));
+      list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     } else {
-      list.sort((a, b) => a.date.compareTo(b.date));
+      list.sort((a, b) => a.createdAt.compareTo(b.createdAt));
     }
 
     return list;
-  }
-
-  /// Computed method to get recalculated stats based on filtered bills.
-  BillsSummaryModel getFilteredSummary(List<BillModel> filteredBills) {
-    double totalSales = 0.0;
-    int pendingBills = 0;
-    for (final bill in filteredBills) {
-      if (bill.isPaid) {
-        totalSales += bill.amount;
-      } else {
-        pendingBills++;
-      }
-    }
-    double avgValue =
-        filteredBills.isNotEmpty ? (totalSales / filteredBills.length) : 0.0;
-    return BillsSummaryModel(
-      totalBills: filteredBills.length,
-      totalSales: totalSales,
-      avgBillValue: avgValue,
-      pendingBills: pendingBills,
-    );
   }
 }

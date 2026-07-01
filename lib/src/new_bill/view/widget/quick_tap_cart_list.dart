@@ -13,12 +13,14 @@ class QuickTapCartList extends StatelessWidget {
     required this.onIncrementQty,
     required this.onDecrementQty,
     required this.onRemoveCartItem,
+    required this.onTapDiscount,
   });
 
   final List<CartItemModel> cartItems;
   final ValueChanged<CartItemModel> onIncrementQty;
   final ValueChanged<CartItemModel> onDecrementQty;
   final ValueChanged<CartItemModel> onRemoveCartItem;
+  final ValueChanged<CartItemModel> onTapDiscount;
 
   @override
   Widget build(BuildContext context) {
@@ -62,106 +64,154 @@ class QuickTapCartList extends StatelessWidget {
           onDismissed: (_) {
             onRemoveCartItem(item);
           },
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 12.h), // Increased padding for bulkier/larger rows
-            child: Row(
-              children: [
-                // Image or Emoji prefix
-                Container(
-                  width: 36.r,
-                  height: 36.r,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8.r),
-                    color: colors.inputBackground,
+          child: GestureDetector(
+            onTap: () => onTapDiscount(item),
+            behavior: HitTestBehavior.opaque,
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 12.h),
+              child: Row(
+                children: [
+                  // Image or Emoji prefix
+                  Container(
+                    width: 36.r,
+                    height: 36.r,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8.r),
+                      color: colors.inputBackground,
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: (item.imageUrl != null && item.imageUrl!.isNotEmpty)
+                        ? CommonCachedNetworkImage(
+                            imageUrl: item.imageUrl!,
+                            width: 36.r,
+                            height: 36.r,
+                            memCacheWidth: 80,
+                            memCacheHeight: 80,
+                            fit: BoxFit.cover,
+                          )
+                        : Center(
+                            child: Text(
+                              item.emoji,
+                              style: TextStyle(fontSize: 18.sp),
+                            ),
+                          ),
                   ),
-                  clipBehavior: Clip.antiAlias,
-                  child: (item.imageUrl != null && item.imageUrl!.isNotEmpty)
-                      ? CommonCachedNetworkImage(
-                          imageUrl: item.imageUrl!,
-                          width: 36.r,
-                          height: 36.r,
-                          memCacheWidth: 80,
-                          memCacheHeight: 80,
-                          fit: BoxFit.cover,
-                        )
-                      : Center(
+                  12.horizontalSpace,
+
+                  // Name + Discount Badge
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item.name,
+                          style: FontPalette.base700(14, color: colors.primaryText),
+                        ),
+                        if (item.hasDiscount) ...[
+                          4.verticalSpace,
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 6.w,
+                              vertical: 2.h,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.green.shade50,
+                              borderRadius: BorderRadius.circular(4.r),
+                            ),
+                            child: Text(
+                              '${item.discountLabel} · Save ₹${item.discountAmount.toStringAsFixed(0)}',
+                              style: FontPalette.base600(
+                                10,
+                                color: Colors.green.shade700,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+
+                  // Qty Multiplier Label (e.g. x3)
+                  Text(
+                    'x${item.quantity}',
+                    style: FontPalette.base500(13, color: colors.secondaryText),
+                  ),
+                  16.horizontalSpace,
+
+                  // Large, easy-to-tap quantity selector
+                  Container(
+                    height: 30.h,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: colors.inputBorder.withValues(alpha: 0.8), width: 1.w),
+                      borderRadius: BorderRadius.circular(100.r),
+                      color: colors.inputBackground,
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 4.w),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        GestureDetector(
+                          onTap: () => onDecrementQty(item),
+                          behavior: HitTestBehavior.opaque,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 4.h),
+                            child: Icon(
+                              Icons.remove_rounded,
+                              size: 15.r,
+                              color: colors.secondaryText,
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 8.w),
                           child: Text(
-                            item.emoji,
-                            style: TextStyle(fontSize: 18.sp),
+                            '${item.quantity}',
+                            style: FontPalette.base700(13, color: colors.primaryText),
                           ),
                         ),
-                ),
-                12.horizontalSpace,
-
-                // Name
-                Expanded(
-                  child: Text(
-                    item.name,
-                    style: FontPalette.base700(14, color: colors.primaryText), // Increased from 13.sp base600
+                        GestureDetector(
+                          onTap: () => onIncrementQty(item),
+                          behavior: HitTestBehavior.opaque,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 4.h),
+                            child: Icon(
+                              Icons.add_rounded,
+                              size: 15.r,
+                              color: colors.primary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
+                  16.horizontalSpace,
 
-                // Qty Multiplier Label (e.g. x3)
-                Text(
-                  'x${item.quantity}',
-                  style: FontPalette.base500(13, color: colors.secondaryText), // Increased from 11.sp
-                ),
-                16.horizontalSpace,
-
-                // Large, easy-to-tap quantity selector
-                Container(
-                  height: 30.h, // Explicit height for easier tap targets
-                  decoration: BoxDecoration(
-                    border: Border.all(color: colors.inputBorder.withValues(alpha: 0.8), width: 1.w),
-                    borderRadius: BorderRadius.circular(100.r),
-                    color: colors.inputBackground,
-                  ),
-                  padding: EdgeInsets.symmetric(horizontal: 4.w),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
+                  // Line Total (shows discounted price if applicable)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      GestureDetector(
-                        onTap: () => onDecrementQty(item),
-                        behavior: HitTestBehavior.opaque,
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 4.h),
-                          child: Icon(
-                            Icons.remove_rounded,
-                            size: 15.r, // Increased from 13.r
+                      if (item.hasDiscount) ...[
+                        Text(
+                          '₹${item.lineTotal.toStringAsFixed(0)}',
+                          style: FontPalette.base400(
+                            11,
                             color: colors.secondaryText,
-                          ),
+                          ).copyWith(decoration: TextDecoration.lineThrough),
                         ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8.w),
-                        child: Text(
-                          '${item.quantity}',
-                          style: FontPalette.base700(13, color: colors.primaryText), // Increased from 11.sp
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () => onIncrementQty(item),
-                        behavior: HitTestBehavior.opaque,
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 4.h),
-                          child: Icon(
-                            Icons.add_rounded,
-                            size: 15.r, // Increased from 13.r
-                            color: colors.primary,
-                          ),
+                      ],
+                      Text(
+                        '₹${item.totalPrice.toStringAsFixed(0)}',
+                        style: FontPalette.base700(
+                          15,
+                          color: item.hasDiscount
+                              ? Colors.green.shade700
+                              : colors.primaryText,
                         ),
                       ),
                     ],
                   ),
-                ),
-                16.horizontalSpace,
-
-                // Line Total
-                Text(
-                  '₹${item.lineTotal.toStringAsFixed(0)}',
-                  style: FontPalette.base700(15, color: colors.primaryText), // Increased from 13.sp
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );

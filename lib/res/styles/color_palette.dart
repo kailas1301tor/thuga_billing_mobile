@@ -1,28 +1,28 @@
 import 'package:flutter/material.dart';
 
 class ColorPalette {
-  // VyapApp POS brand — Green primary
-  static const primaryColor = Color(0xFF22C55E);
-  static const primaryColorDark = Color(0xFF16A34A);
-  static const accentIndigo = Color(0xFF22C55E);
-  static const secondaryColor = Color(0xFF059669);
+  // VyapApp POS brand — Emerald Mint primary
+  static const primaryColor = Color(0xFF05B064);
+  static const primaryColorDark = Color(0xFF039151);
+  static const accentIndigo = Color(0xFF05B064);
+  static const secondaryColor = Color(0xFF047844);
   static const navInactive = Color(0xFF9CA3AF);
   static const navBorder = Color(0xFFE5E7EB);
 
   // Home dashboard tints
-  static const homeStatGreenBg = Color(0xFFECFDF5);
+  static const homeStatGreenBg = Color(0xFFE6F7ED);
   static const homeStatOrangeBg = Color(0xFFFFF7ED);
   static const homeStatPurpleBg = Color(0xFFF3E8FF);
-  static const homeActionGreenBg = Color(0xFFECFDF5);
+  static const homeActionGreenBg = Color(0xFFE6F7ED);
   static const homeActionBlueBg = Color(0xFFEFF6FF);
   static const homeActionPurpleBg = Color(0xFFF5F3FF);
   static const homeOrangeAccent = Color(0xFFF97316);
   static const homePurpleAccent = Color(0xFF9333EA);
   static const homeBlueAccent = Color(0xFF3B82F6);
   static const homeYellowAccent = Color(0xFFEAB308);
-  static const homePaidBadgeBg = Color(0xFFECFDF5);
-  static const homePaidBadgeBorder = Color(0xFF22C55E);
-  static const homeOpenPillBg = Color(0xFFECFDF5);
+  static const homePaidBadgeBg = Color(0xFFE6F7ED);
+  static const homePaidBadgeBorder = Color(0xFF05B064);
+  static const homeOpenPillBg = Color(0xFFE6F7ED);
 
   static const formValidationErrorColor = Color(0xFFFF453A);
   static const successColor = Color(0xFF34C759);
@@ -192,7 +192,7 @@ class AppColors extends ThemeExtension<AppColors> {
     primaryText: Color(0xFF111827),
     secondaryText: Color(0xFF6B7280),
     background: Color(0xFFFFFFFF),
-    authBackground: Color(0xFFF0FDF4),
+    authBackground: Color(0xFFE6F7ED),
     surface: ColorPalette.white,
     errorText: ColorPalette.formValidationErrorColor,
     inputBorder: Color(0xFFE5E7EB),

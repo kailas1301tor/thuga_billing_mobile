@@ -14,11 +14,15 @@ class ProductCardWidget extends StatelessWidget {
     required this.product,
     required this.onEdit,
     required this.onDelete,
+    this.onToggleStatus,
+    this.isToggling = false,
   });
 
   final ProductCrudModel product;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
+  final ValueChanged<bool>? onToggleStatus;
+  final bool isToggling;
 
   @override
   Widget build(BuildContext context) {
@@ -99,22 +103,48 @@ class ProductCardWidget extends StatelessWidget {
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CommonNavBarButton(
-                icon: Icon(
-                  Icons.edit_rounded,
-                  size: 18.r,
-                  color: colors.primary,
-                ),
-                onTap: onEdit,
+              SizedBox(
+                height: 36.h,
+                child: isToggling
+                    ? Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8.h),
+                        child: SizedBox(
+                          width: 20.r,
+                          height: 20.r,
+                          child: CircularProgressIndicator.adaptive(
+                            strokeWidth: 2.w,
+                            valueColor: AlwaysStoppedAnimation<Color>(colors.primary),
+                          ),
+                        ),
+                      )
+                    : Switch.adaptive(
+                        value: product.isActive,
+                        activeTrackColor: colors.primary,
+                        onChanged: onToggleStatus,
+                      ),
               ),
-              8.verticalSpace,
-              CommonNavBarButton(
-                icon: Icon(
-                  Icons.delete_rounded,
-                  size: 18.r,
-                  color: colors.errorText,
-                ),
-                onTap: onDelete,
+              4.verticalSpace,
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CommonNavBarButton(
+                    icon: Icon(
+                      Icons.edit_rounded,
+                      size: 18.r,
+                      color: colors.primary,
+                    ),
+                    onTap: onEdit,
+                  ),
+                  8.horizontalSpace,
+                  CommonNavBarButton(
+                    icon: Icon(
+                      Icons.delete_rounded,
+                      size: 18.r,
+                      color: colors.errorText,
+                    ),
+                    onTap: onDelete,
+                  ),
+                ],
               ),
             ],
           ),

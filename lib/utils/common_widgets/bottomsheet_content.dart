@@ -8,6 +8,7 @@ import '../../res/styles/color_palette.dart';
 import '../../res/styles/font_palette.dart';
 
 import 'primary_button.dart';
+import 'common_search_bar.dart';
 
 class BottomSheetContent extends StatelessWidget {
   final Widget child;
@@ -69,132 +70,201 @@ void showSingleSelectBottomSheet<T>({
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
-    builder:
-        (_) => BottomSheetContent(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              BottomSheetHeader(
-                title: title,
-                onClose: () => Navigator.pop(context),
-              ),
-              20.verticalSpace,
-              SafeArea(
-                child:
-                    loaderState == LoaderState.loading
-                        ? Column(
-                          children: List.generate(
-                            3, // Show 3 placeholder items
-                            (index) => Padding(
-                              padding: EdgeInsets.symmetric(vertical: 8.h),
-                              child: Row(
-                                children: [
-                                  Flexible(
-                                    flex: 4,
-                                    child:
-                                        Container(
-                                          height: 25.h,
-                                          width: double.infinity,
-                                          color: ColorPalette.white,
-                                        ).showGradientShimmer(),
-                                  ),
-                                  Spacer(),
-                                  Container(
-                                    margin: EdgeInsets.all(4.h),
-                                    height: 13.h,
-                                    width: 13.h,
-                                    decoration: const BoxDecoration(
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ).showGradientShimmer(),
-                                ],
-                              ),
-                            ),
-                          ),
-                        )
-                        : height != null
-                        ? // Fixed height with internal scrolling
-                        SizedBox(
-                          height: height,
-                          child: SingleChildScrollView(
-                            child: SingleSelectOptionsList<T>(
-                              options: options,
-                              selectedOptionNotifier: ValueNotifier<T?>(
-                                currentValue,
-                              ),
-                              onOptionSelected: (option) {
-                                if (option == currentValue) {
-                                  Navigator.pop(context);
-                                  return;
-                                }
-                                Future.delayed(
-                                  const Duration(milliseconds: 100),
-                                  () {
-                                    onSelected(option);
-                                    if (context.mounted) {
-                                      Navigator.pop(context);
-                                    }
-                                  },
-                                );
-                              },
-                              displayText: displayText,
-                            ),
-                          ),
-                        )
-                        : // Dynamic height based on content
-                        options.length >
-                            8 // If more than 8 items, make it scrollable
-                        ? SingleChildScrollView(
-                          child: SingleSelectOptionsList<T>(
-                            options: options,
-                            selectedOptionNotifier: ValueNotifier<T?>(
-                              currentValue,
-                            ),
-                            onOptionSelected: (option) {
-                              if (option == currentValue) {
-                                Navigator.pop(context);
-                                return;
-                              }
-                              Future.delayed(
-                                const Duration(milliseconds: 100),
-                                () {
-                                  onSelected(option);
-                                  if (context.mounted) {
-                                    Navigator.pop(context);
-                                  }
-                                },
-                              );
-                            },
-                            displayText: displayText,
-                          ),
-                        )
-                        : SingleSelectOptionsList<T>(
-                          options: options,
-                          selectedOptionNotifier: ValueNotifier<T?>(
-                            currentValue,
-                          ),
-                          onOptionSelected: (option) {
-                            if (option == currentValue) {
-                              Navigator.pop(context);
-                              return;
-                            }
-                            Future.delayed(
-                              const Duration(milliseconds: 100),
-                              () {
-                                onSelected(option);
-                                if (context.mounted) {
-                                  Navigator.pop(context);
-                                }
-                              },
-                            );
-                          },
-                          displayText: displayText,
-                        ),
-              ),
-            ],
-          ),
-        ),
+    builder: (_) => SingleSelectBottomSheetBody<T>(
+      title: title,
+      options: options,
+      currentValue: currentValue,
+      onSelected: onSelected,
+      displayText: displayText,
+      loaderState: loaderState,
+      height: height,
+    ),
   );
+}
+
+class SingleSelectBottomSheetBody<T> extends StatefulWidget {
+  final String title;
+  final List<T> options;
+  final T? currentValue;
+  final Function(T) onSelected;
+  final String Function(T) displayText;
+  final LoaderState loaderState;
+  final double? height;
+
+  const SingleSelectBottomSheetBody({
+    super.key,
+    required this.title,
+    required this.options,
+    required this.currentValue,
+    required this.onSelected,
+    required this.displayText,
+    required this.loaderState,
+    this.height,
+  });
+
+  @override
+  State<SingleSelectBottomSheetBody<T>> createState() =>
+      _SingleSelectBottomSheetBodyState<T>();
+}
+
+class _SingleSelectBottomSheetBodyState<T>
+    extends State<SingleSelectBottomSheetBody<T>> {
+  late final TextEditingController _searchController;
+  String _searchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final filteredOptions = widget.options.where((option) {
+      final text = widget.displayText(option).toLowerCase();
+      return text.contains(_searchQuery.toLowerCase());
+    }).toList();
+
+    return BottomSheetContent(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          BottomSheetHeader(
+            title: widget.title,
+            onClose: () => Navigator.pop(context),
+          ),
+          16.verticalSpace,
+          // Search bar
+          CommonSearchBar(
+            controller: _searchController,
+            hintText: 'Search...',
+
+            onChanged: (val) {
+              setState(() {
+                _searchQuery = val;
+              });
+            },
+            onClear: () {
+              setState(() {
+                _searchQuery = '';
+              });
+            },
+          ),
+          16.verticalSpace,
+          SafeArea(
+            child: widget.loaderState == LoaderState.loading
+                ? Column(
+                    children: List.generate(
+                      3, // Show 3 placeholder items
+                      (index) => Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8.h),
+                        child: Row(
+                          children: [
+                            Flexible(
+                              flex: 4,
+                              child: Container(
+                                height: 25.h,
+                                width: double.infinity,
+                                color: ColorPalette.white,
+                              ).showGradientShimmer(),
+                            ),
+                            const Spacer(),
+                            Container(
+                              margin: EdgeInsets.all(4.h),
+                              height: 13.h,
+                              width: 13.h,
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                              ),
+                            ).showGradientShimmer(),
+                          ],
+                        ),
+                      ),
+                    ),
+                  )
+                : widget.options.isEmpty
+                ? Center(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 32.h),
+                      child: Text(
+                        'No data found',
+                        style: FontPalette.base500(14, color: colors.secondaryText),
+                      ),
+                    ),
+                  )
+                : filteredOptions.isEmpty
+                ? Center(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 32.h),
+                      child: Text(
+                        'No results found',
+                        style: FontPalette.base500(14, color: colors.secondaryText),
+                      ),
+                    ),
+                  )
+                : widget.height != null
+                ? SizedBox(
+                    height: widget.height,
+                    child: SingleChildScrollView(
+                      child: SingleSelectOptionsList<T>(
+                        options: filteredOptions,
+                        selectedOptionNotifier: ValueNotifier<T?>(
+                          widget.currentValue,
+                        ),
+                        onOptionSelected: (option) {
+                          if (option == widget.currentValue) {
+                            Navigator.pop(context);
+                            return;
+                          }
+                          Future.delayed(const Duration(milliseconds: 100), () {
+                            widget.onSelected(option);
+                            if (context.mounted) {
+                              Navigator.pop(context);
+                            }
+                          });
+                        },
+                        displayText: widget.displayText,
+                      ),
+                    ),
+                  )
+                : ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: MediaQuery.of(context).size.height * 0.6,
+                    ),
+                    child: SingleChildScrollView(
+                      child: SingleSelectOptionsList<T>(
+                        options: filteredOptions,
+                        selectedOptionNotifier: ValueNotifier<T?>(
+                          widget.currentValue,
+                        ),
+                        onOptionSelected: (option) {
+                          if (option == widget.currentValue) {
+                            Navigator.pop(context);
+                            return;
+                          }
+                          Future.delayed(const Duration(milliseconds: 100), () {
+                            widget.onSelected(option);
+                            if (context.mounted) {
+                              Navigator.pop(context);
+                            }
+                          });
+                        },
+                        displayText: widget.displayText,
+                      ),
+                    ),
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 // Generic Single Select Options List
@@ -218,74 +288,71 @@ class SingleSelectOptionsList<T> extends StatelessWidget {
       valueListenable: selectedOptionNotifier,
       builder: (context, selectedOption, child) {
         return Column(
-          children:
-              options.map((option) {
-                final isSelected = selectedOption == option;
-                return Column(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        if (selectedOption == option) {
-                          Navigator.pop(context);
-                          return;
-                        }
+          children: options.map((option) {
+            final isSelected = selectedOption == option;
+            return Column(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    if (selectedOption == option) {
+                      Navigator.pop(context);
+                      return;
+                    }
 
-                        selectedOptionNotifier.value = option;
-                        onOptionSelected(option);
-                      },
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                        padding: EdgeInsets.symmetric(vertical: 16.h),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8.r),
-                          color: ColorPalette.transparent,
-                        ),
-                        child: Row(
-                          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              displayText(option),
-                              style: FontPalette.fBlack_16_500,
-                            ),
-                            Spacer(),
-                            AnimatedContainer(
-                              duration: const Duration(milliseconds: 300),
-                              width: 21.w,
-                              height: 21.h,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color:
-                                      isSelected
-                                          ? ColorPalette.secondaryColor
-                                          : const Color(0xFFD1D1D1),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Container(
-                                margin: EdgeInsets.all(4.h),
-                                height: 13.h,
-                                width: 13.h,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color:
-                                      isSelected
-                                          ? ColorPalette.secondaryColor
-                                          : Colors.transparent,
-                                ),
-                              ),
-                            ),
-                            5.horizontalSpace,
-                          ],
-                        ),
-                      ),
+                    selectedOptionNotifier.value = option;
+                    onOptionSelected(option);
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                    padding: EdgeInsets.symmetric(vertical: 16.h),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8.r),
+                      color: ColorPalette.transparent,
                     ),
-                    if (option != options.last)
-                      const Divider(color: ColorPalette.fF1F1F1, height: 1),
-                  ],
-                );
-              }).toList(),
+                    child: Row(
+                      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          displayText(option),
+                          style: FontPalette.fBlack_16_500,
+                        ),
+                        Spacer(),
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          width: 21.w,
+                          height: 21.h,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isSelected
+                                  ? ColorPalette.secondaryColor
+                                  : const Color(0xFFD1D1D1),
+                              width: 1,
+                            ),
+                          ),
+                          child: Container(
+                            margin: EdgeInsets.all(4.h),
+                            height: 13.h,
+                            width: 13.h,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: isSelected
+                                  ? ColorPalette.secondaryColor
+                                  : Colors.transparent,
+                            ),
+                          ),
+                        ),
+                        5.horizontalSpace,
+                      ],
+                    ),
+                  ),
+                ),
+                if (option != options.last)
+                  const Divider(color: ColorPalette.fF1F1F1, height: 1),
+              ],
+            );
+          }).toList(),
         );
       },
     );
@@ -310,41 +377,40 @@ void showMultiSelectBottomSheet<T>({
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
-    builder:
-        (_) => BottomSheetContent(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              BottomSheetHeader(
-                title: title,
-                onClose: () => Navigator.pop(context),
-              ),
-              20.verticalSpace,
-              MultiSelectOptionsList<T>(
-                options: options,
-                selectedOptionsNotifier: selectedOptionsNotifier,
-                onOptionSelected: (option) {
-                  Future.delayed(const Duration(milliseconds: 400), () {
-                    onSelected?.call(option);
-                  });
-                },
-                displayText: displayText,
-              ),
-              20.verticalSpace,
-              SafeArea(
-                child: PrimaryButton(
-                  onPressed: () {
-                    onValuesChanged(selectedOptionsNotifier.value);
-                    Navigator.pop(context);
-                  },
-                  text: "Save",
-                  backgroundColor: ColorPalette.secondaryColor,
-                  fontStyle: FontPalette.fWhite_16_600,
-                ),
-              ),
-            ],
+    builder: (_) => BottomSheetContent(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          BottomSheetHeader(
+            title: title,
+            onClose: () => Navigator.pop(context),
           ),
-        ),
+          20.verticalSpace,
+          MultiSelectOptionsList<T>(
+            options: options,
+            selectedOptionsNotifier: selectedOptionsNotifier,
+            onOptionSelected: (option) {
+              Future.delayed(const Duration(milliseconds: 400), () {
+                onSelected?.call(option);
+              });
+            },
+            displayText: displayText,
+          ),
+          20.verticalSpace,
+          SafeArea(
+            child: PrimaryButton(
+              onPressed: () {
+                onValuesChanged(selectedOptionsNotifier.value);
+                Navigator.pop(context);
+              },
+              text: "Save",
+              backgroundColor: ColorPalette.secondaryColor,
+              fontStyle: FontPalette.fWhite_16_600,
+            ),
+          ),
+        ],
+      ),
+    ),
   ).then((_) => selectedOptionsNotifier.dispose());
 }
 
@@ -399,69 +465,64 @@ class MultiSelectOptionsList<T> extends StatelessWidget {
       valueListenable: selectedOptionsNotifier,
       builder: (context, selectedOptions, child) {
         return Column(
-          children:
-              options.map((option) {
-                final isSelected = selectedOptions.contains(option);
+          children: options.map((option) {
+            final isSelected = selectedOptions.contains(option);
 
-                return Column(
-                  children: [
-                    GestureDetector(
-                      onTap: () => _toggleOption(option),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                        padding: EdgeInsets.symmetric(vertical: 16.h),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8.r),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                displayText(option),
-                                style:
-                                    isSelected
-                                        ? FontPalette.fBlack_16_600
-                                        : FontPalette.fBlack_16_500,
-                              ),
-                            ),
-                            AnimatedContainer(
-                              duration: const Duration(milliseconds: 300),
-                              width: 21.w,
-                              height: 21.h,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color:
-                                      isSelected
-                                          ? Colors.transparent
-                                          : ColorPalette.fD1D1D1,
-                                  width: 1,
-                                ),
-                                color:
-                                    isSelected
-                                        ? ColorPalette.secondaryColor
-                                        : Colors.transparent,
-                              ),
-                              child:
-                                  isSelected
-                                      ? const Icon(
-                                        Icons.check,
-                                        size: 14,
-                                        color: Colors.white,
-                                      )
-                                      : null,
-                            ),
-                          ],
-                        ),
-                      ),
+            return Column(
+              children: [
+                GestureDetector(
+                  onTap: () => _toggleOption(option),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                    padding: EdgeInsets.symmetric(vertical: 16.h),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8.r),
                     ),
-                    if (option != options.last)
-                      Divider(color: ColorPalette.fF1F1F1, height: 1),
-                  ],
-                );
-              }).toList(),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            displayText(option),
+                            style: isSelected
+                                ? FontPalette.fBlack_16_600
+                                : FontPalette.fBlack_16_500,
+                          ),
+                        ),
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          width: 21.w,
+                          height: 21.h,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isSelected
+                                  ? Colors.transparent
+                                  : ColorPalette.fD1D1D1,
+                              width: 1,
+                            ),
+                            color: isSelected
+                                ? ColorPalette.secondaryColor
+                                : Colors.transparent,
+                          ),
+                          child: isSelected
+                              ? const Icon(
+                                  Icons.check,
+                                  size: 14,
+                                  color: Colors.white,
+                                )
+                              : null,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                if (option != options.last)
+                  Divider(color: ColorPalette.fF1F1F1, height: 1),
+              ],
+            );
+          }).toList(),
         );
       },
     );
@@ -483,10 +544,7 @@ class BottomSheetHeader extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          title,
-          style: FontPalette.fBlack_18_600,
-        ),
+        Text(title, style: FontPalette.fBlack_18_600),
         GestureDetector(
           onTap: onClose,
           child: Container(

@@ -135,6 +135,7 @@ class SettingsRepoImpl implements SettingsRepo {
     required String phoneNumber,
   }) async {
     final Map<String, dynamic> params = {
+      'id': companyId,
       'email': email,
       'company_name': companyName,
       'address': address,
@@ -148,7 +149,6 @@ class SettingsRepoImpl implements SettingsRepo {
         .safe(
           _networkServices.putRequest(
             endPoint: AppConstants.companyDetails,
-            queryParameters: {'id': companyId},
             parameters: params,
           ),
         )

@@ -3,100 +3,108 @@ import 'package:vyapapp/utils/helpers/safe_converters.dart';
 
 class BillModel {
   const BillModel({
-    required this.billNumber,
-    required this.timeLabel,
-    required this.customerLabel,
-    required this.itemsCount,
-    required this.amount,
-    required this.isPaid,
+    required this.id,
+    this.customerId,
+    required this.orderNumber,
     required this.paymentMethod,
-    required this.date,
+    required this.paymentStatus,
+    required this.totalAmount,
+    required this.discountAmount,
+    required this.dateString,
+    required this.createdAt,
   });
 
-  final String billNumber;
-  final String timeLabel;
-  final String customerLabel;
-  final int itemsCount;
-  final double amount;
-  final bool isPaid;
+  final int id;
+  final int? customerId;
+  final String orderNumber;
   final String paymentMethod;
-  final DateTime date;
+  final String paymentStatus;
+  final double totalAmount;
+  final double discountAmount;
+  final String dateString;
+  final DateTime createdAt;
 
   factory BillModel.fromJson(Map<String, dynamic> json) {
     return BillModel(
-      billNumber: convertToString(json['billNumber']),
-      timeLabel: convertToString(json['timeLabel']),
-      customerLabel: convertToString(json['customerLabel']),
-      itemsCount: convertToInt(json['itemsCount']),
-      amount: convertToDouble(json['amount']),
-      isPaid: convertToBool(json['isPaid']),
-      paymentMethod: convertToString(json['paymentMethod']),
-      date: DateTime.tryParse(convertToString(json['date'])) ?? DateTime.now(),
+      id: convertToInt(json['id']),
+      customerId: json['customer'] == null ? null : convertToInt(json['customer']),
+      orderNumber: convertToString(json['order_number']),
+      paymentMethod: convertToString(json['payment_method']),
+      paymentStatus: convertToString(json['payment_status']),
+      totalAmount: convertToDouble(json['total_amount']),
+      discountAmount: convertToDouble(json['discount_amount']),
+      dateString: convertToString(json['date']),
+      createdAt: DateTime.tryParse(convertToString(json['created_at'])) ?? DateTime.now(),
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'billNumber': billNumber,
-        'timeLabel': timeLabel,
-        'customerLabel': customerLabel,
-        'itemsCount': itemsCount,
-        'amount': amount,
-        'isPaid': isPaid,
-        'paymentMethod': paymentMethod,
-        'date': date.toIso8601String(),
+        'id': id,
+        'customer': customerId,
+        'order_number': orderNumber,
+        'payment_method': paymentMethod,
+        'payment_status': paymentStatus,
+        'total_amount': totalAmount.toString(),
+        'discount_amount': discountAmount.toString(),
+        'date': dateString,
+        'created_at': createdAt.toIso8601String(),
       };
 }
 
-class BillsSummaryModel {
-  const BillsSummaryModel({
-    required this.totalBills,
-    required this.totalSales,
-    required this.avgBillValue,
-    required this.pendingBills,
+class BillsResults {
+  const BillsResults({
+    required this.totalCount,
+    required this.totalPages,
+    required this.currentPage,
+    required this.itemPerPage,
+    required this.data,
   });
 
-  final int totalBills;
-  final double totalSales;
-  final double avgBillValue;
-  final int pendingBills;
+  final int totalCount;
+  final int totalPages;
+  final int currentPage;
+  final int itemPerPage;
+  final List<BillModel> data;
 
-  factory BillsSummaryModel.fromJson(Map<String, dynamic> json) {
-    return BillsSummaryModel(
-      totalBills: convertToInt(json['totalBills']),
-      totalSales: convertToDouble(json['totalSales']),
-      avgBillValue: convertToDouble(json['avgBillValue']),
-      pendingBills: convertToInt(json['pendingBills']),
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-        'totalBills': totalBills,
-        'totalSales': totalSales,
-        'avgBillValue': avgBillValue,
-        'pendingBills': pendingBills,
-      };
-}
-
-class BillsResponseModel {
-  const BillsResponseModel({
-    required this.summary,
-    required this.bills,
-  });
-
-  final BillsSummaryModel summary;
-  final List<BillModel> bills;
-
-  factory BillsResponseModel.fromJson(Map<String, dynamic> json) {
-    return BillsResponseModel(
-      summary: BillsSummaryModel.fromJson(convertToMap(json['summary'])),
-      bills: convertToList(json['bills'])
+  factory BillsResults.fromJson(Map<String, dynamic> json) {
+    return BillsResults(
+      totalCount: convertToInt(json['total_count']),
+      totalPages: convertToInt(json['total_pages']),
+      currentPage: convertToInt(json['current_page']),
+      itemPerPage: convertToInt(json['item_per_page']),
+      data: convertToList(json['data'])
           .map((e) => BillModel.fromJson(convertToMap(e)))
           .toList(),
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'summary': summary.toJson(),
-        'bills': bills.map((b) => b.toJson()).toList(),
+        'total_count': totalCount,
+        'total_pages': totalPages,
+        'current_page': currentPage,
+        'item_per_page': itemPerPage,
+        'data': data.map((e) => e.toJson()).toList(),
+      };
+}
+
+class BillsResponseModel {
+  const BillsResponseModel({
+    required this.message,
+    required this.results,
+  });
+
+  final String message;
+  final BillsResults results;
+
+  factory BillsResponseModel.fromJson(Map<String, dynamic> json) {
+    return BillsResponseModel(
+      message: convertToString(json['message']),
+      results: BillsResults.fromJson(convertToMap(json['results'])),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'message': message,
+        'results': results.toJson(),
       };
 }

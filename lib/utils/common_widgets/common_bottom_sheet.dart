@@ -33,6 +33,7 @@ class CommonBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
     return Container(
       width: double.maxFinite,
@@ -43,7 +44,7 @@ class CommonBottomSheet extends StatelessWidget {
       child: SafeArea(
         top: false,
         child: Padding(
-          padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 12.h),
+          padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 12.h + bottomInset),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [

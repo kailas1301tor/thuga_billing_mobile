@@ -1,4 +1,6 @@
 // lib/src/new_bill/notifier/new_bill_notifier.dart
+import 'dart:async';
+
 import 'package:either_dart/either.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,6 +9,8 @@ import 'package:vyapapp/res/enums/enums.dart';
 import 'package:vyapapp/services/repo_di.dart';
 import 'package:vyapapp/utils/helpers/api_error_handler.dart';
 import 'package:vyapapp/utils/helpers/toast_helper.dart';
+import 'package:vyapapp/utils/common_widgets/common_bottom_sheet.dart';
+import 'package:vyapapp/src/new_bill/view/widget/bill_preview_sheet.dart';
 import '../../main/model/dropdown_model.dart';
 import '../model/new_bill_model.dart';
 import '../state/new_bill_state.dart';
@@ -23,7 +27,7 @@ class NewBillNotifier extends _$NewBillNotifier {
   late final TextEditingController customPriceController;
   late final TextEditingController quantityController;
   late final FocusNode searchFocusNode;
-  late final PageController productPageController;
+  Timer? _searchDebounce;
 
   @override
   NewBillState build() {
@@ -35,16 +39,11 @@ class NewBillNotifier extends _$NewBillNotifier {
     customPriceController = TextEditingController();
     quantityController = TextEditingController();
     searchFocusNode = FocusNode();
-    productPageController = PageController();
 
-    searchController.addListener(() {
-      state = state.copyWith(searchQuery: searchController.text.trim());
-      if (productPageController.hasClients) {
-        productPageController.jumpToPage(0);
-      }
-    });
+    searchController.addListener(_onSearchChanged);
 
     ref.onDispose(() {
+      _searchDebounce?.cancel();
       searchController.dispose();
       amountController.dispose();
       descriptionController.dispose();
@@ -53,53 +52,113 @@ class NewBillNotifier extends _$NewBillNotifier {
       customPriceController.dispose();
       quantityController.dispose();
       searchFocusNode.dispose();
-      productPageController.dispose();
     });
 
     Future.microtask(() => fetchProducts());
     return const NewBillState();
   }
 
-  Future<void> fetchProducts() async {
-    state = state.copyWith(loaderState: LoaderState.loading);
-    return await ref.read(newBillRepositoryProvider).getCategoriesWithProducts().fold(
+  void _onSearchChanged() {
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 400), () {
+      final query = searchController.text.trim();
+      state = state.copyWith(searchQuery: query, currentPage: 1);
+      fetchProducts(
+        search: query.isNotEmpty ? query : null,
+        categoryId: state.selectedCategoryId,
+      );
+    });
+  }
+
+  Future<void> fetchProducts({
+    String? search,
+    int? categoryId,
+    int page = 1,
+  }) async {
+    if (page == 1) {
+      state = state.copyWith(loaderState: LoaderState.loading);
+    } else {
+      state = state.copyWith(isLoadingMore: true);
+    }
+
+    return await ref.read(newBillRepositoryProvider)
+        .getCategoriesWithProducts(
+          search: search,
+          categoryId: categoryId,
+          page: page,
+          pageSize: 9,
+        )
+        .fold(
       (left) {
         state = state.copyWith(
           loaderState: handleResponseError(left.key),
+          isLoadingMore: false,
           errorMessage: left.message,
         );
       },
       (right) {
         final categories = right.results.data;
-        // Flatten products from categories
-        final allProducts = categories.expand((cat) => cat.products).toList();
 
-        // Default selection to the first category if category list is not empty
-        String defaultCategory = state.selectedCategory;
-        if (categories.isNotEmpty) {
-          defaultCategory = categories.first.name;
-        }
+        // Find the selected category's products
+        final selectedCatId = categoryId ?? state.selectedCategoryId;
+        final selectedCat = categories.firstWhere(
+          (c) => c.id == selectedCatId,
+          orElse: () => categories.first,
+        );
+        final newProducts = selectedCat.products;
+
+        // Page 1 → replace; page > 1 → append
+        final allProducts = page == 1
+            ? newProducts
+            : [...state.products, ...newProducts];
+
+        // On first load, default selection to the first category
+        final selectedName = page == 1 && state.selectedCategory.isEmpty
+            ? selectedCat.name
+            : state.selectedCategory;
 
         state = state.copyWith(
-          loaderState: LoaderState.loaded,
+          loaderState: allProducts.isEmpty
+              ? LoaderState.noData
+              : LoaderState.loaded,
+          isLoadingMore: false,
           categories: categories,
           products: allProducts,
-          selectedCategory: defaultCategory,
+          selectedCategory: selectedName,
+          currentPage: right.results.currentPage,
+          totalPages: right.results.totalPages,
         );
       },
     ).catchError((Object e) {
       debugPrint("🔴 Error fetching categories with products: $e");
-      state = state.copyWith(loaderState: LoaderState.error);
+      state = state.copyWith(
+        loaderState: LoaderState.error,
+        isLoadingMore: false,
+      );
     });
   }
 
   // ── Mode & Filter ──────────────────────────────────────────────
   void setBillingMode(int mode) => state = state.copyWith(billingMode: mode);
-  void setCategory(String cat) {
-    state = state.copyWith(selectedCategory: cat);
-    if (productPageController.hasClients) {
-      productPageController.jumpToPage(0);
-    }
+  void setCategory(String catName, int catId) {
+    state = state.copyWith(
+      selectedCategory: catName,
+      selectedCategoryId: catId,
+      currentPage: 1,
+    );
+    fetchProducts(
+      categoryId: catId,
+      search: state.searchQuery.isNotEmpty ? state.searchQuery : null,
+    );
+  }
+
+  void loadMoreProducts() {
+    if (state.isLoadingMore || state.currentPage >= state.totalPages) return;
+    fetchProducts(
+      search: state.searchQuery.isNotEmpty ? state.searchQuery : null,
+      categoryId: state.selectedCategoryId,
+      page: state.currentPage + 1,
+    );
   }
   void setPaymentMethod(String method) => state = state.copyWith(paymentMethod: method);
 
@@ -176,6 +235,46 @@ class NewBillNotifier extends _$NewBillNotifier {
 
   void clearCart() => state = state.copyWith(cart: const []);
 
+  void setDiscountAmount(double amount) {
+    state = state.copyWith(discountAmount: amount);
+  }
+
+  void updateCartItemDiscount({
+    required CartItemModel item,
+    required String discountType,
+    required double discountValue,
+    int? bogoBuyQty,
+    int? bogoGetQty,
+  }) {
+    final updated = state.cart.map((i) {
+      if (i == item) {
+        return i.copyWith(
+          discountType: discountType,
+          discountValue: discountValue,
+          bogoBuyQty: () => bogoBuyQty,
+          bogoGetQty: () => bogoGetQty,
+        );
+      }
+      return i;
+    }).toList();
+    state = state.copyWith(cart: updated);
+  }
+
+  void removeCartItemDiscount(CartItemModel item) {
+    final updated = state.cart.map((i) {
+      if (i == item) {
+        return i.copyWith(
+          discountType: 'None',
+          discountValue: 0.0,
+          bogoBuyQty: () => null,
+          bogoGetQty: () => null,
+        );
+      }
+      return i;
+    }).toList();
+    state = state.copyWith(cart: updated);
+  }
+
   // ── Amount Entry ───────────────────────────────────────────────
   void addAmountEntry() {
     final amtVal = double.tryParse(amountController.text) ?? 0.0;
@@ -231,18 +330,31 @@ class NewBillNotifier extends _$NewBillNotifier {
     HapticFeedback.mediumImpact();
     state = state.copyWith(isSavingBill: true);
 
-    final total = state.cart.fold<double>(0, (sum, item) => sum + item.lineTotal);
+    final itemDiscountTotal = state.cart.fold<double>(
+      0, (sum, item) => sum + item.discountAmount,
+    );
+    final subtotalAfterItemDiscounts = state.cart.fold<double>(
+      0, (sum, item) => sum + item.totalPrice,
+    );
+    final total = (subtotalAfterItemDiscounts - state.discountAmount)
+        .clamp(0.0, double.infinity);
+    final totalDiscount = itemDiscountTotal + state.discountAmount;
 
     final payload = {
       'customer': state.selectedCustomer?.id,
       'payment_method': state.paymentMethod,
       'total_amount': total.toStringAsFixed(2),
-      'discount_amount': '0.00',
+      'discount_amount': totalDiscount.toStringAsFixed(2),
       'items': state.cart.map((item) => {
         'product': item.productId,
         'qty': item.quantity,
         'price': item.price.toStringAsFixed(2),
-        'total_price': item.lineTotal.toStringAsFixed(2),
+        'discount_type': item.discountType,
+        'discount_value': item.discountValue.toStringAsFixed(2),
+        'discount_amount': item.discountAmount.toStringAsFixed(2),
+        'bogo_buy_qty': item.bogoBuyQty,
+        'bogo_get_qty': item.bogoGetQty,
+        'total_price': item.totalPrice.toStringAsFixed(2),
       }).toList(),
     };
 
@@ -252,15 +364,47 @@ class NewBillNotifier extends _$NewBillNotifier {
         showCustomErrorToast(message: left.message ?? 'Failed to save bill');
         state = state.copyWith(isSavingBill: false);
       },
-      (right) {
+      (right) async {
         debugPrint("🟢 API SUCCESS: ${right.message}");
         showCustomToast(message: right.message);
+
+        // Construct preview data
+        final previewOrderNumber = right.data?.orderNumber ?? 'ORD-TEMP-${state.billNumber}';
+        final previewDate = right.data?.dateString ?? DateTime.now().toString();
+        final previewSubtotal = state.cart.fold<double>(
+          0, (sum, item) => sum + item.lineTotal,
+        );
+        final previewItemDiscount = state.cart.fold<double>(
+          0, (sum, item) => sum + item.discountAmount,
+        );
+
+        // Show the professional bill preview bottom sheet
+        if (context.mounted) {
+          await CommonBottomSheet.show(
+            context: context,
+            title: 'Bill Invoice',
+            isScrollControlled: true,
+            child: BillPreviewSheet(
+              orderNumber: previewOrderNumber,
+              dateString: previewDate,
+              paymentMethod: state.paymentMethod,
+              customerName: state.selectedCustomer?.name ?? 'Walk-in Customer',
+              cartItems: state.cart,
+              subtotal: previewSubtotal,
+              itemDiscountAmount: previewItemDiscount,
+              billDiscountAmount: state.discountAmount,
+            ),
+          );
+        }
+
+        // Reset state and clear cart after the sheet closes
         state = state.copyWith(
           billNumber: state.billNumber + 1,
           cart: const [],
           selectedCustomer: null,
           isCartExpanded: false,
           isSavingBill: false,
+          discountAmount: 0.0,
         );
       },
     ).catchError((Object e) {

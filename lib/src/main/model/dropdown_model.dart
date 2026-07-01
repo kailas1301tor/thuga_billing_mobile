@@ -51,12 +51,14 @@ class DropdownsDataModel {
   final List<DropdownCustomerModel> customers;
   final List<DropdownItemModel> paymentMethods;
   final List<DropdownItemModel> paymentStatuses;
+  final List<DropdownItemModel> discountTypes;
 
   const DropdownsDataModel({
     this.products = const [],
     this.customers = const [],
     this.paymentMethods = const [],
     this.paymentStatuses = const [],
+    this.discountTypes = const [],
   });
 
   factory DropdownsDataModel.fromJson(Map<String, dynamic> json) {
@@ -71,6 +73,9 @@ class DropdownsDataModel {
           .map((e) => DropdownItemModel.fromJson(convertToMap(e)))
           .toList(),
       paymentStatuses: convertToList(json['payment_statuses'])
+          .map((e) => DropdownItemModel.fromJson(convertToMap(e)))
+          .toList(),
+      discountTypes: convertToList(json['discount_types'])
           .map((e) => DropdownItemModel.fromJson(convertToMap(e)))
           .toList(),
     );

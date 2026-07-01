@@ -28,32 +28,32 @@ class HomeGreetingRowWidget extends StatelessWidget {
             style: FontPalette.base700(18, color: colors.primaryText),
           ),
           8.verticalSpace,
-          Row(
-            children: [
-              Icon(
-                Icons.storefront_outlined,
-                size: 16.r,
-                color: colors.primary,
-              ),
-              6.horizontalSpace,
-              Flexible(
-                child: Text(
-                  shopName,
-                  style: FontPalette.base500(
-                    13,
-                    color: colors.secondaryText,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              Icon(
-                Icons.chevron_right_rounded,
-                size: 18.r,
-                color: colors.secondaryText,
-              ),
-            ],
-          ),
+          // Row(
+          //   children: [
+          //     Icon(
+          //       Icons.storefront_outlined,
+          //       size: 16.r,
+          //       color: colors.primary,
+          //     ),
+          //     6.horizontalSpace,
+          //     Flexible(
+          //       child: Text(
+          //         shopName,
+          //         style: FontPalette.base500(
+          //           13,
+          //           color: colors.secondaryText,
+          //         ),
+          //         maxLines: 1,
+          //         overflow: TextOverflow.ellipsis,
+          //       ),
+          //     ),
+          //     Icon(
+          //       Icons.chevron_right_rounded,
+          //       size: 18.r,
+          //       color: colors.secondaryText,
+          //     ),
+          //   ],
+          // ),
         ],
       ),
     );

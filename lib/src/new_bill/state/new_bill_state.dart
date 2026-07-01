@@ -12,6 +12,7 @@ sealed class NewBillState with _$NewBillState {
     @Default(LoaderState.loaded) LoaderState loaderState,
     @Default(0) int billingMode, // 0: Quick Tap, 1: Amount Entry
     @Default('') String selectedCategory,
+    @Default(0) int selectedCategoryId, // 0 = "All Categories"
     @Default('') String searchQuery,
     @Default(false) bool isSearchExpanded,
     @Default(false) bool isCartExpanded,
@@ -21,6 +22,10 @@ sealed class NewBillState with _$NewBillState {
     @Default('Cash') String paymentMethod,
     @Default(1046) int billNumber,
     @Default(false) bool isSavingBill,
+    @Default(0.0) double discountAmount,
+    @Default(1) int currentPage,
+    @Default(1) int totalPages,
+    @Default(false) bool isLoadingMore,
     DropdownCustomerModel? selectedCustomer,
     String? errorMessage,
   }) = _NewBillState;

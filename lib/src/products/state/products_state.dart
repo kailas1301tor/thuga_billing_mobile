@@ -21,5 +21,6 @@ sealed class ProductsState with _$ProductsState {
     int? filterCategoryId,
     @Default(true) bool isQuickProduct,
     String? selectedImagePath,
+    @Default([]) List<int> togglingProductIds,
   }) = _ProductsState;
 }

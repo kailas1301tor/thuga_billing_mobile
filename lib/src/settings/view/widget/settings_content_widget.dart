@@ -5,17 +5,16 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:vyapapp/res/styles/color_palette.dart';
 import 'package:vyapapp/res/styles/font_palette.dart';
 import 'package:vyapapp/res/styles/theme_provider.dart';
+import 'package:vyapapp/src/auth/notifier/auth_notifier.dart';
 import 'package:vyapapp/utils/common_widgets/common_container.dart';
+import 'package:vyapapp/utils/common_widgets/common_dialog_box.dart';
 import 'package:vyapapp/utils/common_widgets/common_text_form_field.dart';
 import 'package:vyapapp/utils/common_widgets/primary_button.dart';
 import '../../notifier/settings_notifier.dart';
 import '../../model/settings_model.dart';
 
 class SettingsContentWidget extends ConsumerWidget {
-  const SettingsContentWidget({
-    super.key,
-    required this.settings,
-  });
+  const SettingsContentWidget({super.key, required this.settings});
 
   final SettingsModel settings;
 
@@ -23,8 +22,11 @@ class SettingsContentWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final notifier = ref.read(settingsNotifierProvider.notifier);
-    final themeMode = ref.watch(themeNotifierProvider).valueOrNull ?? ThemeMode.system;
-    final firstLetter = settings.storeName.isNotEmpty ? settings.storeName.trim()[0].toUpperCase() : 'S';
+    final themeMode =
+        ref.watch(themeNotifierProvider).valueOrNull ?? ThemeMode.system;
+    final firstLetter = settings.storeName.isNotEmpty
+        ? settings.storeName.trim()[0].toUpperCase()
+        : 'S';
 
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
@@ -63,13 +65,23 @@ class SettingsContentWidget extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            settings.storeName.isNotEmpty ? settings.storeName : 'My Store',
-                            style: FontPalette.base700(16, color: colors.primaryText),
+                            settings.storeName.isNotEmpty
+                                ? settings.storeName
+                                : 'My Store',
+                            style: FontPalette.base700(
+                              16,
+                              color: colors.primaryText,
+                            ),
                           ),
                           4.verticalSpace,
                           Text(
-                            settings.email.isNotEmpty ? settings.email : 'No email set',
-                            style: FontPalette.base400(12, color: colors.secondaryText),
+                            settings.email.isNotEmpty
+                                ? settings.email
+                                : 'No email set',
+                            style: FontPalette.base400(
+                              12,
+                              color: colors.secondaryText,
+                            ),
                           ),
                         ],
                       ),
@@ -111,28 +123,6 @@ class SettingsContentWidget extends ConsumerWidget {
           ),
           20.verticalSpace,
 
-          // 2. Tax Rate Section
-          _buildSectionHeader(context, 'Tax Configuration'),
-          12.verticalSpace,
-          CommonContainer(
-            padding: EdgeInsets.all(16.r),
-            borderRadius: 16.r,
-            child: CommonTextFormField(
-              controller: notifier.taxController,
-              title: 'Default Tax Rate',
-              hintText: '0',
-              inputType: TextInputType.number,
-              suffix: Padding(
-                padding: EdgeInsets.only(right: 12.w),
-                child: Text(
-                  '%',
-                  style: FontPalette.base700(14, color: colors.secondaryText),
-                ),
-              ),
-            ),
-          ),
-          20.verticalSpace,
-
           // 3. App Customization Section
           _buildSectionHeader(context, 'App Preference & Customization'),
           12.verticalSpace,
@@ -151,6 +141,23 @@ class SettingsContentWidget extends ConsumerWidget {
             radius: 12,
           ),
           20.verticalSpace,
+
+          // 5. Logout Button
+          TextButton(
+            onPressed: () => _showLogoutConfirmation(context, ref),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.logout_rounded, color: colors.errorText, size: 18.r),
+                8.horizontalSpace,
+                Text(
+                  'Logout',
+                  style: FontPalette.base600(15, color: colors.errorText),
+                ),
+              ],
+            ),
+          ),
+          20.verticalSpace,
         ],
       ),
     );
@@ -167,7 +174,11 @@ class SettingsContentWidget extends ConsumerWidget {
     );
   }
 
-  Widget _buildThemeSelector(BuildContext context, WidgetRef ref, ThemeMode currentMode) {
+  Widget _buildThemeSelector(
+    BuildContext context,
+    WidgetRef ref,
+    ThemeMode currentMode,
+  ) {
     final colors = context.appColors;
 
     Widget buildOption({
@@ -178,11 +189,14 @@ class SettingsContentWidget extends ConsumerWidget {
       final isSelected = currentMode == mode;
       return Expanded(
         child: GestureDetector(
-          onTap: () => ref.read(themeNotifierProvider.notifier).setThemeMode(mode),
+          onTap: () =>
+              ref.read(themeNotifierProvider.notifier).setThemeMode(mode),
           child: Container(
             padding: EdgeInsets.symmetric(vertical: 12.h),
             decoration: BoxDecoration(
-              color: isSelected ? colors.primary.withValues(alpha: 0.08) : colors.inputBackground,
+              color: isSelected
+                  ? colors.primary.withValues(alpha: 0.08)
+                  : colors.inputBackground,
               borderRadius: BorderRadius.circular(12.r),
               border: Border.all(
                 color: isSelected ? colors.primary : colors.inputBorder,
@@ -231,6 +245,20 @@ class SettingsContentWidget extends ConsumerWidget {
           icon: Icons.settings_suggest_rounded,
         ),
       ],
+    );
+  }
+
+  void _showLogoutConfirmation(BuildContext context, WidgetRef ref) {
+    CommonDialogBox.show(
+      context: context,
+      title: 'Confirm Logout',
+      message:
+          'Are you sure you want to log out? All local session data will be cleared.',
+      primaryLabel: 'Logout',
+      secondaryLabel: 'Cancel',
+      onPrimary: () {
+        ref.read(authNotifierProvider.notifier).logout();
+      },
     );
   }
 }

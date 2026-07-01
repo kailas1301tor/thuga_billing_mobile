@@ -31,6 +31,7 @@ mixin _$ProductsState {
   int? get filterCategoryId => throw _privateConstructorUsedError;
   bool get isQuickProduct => throw _privateConstructorUsedError;
   String? get selectedImagePath => throw _privateConstructorUsedError;
+  List<int> get togglingProductIds => throw _privateConstructorUsedError;
 
   /// Create a copy of ProductsState
   /// with the given fields replaced by the non-null parameter values.
@@ -61,6 +62,7 @@ abstract class $ProductsStateCopyWith<$Res> {
     int? filterCategoryId,
     bool isQuickProduct,
     String? selectedImagePath,
+    List<int> togglingProductIds,
   });
 }
 
@@ -93,6 +95,7 @@ class _$ProductsStateCopyWithImpl<$Res, $Val extends ProductsState>
     Object? filterCategoryId = freezed,
     Object? isQuickProduct = null,
     Object? selectedImagePath = freezed,
+    Object? togglingProductIds = null,
   }) {
     return _then(
       _value.copyWith(
@@ -152,6 +155,10 @@ class _$ProductsStateCopyWithImpl<$Res, $Val extends ProductsState>
                 ? _value.selectedImagePath
                 : selectedImagePath // ignore: cast_nullable_to_non_nullable
                       as String?,
+            togglingProductIds: null == togglingProductIds
+                ? _value.togglingProductIds
+                : togglingProductIds // ignore: cast_nullable_to_non_nullable
+                      as List<int>,
           )
           as $Val,
     );
@@ -182,6 +189,7 @@ abstract class _$$ProductsStateImplCopyWith<$Res>
     int? filterCategoryId,
     bool isQuickProduct,
     String? selectedImagePath,
+    List<int> togglingProductIds,
   });
 }
 
@@ -213,6 +221,7 @@ class __$$ProductsStateImplCopyWithImpl<$Res>
     Object? filterCategoryId = freezed,
     Object? isQuickProduct = null,
     Object? selectedImagePath = freezed,
+    Object? togglingProductIds = null,
   }) {
     return _then(
       _$ProductsStateImpl(
@@ -272,6 +281,10 @@ class __$$ProductsStateImplCopyWithImpl<$Res>
             ? _value.selectedImagePath
             : selectedImagePath // ignore: cast_nullable_to_non_nullable
                   as String?,
+        togglingProductIds: null == togglingProductIds
+            ? _value._togglingProductIds
+            : togglingProductIds // ignore: cast_nullable_to_non_nullable
+                  as List<int>,
       ),
     );
   }
@@ -295,7 +308,8 @@ class _$ProductsStateImpl implements _ProductsState {
     this.filterCategoryId,
     this.isQuickProduct = true,
     this.selectedImagePath,
-  });
+    final List<int> togglingProductIds = const [],
+  }) : _togglingProductIds = togglingProductIds;
 
   @override
   @JsonKey()
@@ -334,10 +348,19 @@ class _$ProductsStateImpl implements _ProductsState {
   final bool isQuickProduct;
   @override
   final String? selectedImagePath;
+  final List<int> _togglingProductIds;
+  @override
+  @JsonKey()
+  List<int> get togglingProductIds {
+    if (_togglingProductIds is EqualUnmodifiableListView)
+      return _togglingProductIds;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_togglingProductIds);
+  }
 
   @override
   String toString() {
-    return 'ProductsState(loaderState: $loaderState, response: $response, errorMessage: $errorMessage, selectedCategoryId: $selectedCategoryId, searchQuery: $searchQuery, saveProductLoader: $saveProductLoader, updateProductLoader: $updateProductLoader, deleteProductLoader: $deleteProductLoader, page: $page, pageSize: $pageSize, sort: $sort, filterCategoryId: $filterCategoryId, isQuickProduct: $isQuickProduct, selectedImagePath: $selectedImagePath)';
+    return 'ProductsState(loaderState: $loaderState, response: $response, errorMessage: $errorMessage, selectedCategoryId: $selectedCategoryId, searchQuery: $searchQuery, saveProductLoader: $saveProductLoader, updateProductLoader: $updateProductLoader, deleteProductLoader: $deleteProductLoader, page: $page, pageSize: $pageSize, sort: $sort, filterCategoryId: $filterCategoryId, isQuickProduct: $isQuickProduct, selectedImagePath: $selectedImagePath, togglingProductIds: $togglingProductIds)';
   }
 
   @override
@@ -370,7 +393,11 @@ class _$ProductsStateImpl implements _ProductsState {
             (identical(other.isQuickProduct, isQuickProduct) ||
                 other.isQuickProduct == isQuickProduct) &&
             (identical(other.selectedImagePath, selectedImagePath) ||
-                other.selectedImagePath == selectedImagePath));
+                other.selectedImagePath == selectedImagePath) &&
+            const DeepCollectionEquality().equals(
+              other._togglingProductIds,
+              _togglingProductIds,
+            ));
   }
 
   @override
@@ -390,6 +417,7 @@ class _$ProductsStateImpl implements _ProductsState {
     filterCategoryId,
     isQuickProduct,
     selectedImagePath,
+    const DeepCollectionEquality().hash(_togglingProductIds),
   );
 
   /// Create a copy of ProductsState
@@ -417,6 +445,7 @@ abstract class _ProductsState implements ProductsState {
     final int? filterCategoryId,
     final bool isQuickProduct,
     final String? selectedImagePath,
+    final List<int> togglingProductIds,
   }) = _$ProductsStateImpl;
 
   @override
@@ -447,6 +476,8 @@ abstract class _ProductsState implements ProductsState {
   bool get isQuickProduct;
   @override
   String? get selectedImagePath;
+  @override
+  List<int> get togglingProductIds;
 
   /// Create a copy of ProductsState
   /// with the given fields replaced by the non-null parameter values.

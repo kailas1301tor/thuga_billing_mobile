@@ -7,12 +7,9 @@ import 'package:vyapapp/utils/common_widgets/common_container.dart';
 import '../../model/reports_model.dart';
 
 class ReportsPaymentShare extends StatelessWidget {
-  const ReportsPaymentShare({
-    super.key,
-    required this.shares,
-  });
+  const ReportsPaymentShare({super.key, required this.shares});
 
-  final List<PaymentShareModel> shares;
+  final List<PaymentShareModel>? shares;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +30,7 @@ class ReportsPaymentShare extends StatelessWidget {
     }
 
     // Filter out shares that have 0 amount to build a clean distribution bar
-    final validShares = shares.where((share) => share.amount > 0).toList();
+    final validShares = shares?.where((share) => share.amount > 0).toList();
 
     return CommonContainer(
       padding: EdgeInsets.all(16.r),
@@ -48,17 +45,12 @@ class ReportsPaymentShare extends StatelessWidget {
           16.verticalSpace,
 
           // Horizontal Segmented Progress Bar
-          if (validShares.isEmpty)
+          if ((validShares ?? []).isEmpty)
             Container(
-              height: 12.h,
-              decoration: BoxDecoration(
-                color: colors.inputBackground,
-                borderRadius: BorderRadius.circular(6.r),
-              ),
               alignment: Alignment.center,
               child: Text(
                 'No transactions',
-                style: FontPalette.base400(9, color: colors.secondaryText),
+                style: FontPalette.base400(13, color: colors.secondaryText),
               ),
             )
           else
@@ -67,7 +59,7 @@ class ReportsPaymentShare extends StatelessWidget {
               child: SizedBox(
                 height: 12.h,
                 child: Row(
-                  children: validShares.map((share) {
+                  children: (validShares ?? []).map((share) {
                     final percentage = share.percentage;
                     return Expanded(
                       flex: (percentage * 100).round(),
@@ -83,7 +75,7 @@ class ReportsPaymentShare extends StatelessWidget {
 
           // Legends / Details Grid
           Column(
-            children: shares.map((share) {
+            children: (shares ?? []).map((share) {
               final methodColor = getMethodColor(share.paymentMethod);
               return Padding(
                 padding: EdgeInsets.only(bottom: 10.h),
@@ -103,7 +95,10 @@ class ReportsPaymentShare extends StatelessWidget {
                         8.horizontalSpace,
                         Text(
                           share.paymentMethod,
-                          style: FontPalette.base500(13, color: colors.primaryText),
+                          style: FontPalette.base500(
+                            13,
+                            color: colors.primaryText,
+                          ),
                         ),
                       ],
                     ),
@@ -111,11 +106,17 @@ class ReportsPaymentShare extends StatelessWidget {
                       children: [
                         Text(
                           '₹${share.amount.toStringAsFixed(0)}',
-                          style: FontPalette.base600(13, color: colors.primaryText),
+                          style: FontPalette.base600(
+                            13,
+                            color: colors.primaryText,
+                          ),
                         ),
                         8.horizontalSpace,
                         Container(
-                          padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 6.w,
+                            vertical: 2.h,
+                          ),
                           decoration: BoxDecoration(
                             color: methodColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(6.r),

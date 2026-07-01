@@ -6,12 +6,15 @@ import 'package:vyapapp/res/styles/color_palette.dart';
 import 'package:vyapapp/res/styles/font_palette.dart';
 import 'package:vyapapp/utils/common_widgets/common_bottom_sheet.dart';
 import 'package:vyapapp/utils/common_widgets/common_search_bar.dart';
-
+import 'package:vyapapp/utils/common_widgets/common_text_form_field.dart';
+import 'package:vyapapp/utils/common_widgets/primary_button.dart';
+import 'package:vyapapp/utils/helpers/toast_helper.dart';
 import 'package:vyapapp/utils/common_widgets/bottomsheet_content.dart';
 import '../../../main/model/dropdown_model.dart';
 import '../../../main/notifier/dropdowns_notifier.dart';
 import '../../model/new_bill_model.dart';
 import '../../notifier/new_bill_notifier.dart';
+import 'item_discount_sheet.dart';
 import 'quantity_picker_sheet.dart';
 import 'quick_tap_cart_list.dart';
 import 'quick_tap_cart_strip.dart';
@@ -30,16 +33,19 @@ class QuickTapView extends ConsumerWidget {
     final selectedCategory = ref.watch(
       newBillNotifierProvider.select((s) => s.selectedCategory),
     );
-    final searchQuery = ref.watch(
-      newBillNotifierProvider.select((s) => s.searchQuery),
-    );
     final isCartExpanded = ref.watch(
       newBillNotifierProvider.select((s) => s.isCartExpanded),
     );
     final products = ref.watch(
       newBillNotifierProvider.select((s) => s.products),
     );
+    final isLoadingMore = ref.watch(
+      newBillNotifierProvider.select((s) => s.isLoadingMore),
+    );
     final cartItems = ref.watch(newBillNotifierProvider.select((s) => s.cart));
+    final discountAmount = ref.watch(
+      newBillNotifierProvider.select((s) => s.discountAmount),
+    );
     final selectedCustomer = ref.watch(
       newBillNotifierProvider.select((s) => s.selectedCustomer),
     );
@@ -47,25 +53,16 @@ class QuickTapView extends ConsumerWidget {
     final customerList = dropdownsState.data.customers;
     final customersLoader = dropdownsState.loaderState;
 
-    // Filter Products by Category Name and Search Query
-    final filteredProducts = products.where((p) {
-      final matchesCategory =
-          p.categoryName.toLowerCase() == selectedCategory.toLowerCase();
-      final matchesSearch =
-          searchQuery.isEmpty ||
-          p.name.toLowerCase().contains(searchQuery.toLowerCase());
-      return matchesCategory && matchesSearch;
-    }).toList();
-
     return Expanded(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // 1. Full-Width Category Chips Row
           Padding(
             padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 4.h),
             child: QuickTapCategoryChips(
               selectedCategory: selectedCategory,
-              onCategorySelected: (cat) => notifier.setCategory(cat),
+              onCategorySelected: (name, id) => notifier.setCategory(name, id),
             ),
           ),
 
@@ -202,7 +199,7 @@ class QuickTapView extends ConsumerWidget {
 
           // 3. Main Product Grid Area
           Expanded(
-            child: filteredProducts.isEmpty
+            child: products.isEmpty
                 ? Center(
                     child: Text(
                       'No products found',
@@ -212,130 +209,77 @@ class QuickTapView extends ConsumerWidget {
                       ),
                     ),
                   )
-                : Builder(
-                    builder: (context) {
-                      final int chunkSize = 12;
-                      final pages = <List<ProductModel>>[];
-                      for (
-                        var i = 0;
-                        i < filteredProducts.length;
-                        i += chunkSize
-                      ) {
-                        pages.add(
-                          filteredProducts.sublist(
-                            i,
-                            i + chunkSize > filteredProducts.length
-                                ? filteredProducts.length
-                                : i + chunkSize,
-                          ),
-                        );
+                : NotificationListener<ScrollNotification>(
+                    onNotification: (notification) {
+                      if (notification is ScrollEndNotification &&
+                          notification.metrics.pixels >=
+                              notification.metrics.maxScrollExtent - 200) {
+                        notifier.loadMoreProducts();
                       }
-
-                      Widget buildGrid(List<ProductModel> chunk) {
-                        return GridView.builder(
-                          physics: pages.length > 1
-                              ? const NeverScrollableScrollPhysics()
-                              : const BouncingScrollPhysics(),
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 20.w,
-                            vertical: 6.h,
+                      return false;
+                    },
+                    child: GridView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 20.w,
+                        vertical: 6.h,
+                      ),
+                      gridDelegate:
+                          SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            mainAxisSpacing: 8.h,
+                            crossAxisSpacing: 10.w,
+                            childAspectRatio: 0.85,
                           ),
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 3,
-                                mainAxisSpacing: 8.h,
-                                crossAxisSpacing: 10.w,
-                                childAspectRatio: 0.85,
+                      itemCount: products.length + (isLoadingMore ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (index == products.length) {
+                          return Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(8.r),
+                              child: SizedBox(
+                                width: 24.r,
+                                height: 24.r,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.w,
+                                  color: colors.primary,
+                                ),
                               ),
-                          itemCount: chunk.length,
-                          itemBuilder: (context, index) {
-                            final product = chunk[index];
-                            final cartItemIndex = cartItems.indexWhere(
-                              (item) => item.productId == product.id,
-                            );
-                            final qty = cartItemIndex >= 0
-                                ? cartItems[cartItemIndex].quantity
-                                : 0;
-                            return QuickTapProductCard(
-                              product: product,
-                              quantity: qty,
-                              onTap: () => notifier.addToCart(product),
-                              onLongPress: () {
-                                CommonBottomSheet.show(
-                                  context: context,
-                                  title: 'Select Quantity',
-                                  isScrollControlled: true,
-                                  child: QuantityPickerSheet(
-                                    product: product,
-                                    initialQuantity: qty,
-                                    onConfirm: (newQty) {
-                                      notifier.setProductQuantity(
-                                        product,
-                                        newQty,
-                                      );
-                                    },
-                                  ),
-                                );
-                              },
+                            ),
+                          );
+                        }
+                        final product = products[index];
+                        final cartItemIndex = cartItems.indexWhere(
+                          (item) => item.productId == product.id,
+                        );
+                        final qty = cartItemIndex >= 0
+                            ? cartItems[cartItemIndex].quantity
+                            : 0;
+                        return QuickTapProductCard(
+                          product: product,
+                          quantity: qty,
+                          onTap: () => notifier.addToCart(product),
+                          onReduce: () => notifier.setProductQuantity(product, qty - 1),
+                          onLongPress: () {
+                            CommonBottomSheet.show(
+                              context: context,
+                              title: 'Select Quantity',
+                              isScrollControlled: true,
+                              child: QuantityPickerSheet(
+                                product: product,
+                                initialQuantity: qty,
+                                onConfirm: (newQty) {
+                                  notifier.setProductQuantity(
+                                    product,
+                                    newQty,
+                                  );
+                                },
+                              ),
                             );
                           },
                         );
-                      }
-
-                      if (pages.length <= 1) {
-                        return buildGrid(filteredProducts);
-                      }
-
-                      return Column(
-                        children: [
-                          Expanded(
-                            child: PageView.builder(
-                              controller: notifier.productPageController,
-                              itemCount: pages.length,
-                              itemBuilder: (context, pageIndex) =>
-                                  buildGrid(pages[pageIndex]),
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(top: 4.h, bottom: 8.h),
-                            child: AnimatedBuilder(
-                              animation: notifier.productPageController,
-                              builder: (context, child) {
-                                final int currentPage =
-                                    notifier.productPageController.hasClients
-                                    ? notifier.productPageController.page
-                                              ?.round() ??
-                                          0
-                                    : 0;
-                                return Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: List.generate(pages.length, (
-                                    index,
-                                  ) {
-                                    final isActive = index == currentPage;
-                                    return Container(
-                                      margin: EdgeInsets.symmetric(
-                                        horizontal: 4.w,
-                                      ),
-                                      width: isActive ? 16.w : 6.r,
-                                      height: 6.r,
-                                      decoration: BoxDecoration(
-                                        color: isActive
-                                            ? colors.primary
-                                            : colors.inputBorder,
-                                        borderRadius: BorderRadius.circular(
-                                          3.r,
-                                        ),
-                                      ),
-                                    );
-                                  }),
-                                );
-                              },
-                            ),
-                          ),
-                        ],
-                      );
-                    },
+                      },
+                    ),
                   ),
           ),
 
@@ -345,7 +289,7 @@ class QuickTapView extends ConsumerWidget {
             curve: Curves.easeInOut,
             child: cartItems.isNotEmpty && isCartExpanded
                 ? Container(
-                    constraints: BoxConstraints(maxHeight: 200.h),
+                    constraints: BoxConstraints(maxHeight: 260.h),
                     decoration: BoxDecoration(
                       color: colors.surface,
                       border: Border(
@@ -394,8 +338,97 @@ class QuickTapView extends ConsumerWidget {
                                   notifier.decrementQuantity(item),
                               onRemoveCartItem: (item) =>
                                   notifier.removeCartItem(item),
+                              onTapDiscount: (item) =>
+                                  _showItemDiscountSheet(context, ref, item),
                             ),
                           ),
+                        ),
+                        // Pricing Summary block
+                        Builder(
+                          builder: (context) {
+                            final subtotal = cartItems.fold<double>(
+                              0.0,
+                              (sum, item) => sum + item.totalPrice,
+                            );
+                            return Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 20.w,
+                                vertical: 10.h,
+                              ),
+                              decoration: BoxDecoration(
+                                color: colors.inputBackground.withValues(alpha: 0.5),
+                                border: Border(
+                                  top: BorderSide(color: colors.inputBorder, width: 1.w),
+                                ),
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Subtotal',
+                                        style: FontPalette.base500(
+                                          12,
+                                          color: colors.secondaryText,
+                                        ),
+                                      ),
+                                      Text(
+                                        '₹${subtotal.toStringAsFixed(2)}',
+                                        style: FontPalette.base600(
+                                          12,
+                                          color: colors.primaryText,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  6.verticalSpace,
+                                  GestureDetector(
+                                    onTap: () => _showDiscountDialog(
+                                      context,
+                                      ref,
+                                      subtotal,
+                                    ),
+                                    behavior: HitTestBehavior.opaque,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Text(
+                                              'Discount',
+                                              style: FontPalette.base500(
+                                                12,
+                                                color: colors.secondaryText,
+                                              ),
+                                            ),
+                                            4.horizontalSpace,
+                                            Icon(
+                                              Icons.edit_rounded,
+                                              size: 12.r,
+                                              color: colors.primary,
+                                            ),
+                                          ],
+                                        ),
+                                        Text(
+                                          discountAmount > 0
+                                              ? '- ₹${discountAmount.toStringAsFixed(2)}'
+                                              : '₹0.00',
+                                          style: FontPalette.base700(
+                                            12,
+                                            color: discountAmount > 0
+                                                ? Colors.green.shade600
+                                                : colors.primaryText,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -437,4 +470,112 @@ class QuickTapView extends ConsumerWidget {
   //     ),
   //   );
   // }
+
+  void _showItemDiscountSheet(
+    BuildContext context,
+    WidgetRef ref,
+    CartItemModel item,
+  ) {
+    final notifier = ref.read(newBillNotifierProvider.notifier);
+    CommonBottomSheet.show(
+      context: context,
+      title: 'Item Discount',
+      isScrollControlled: true,
+      child: ItemDiscountSheet(
+        item: item,
+        onApply: ({
+          required String discountType,
+          required double discountValue,
+          int? bogoBuyQty,
+          int? bogoGetQty,
+        }) {
+          notifier.updateCartItemDiscount(
+            item: item,
+            discountType: discountType,
+            discountValue: discountValue,
+            bogoBuyQty: bogoBuyQty,
+            bogoGetQty: bogoGetQty,
+          );
+        },
+        onRemove: () => notifier.removeCartItemDiscount(item),
+      ),
+    );
+  }
+
+  void _showDiscountDialog(BuildContext context, WidgetRef ref, double subtotal) {
+    final colors = context.appColors;
+    final notifier = ref.read(newBillNotifierProvider.notifier);
+    final currentDiscount = ref.read(newBillNotifierProvider.select((s) => s.discountAmount));
+    final controller = TextEditingController(text: currentDiscount > 0 ? currentDiscount.toStringAsFixed(2) : '');
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          insetPadding: EdgeInsets.symmetric(horizontal: 24.w),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.r)),
+          child: Padding(
+            padding: EdgeInsets.all(24.r),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  'Apply Discount',
+                  textAlign: TextAlign.center,
+                  style: FontPalette.base700(18, color: colors.primaryText),
+                ),
+                16.verticalSpace,
+                Text(
+                  'Enter discount amount to apply on subtotal of ₹${subtotal.toStringAsFixed(2)}',
+                  textAlign: TextAlign.center,
+                  style: FontPalette.base400(13, color: colors.secondaryText),
+                ),
+                16.verticalSpace,
+                CommonTextFormField(
+                  controller: controller,
+                  hintText: 'Enter discount amount (₹)',
+                  inputType: const TextInputType.numberWithOptions(decimal: true),
+                  autoFocus: true,
+                ),
+                24.verticalSpace,
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text(
+                          'Cancel',
+                          style: FontPalette.base600(14, color: colors.secondaryText),
+                        ),
+                      ),
+                    ),
+                    12.horizontalSpace,
+                    Expanded(
+                      child: PrimaryButton(
+                        text: 'Apply',
+                        radius: 12,
+                        onPressed: () {
+                          final value = double.tryParse(controller.text) ?? 0.0;
+                          if (value < 0.0 || value > subtotal) {
+                            showCustomErrorToast(
+                              message: 'Please enter a valid discount amount',
+                            );
+                            return;
+                          }
+                          notifier.setDiscountAmount(value);
+                          Navigator.pop(context);
+                          showCustomToast(message: 'Discount applied successfully');
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    ).then((_) => controller.dispose());
+  }
 }

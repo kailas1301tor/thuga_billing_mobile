@@ -15,13 +15,15 @@ class QuickTapCartStrip extends ConsumerWidget {
     
     final isExpanded = ref.watch(newBillNotifierProvider.select((s) => s.isCartExpanded));
     final cart = ref.watch(newBillNotifierProvider.select((s) => s.cart));
+    final discountAmount = ref.watch(newBillNotifierProvider.select((s) => s.discountAmount));
 
     if (cart.isEmpty) {
       return const SizedBox.shrink();
     }
 
     final totalItems = cart.fold<int>(0, (sum, item) => sum + item.quantity);
-    final totalPrice = cart.fold<double>(0.0, (sum, item) => sum + item.lineTotal);
+    final subtotal = cart.fold<double>(0.0, (sum, item) => sum + item.totalPrice);
+    final totalPrice = (subtotal - discountAmount).clamp(0.0, double.infinity);
 
     return GestureDetector(
       onTap: () {

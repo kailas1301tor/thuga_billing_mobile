@@ -108,7 +108,9 @@ class ProductModel {
         image: json['image'] != null ? convertToString(json['image']) : null,
         imageUrl: json['image_url'] != null ? convertToString(json['image_url']) : null,
         isQuickProduct: convertToBool(json['is_quick_product']),
-        isActive: convertToBool(json['is_active']),
+        isActive: json['status'] != null
+            ? convertToString(json['status']).toLowerCase() == 'active'
+            : convertToBool(json['is_active']),
         deleted: convertToBool(json['deleted']),
       );
 
@@ -129,11 +131,47 @@ class ProductModel {
 
 class BillResponse {
   final String message;
+  final BillResponseData? data;
 
-  const BillResponse({required this.message});
+  const BillResponse({required this.message, this.data});
 
-  factory BillResponse.fromJson(Map<String, dynamic> json) => BillResponse(
-        message: convertToString(json['message']),
+  factory BillResponse.fromJson(Map<String, dynamic> json) {
+    final results = json['results'] != null ? convertToMap(json['results']) : null;
+    final dataMap = results != null && results['data'] != null ? convertToMap(results['data']) : null;
+    return BillResponse(
+      message: convertToString(json['message']),
+      data: dataMap != null ? BillResponseData.fromJson(dataMap) : null,
+    );
+  }
+}
+
+class BillResponseData {
+  final int id;
+  final String orderNumber;
+  final String dateString;
+  final String paymentMethod;
+  final String paymentStatus;
+  final double totalAmount;
+  final double discountAmount;
+
+  const BillResponseData({
+    required this.id,
+    required this.orderNumber,
+    required this.dateString,
+    required this.paymentMethod,
+    required this.paymentStatus,
+    required this.totalAmount,
+    required this.discountAmount,
+  });
+
+  factory BillResponseData.fromJson(Map<String, dynamic> json) => BillResponseData(
+        id: convertToInt(json['id']),
+        orderNumber: convertToString(json['order_number']),
+        dateString: convertToString(json['date']),
+        paymentMethod: convertToString(json['payment_method']),
+        paymentStatus: convertToString(json['payment_status']),
+        totalAmount: convertToDouble(json['total_amount']),
+        discountAmount: convertToDouble(json['discount_amount']),
       );
 }
 
@@ -146,6 +184,10 @@ class CartItemModel {
     required this.emoji,
     this.imageUrl,
     this.isCustom = false,
+    this.discountType = 'None',
+    this.discountValue = 0.0,
+    this.bogoBuyQty,
+    this.bogoGetQty,
   });
 
   final int? productId;
@@ -155,8 +197,64 @@ class CartItemModel {
   final String emoji;
   final String? imageUrl;
   final bool isCustom;
+  final String discountType;
+  final double discountValue;
+  final int? bogoBuyQty;
+  final int? bogoGetQty;
 
+  /// Raw line total without any discount applied.
   double get lineTotal => price * quantity;
+
+  /// Computed discount amount — mirrors backend Python logic exactly.
+  double get discountAmount {
+    double discount = 0.0;
+
+    switch (discountType) {
+      case 'Percentage':
+        discount = (price * quantity) * (discountValue / 100);
+      case 'Amount':
+        discount = discountValue;
+      case 'BOGO':
+        final buyQty = bogoBuyQty ?? 0;
+        final getQty = bogoGetQty ?? 0;
+        if (buyQty > 0 && getQty > 0) {
+          final freeUnits = (quantity ~/ (buyQty + getQty)) * getQty;
+          discount = freeUnits * price;
+        }
+      case 'Slab':
+        discount = (price - discountValue) * quantity;
+      default:
+        discount = 0.0;
+    }
+
+    // Avoid negative totals — cap discount at raw line total
+    if (discount > lineTotal) {
+      discount = lineTotal;
+    }
+    return discount < 0 ? 0.0 : discount;
+  }
+
+  /// Final price after discount applied.
+  double get totalPrice => lineTotal - discountAmount;
+
+  /// Whether this item has an active discount.
+  bool get hasDiscount => discountType != 'None' && discountAmount > 0;
+
+  /// Human-readable discount label for UI badges.
+  String get discountLabel {
+    switch (discountType) {
+      case 'Percentage':
+        return '${discountValue.toStringAsFixed(discountValue.truncateToDouble() == discountValue ? 0 : 1)}% off';
+      case 'Amount':
+        return '₹${discountValue.toStringAsFixed(0)} off';
+      case 'BOGO':
+        return 'Buy ${bogoBuyQty ?? 0} Get ${bogoGetQty ?? 0}';
+      case 'Slab':
+        return '₹${discountValue.toStringAsFixed(0)}/unit';
+      default:
+        return '';
+    }
+  }
 
   CartItemModel copyWith({
     int? productId,
@@ -166,6 +264,10 @@ class CartItemModel {
     String? emoji,
     String? imageUrl,
     bool? isCustom,
+    String? discountType,
+    double? discountValue,
+    int? Function()? bogoBuyQty,
+    int? Function()? bogoGetQty,
   }) {
     return CartItemModel(
       productId: productId ?? this.productId,
@@ -175,6 +277,10 @@ class CartItemModel {
       emoji: emoji ?? this.emoji,
       imageUrl: imageUrl ?? this.imageUrl,
       isCustom: isCustom ?? this.isCustom,
+      discountType: discountType ?? this.discountType,
+      discountValue: discountValue ?? this.discountValue,
+      bogoBuyQty: bogoBuyQty != null ? bogoBuyQty() : this.bogoBuyQty,
+      bogoGetQty: bogoGetQty != null ? bogoGetQty() : this.bogoGetQty,
     );
   }
 
@@ -186,6 +292,16 @@ class CartItemModel {
         emoji: convertToString(json['emoji']),
         imageUrl: json['imageUrl'] != null ? convertToString(json['imageUrl']) : null,
         isCustom: convertToBool(json['isCustom']),
+        discountType: json['discount_type'] != null
+            ? convertToString(json['discount_type'])
+            : 'None',
+        discountValue: convertToDouble(json['discount_value']),
+        bogoBuyQty: json['bogo_buy_qty'] != null
+            ? convertToInt(json['bogo_buy_qty'])
+            : null,
+        bogoGetQty: json['bogo_get_qty'] != null
+            ? convertToInt(json['bogo_get_qty'])
+            : null,
       );
 
   Map<String, dynamic> toJson() => {
@@ -196,5 +312,9 @@ class CartItemModel {
         'emoji': emoji,
         'imageUrl': imageUrl,
         'isCustom': isCustom,
+        'discount_type': discountType,
+        'discount_value': discountValue,
+        'bogo_buy_qty': bogoBuyQty,
+        'bogo_get_qty': bogoGetQty,
       };
 }

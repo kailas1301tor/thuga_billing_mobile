@@ -28,7 +28,7 @@ final authRepositoryProvider = AutoDisposeProvider<AuthRepo>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef AuthRepositoryRef = AutoDisposeProviderRef<AuthRepo>;
-String _$homeRepositoryHash() => r'679cf61ee5effd8b2fab346bc8424e90ae8d3e02';
+String _$homeRepositoryHash() => r'2faba056fd222c0682a46a942b08605ec055b643';
 
 /// See also [homeRepository].
 @ProviderFor(homeRepository)
@@ -45,7 +45,7 @@ final homeRepositoryProvider = AutoDisposeProvider<HomeRepo>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef HomeRepositoryRef = AutoDisposeProviderRef<HomeRepo>;
-String _$billsRepositoryHash() => r'07e2b564822b55a5b66ee365f9d8de26a444417b';
+String _$billsRepositoryHash() => r'1d3ea7b54c237ef6ef44dd59dde14d29a674cea8';
 
 /// See also [billsRepository].
 @ProviderFor(billsRepository)
@@ -62,7 +62,7 @@ final billsRepositoryProvider = AutoDisposeProvider<BillsRepo>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef BillsRepositoryRef = AutoDisposeProviderRef<BillsRepo>;
-String _$reportsRepositoryHash() => r'd06f5d3e70c1f685ba1174b3614a20c7014635d8';
+String _$reportsRepositoryHash() => r'328f64516b575bc372c8087fe6a45bbf8cd14183';
 
 /// See also [reportsRepository].
 @ProviderFor(reportsRepository)
@@ -115,11 +115,11 @@ final newBillRepositoryProvider = AutoDisposeProvider<NewBillRepo>.internal(
 // ignore: unused_element
 typedef NewBillRepositoryRef = AutoDisposeProviderRef<NewBillRepo>;
 String _$dropdownsRepositoryHash() =>
-    r'30fe922ad4e4e58ec96266ed601276b1b5e73509';
+    r'52a12124c178bbdd4c5fb5b3bdaf17048a5d45ca';
 
 /// See also [dropdownsRepository].
 @ProviderFor(dropdownsRepository)
-final dropdownsRepositoryProvider = Provider<DropdownsRepo>.internal(
+final dropdownsRepositoryProvider = AutoDisposeProvider<DropdownsRepo>.internal(
   dropdownsRepository,
   name: r'dropdownsRepositoryProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -131,7 +131,7 @@ final dropdownsRepositoryProvider = Provider<DropdownsRepo>.internal(
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef DropdownsRepositoryRef = ProviderRef<DropdownsRepo>;
+typedef DropdownsRepositoryRef = AutoDisposeProviderRef<DropdownsRepo>;
 String _$categoriesRepositoryHash() =>
     r'4fa4e24b107065a6968704c908f363f22d59021d';
 
@@ -187,5 +187,23 @@ final customersRepositoryProvider = AutoDisposeProvider<CustomersRepo>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CustomersRepositoryRef = AutoDisposeProviderRef<CustomersRepo>;
+String _$purchasesRepositoryHash() =>
+    r'ed26aee103fa775d51db2e417645bba9878b1e29';
+
+/// See also [purchasesRepository].
+@ProviderFor(purchasesRepository)
+final purchasesRepositoryProvider = AutoDisposeProvider<PurchasesRepo>.internal(
+  purchasesRepository,
+  name: r'purchasesRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$purchasesRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef PurchasesRepositoryRef = AutoDisposeProviderRef<PurchasesRepo>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

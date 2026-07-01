@@ -77,8 +77,8 @@ class CustomersNotifier extends _$CustomersNotifier {
     final name = nameController.text.trim();
     final phone = phoneController.text.trim();
 
-    if (name.isEmpty || phone.isEmpty) {
-      showCustomErrorToast(message: 'Please fill all required fields');
+    if (name.isEmpty) {
+      showCustomErrorToast(message: 'Please enter a customer name');
       return false;
     }
 
@@ -112,8 +112,8 @@ class CustomersNotifier extends _$CustomersNotifier {
     final name = nameController.text.trim();
     final phone = phoneController.text.trim();
 
-    if (name.isEmpty || phone.isEmpty) {
-      showCustomErrorToast(message: 'Please fill all required fields');
+    if (name.isEmpty) {
+      showCustomErrorToast(message: 'Please enter a customer name');
       return false;
     }
 

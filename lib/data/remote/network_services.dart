@@ -24,7 +24,7 @@ NetworkServices networkServices(Ref<NetworkServices> ref) {
 
 /// Maximum characters to log from a response body.
 /// Prevents jank/OOM when debugging endpoints that return huge payloads.
-const int _kMaxLogBodyLength = 2000;
+const int _kMaxLogBodyLength = 100000;
 
 /// Pretty-prints JSON and truncates to [_kMaxLogBodyLength] characters.
 String _formatBody(dynamic data) {

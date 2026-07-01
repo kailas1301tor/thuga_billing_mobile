@@ -34,7 +34,7 @@ class SplashNotifier extends _$SplashNotifier {
     var route = RouteConstants.routeLoginScreen;
 
     try {
-      await Future<void>.delayed(const Duration(milliseconds: 500));
+      await Future<void>.delayed(const Duration(milliseconds: 1500));
 
       String? accessToken;
       try {

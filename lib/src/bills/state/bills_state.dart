@@ -12,8 +12,6 @@ sealed class BillsState with _$BillsState {
     BillsResponseModel? data,
     @Default('') String searchQuery,
     @Default('Today') String dateRangeFilter,
-    @Default('All') String statusFilter,
-    @Default('All') String paymentFilter,
     @Default(true) bool isNewestFirst,
     String? errorMessage,
   }) = _BillsState;

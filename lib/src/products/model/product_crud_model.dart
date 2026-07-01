@@ -79,6 +79,7 @@ class ProductCrudModel {
   final int? categoryId;
   final String? categoryName;
   final String name;
+  final String? barcode;
   final double quantity;
   final double price;
   final bool isQuickProduct;
@@ -94,6 +95,7 @@ class ProductCrudModel {
     this.categoryId,
     this.categoryName,
     required this.name,
+    this.barcode,
     required this.quantity,
     required this.price,
     this.isQuickProduct = false,
@@ -110,10 +112,13 @@ class ProductCrudModel {
         categoryId: convertToInt(json['category']),
         categoryName: convertToString(json['category_name']),
         name: convertToString(json['name']),
+        barcode: json['barcode'] != null ? convertToString(json['barcode']) : null,
         quantity: convertToDouble(json['qty']),
         price: convertToDouble(json['price']),
         isQuickProduct: convertToBool(json['is_quick_product']),
-        isActive: convertToBool(json['is_active']),
+        isActive: json['status'] != null
+            ? convertToString(json['status']).toLowerCase() == 'active'
+            : convertToBool(json['is_active']),
         deleted: convertToBool(json['deleted']),
         image: json['image'] != null ? convertToString(json['image']) : null,
         imageUrl: json['image_url'] != null ? convertToString(json['image_url']) : null,

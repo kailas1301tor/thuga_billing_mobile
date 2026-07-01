@@ -4,6 +4,7 @@ import 'package:either_dart/either.dart';
 import 'package:vyapapp/data/remote/network_base_services.dart';
 import 'package:vyapapp/data/remote/network_services.dart';
 import 'package:vyapapp/res/constants/app_constants.dart';
+import 'package:vyapapp/src/auth/model/auth_model.dart';
 import 'package:vyapapp/utils/helpers/safe_converters.dart';
 import '../model/product_crud_model.dart';
 
@@ -18,6 +19,7 @@ abstract class ProductsRepo {
   Future<Either<ResponseError, ProductAddResponse>> createProduct(FormData formData);
   Future<Either<ResponseError, ProductAddResponse>> updateProduct(int id, FormData formData);
   Future<Either<ResponseError, ProductDeleteResponse>> deleteProduct(int id);
+  Future<Either<ResponseError, CommonResponseModel>> toggleProductStatus(int id, String status);
 }
 
 class ProductsRepoImpl implements ProductsRepo {
@@ -64,9 +66,10 @@ class ProductsRepoImpl implements ProductsRepo {
 
   @override
   Future<Either<ResponseError, ProductAddResponse>> updateProduct(int id, FormData formData) async {
+    formData.fields.add(MapEntry('id', id.toString()));
     return await _services
         .safe(_services.putMultiPartRequest(
-          endPoint: "${AppConstants.products}?id=$id",
+          endPoint: AppConstants.products,
           formFields: formData,
         ))
         .thenRight(_services.checkHttpStatus)
@@ -84,5 +87,20 @@ class ProductsRepoImpl implements ProductsRepo {
         .thenRight(_services.checkHttpStatus)
         .thenRight(_services.parseJson)
         .mapRight((right) => ProductDeleteResponse.fromJson(convertToMap(right)));
+  }
+
+  @override
+  Future<Either<ResponseError, CommonResponseModel>> toggleProductStatus(int id, String status) async {
+    return await _services
+        .safe(_services.putRequest(
+          endPoint: AppConstants.productStatus,
+          parameters: {
+            'id': id,
+            'status': status,
+          },
+        ))
+        .thenRight(_services.checkHttpStatus)
+        .thenRight(_services.parseJson)
+        .mapRight((right) => CommonResponseModel.fromJson(convertToMap(right)));
   }
 }

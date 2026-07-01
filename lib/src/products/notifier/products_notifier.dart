@@ -10,6 +10,7 @@ import 'package:vyapapp/utils/helpers/toast_helper.dart';
 import 'package:vyapapp/utils/helpers/debounce_helper.dart';
 import 'package:vyapapp/src/main/notifier/dropdowns_notifier.dart';
 import 'package:vyapapp/utils/helpers/file_picker.dart';
+import '../model/product_crud_model.dart';
 import '../state/products_state.dart';
 
 part 'products_notifier.g.dart';
@@ -18,6 +19,8 @@ part 'products_notifier.g.dart';
 class ProductsNotifier extends _$ProductsNotifier {
   late final TextEditingController nameController;
   late final TextEditingController priceController;
+  late final TextEditingController barcodeController;
+  late final TextEditingController qtyController;
   late final TextEditingController searchController;
   late final FocusNode searchFocusNode;
 
@@ -25,12 +28,16 @@ class ProductsNotifier extends _$ProductsNotifier {
   ProductsState build() {
     nameController = TextEditingController();
     priceController = TextEditingController();
+    barcodeController = TextEditingController();
+    qtyController = TextEditingController();
     searchController = TextEditingController();
     searchFocusNode = FocusNode();
 
     ref.onDispose(() {
       nameController.dispose();
       priceController.dispose();
+      barcodeController.dispose();
+      qtyController.dispose();
       searchController.dispose();
       searchFocusNode.dispose();
     });
@@ -100,6 +107,8 @@ class ProductsNotifier extends _$ProductsNotifier {
   void clearForm() {
     nameController.clear();
     priceController.clear();
+    barcodeController.clear();
+    qtyController.clear();
     state = state.copyWith(
       selectedCategoryId: null,
       isQuickProduct: true,
@@ -153,6 +162,15 @@ class ProductsNotifier extends _$ProductsNotifier {
       'is_quick_product': state.isQuickProduct,
     };
 
+    final barcode = barcodeController.text.trim();
+    if (barcode.isNotEmpty) {
+      map['barcode'] = barcode;
+    }
+    final qty = qtyController.text.trim();
+    if (qty.isNotEmpty) {
+      map['qty'] = qty;
+    }
+
     if (state.selectedImagePath != null) {
       map['image'] = await MultipartFile.fromFile(
         state.selectedImagePath!,
@@ -200,6 +218,15 @@ class ProductsNotifier extends _$ProductsNotifier {
       'is_quick_product': state.isQuickProduct,
     };
 
+    final barcode = barcodeController.text.trim();
+    if (barcode.isNotEmpty) {
+      map['barcode'] = barcode;
+    }
+    final qty = qtyController.text.trim();
+    if (qty.isNotEmpty) {
+      map['qty'] = qty;
+    }
+
     if (state.selectedImagePath != null) {
       map['image'] = await MultipartFile.fromFile(
         state.selectedImagePath!,
@@ -243,6 +270,79 @@ class ProductsNotifier extends _$ProductsNotifier {
         fetchProducts(showLoader: false);
         ref.read(dropdownsNotifierProvider.notifier).refreshDropdowns();
         state = state.copyWith(deleteProductLoader: false);
+        return true;
+      },
+    );
+  }
+
+  Future<bool> toggleProductStatus(int id, bool isActive) async {
+    // Add product ID to toggling list
+    state = state.copyWith(
+      togglingProductIds: [...state.togglingProductIds, id],
+    );
+
+    // Optimistically update the product's active status locally
+    final oldResponse = state.response;
+    if (oldResponse != null) {
+      final updatedList = oldResponse.results.data.map((product) {
+        if (product.id == id) {
+          return ProductCrudModel(
+            id: product.id,
+            categoryId: product.categoryId,
+            categoryName: product.categoryName,
+            name: product.name,
+            barcode: product.barcode,
+            quantity: product.quantity,
+            price: product.price,
+            isQuickProduct: product.isQuickProduct,
+            isActive: isActive,
+            deleted: product.deleted,
+            image: product.image,
+            imageUrl: product.imageUrl,
+            createdAt: product.createdAt,
+            updatedAt: product.updatedAt,
+          );
+        }
+        return product;
+      }).toList();
+
+      final updatedResponse = ProductResponse(
+        message: oldResponse.message,
+        results: ProductResults(
+          totalCount: oldResponse.results.totalCount,
+          totalPages: oldResponse.results.totalPages,
+          currentPage: oldResponse.results.currentPage,
+          itemPerPage: oldResponse.results.itemPerPage,
+          data: updatedList,
+        ),
+      );
+
+      state = state.copyWith(response: updatedResponse);
+    }
+
+    final statusString = isActive ? "Active" : "Inactive";
+    final result = await ref
+        .read(productsRepositoryProvider)
+        .toggleProductStatus(id, statusString);
+
+    // Remove product ID from toggling list
+    state = state.copyWith(
+      togglingProductIds: state.togglingProductIds.where((tId) => tId != id).toList(),
+    );
+
+    return result.fold(
+      (left) {
+        debugPrint("🔴 API ERROR: ${left.message}");
+        showCustomErrorToast(message: left.message ?? 'Failed to update product status');
+        // Revert local state on failure
+        state = state.copyWith(response: oldResponse);
+        return false;
+      },
+      (right) {
+        debugPrint("🟢 API SUCCESS: ${right.message}");
+        showCustomToast(message: right.message);
+        // Refresh products list from server
+        fetchProducts(showLoader: false);
         return true;
       },
     );
