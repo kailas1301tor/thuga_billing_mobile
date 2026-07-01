@@ -81,6 +81,7 @@ class BillDetailModel {
     required this.paymentStatus,
     required this.totalAmount,
     required this.discountAmount,
+    required this.balance,
     required this.dateString,
     required this.createdAt,
     required this.items,
@@ -93,6 +94,7 @@ class BillDetailModel {
   final String paymentStatus;
   final double totalAmount;
   final double discountAmount;
+  final double balance;
   final String dateString;
   final DateTime createdAt;
   final List<BillDetailItemModel> items;
@@ -106,6 +108,7 @@ class BillDetailModel {
       paymentStatus: convertToString(json['payment_status']),
       totalAmount: convertToDouble(json['total_amount']),
       discountAmount: convertToDouble(json['discount_amount']),
+      balance: convertToDouble(json['balance']),
       dateString: convertToString(json['date']),
       createdAt: DateTime.tryParse(convertToString(json['created_at'])) ?? DateTime.now(),
       items: convertToList(json['items'])

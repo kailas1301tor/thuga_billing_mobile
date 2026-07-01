@@ -61,7 +61,12 @@ class NewBillScreen extends ConsumerWidget {
             NewBillFooter(
               totalAmount: totalAmount,
               paymentMethod: state.paymentMethod,
+              selectedCustomer: state.selectedCustomer,
+              paymentStatus: state.paymentStatus,
+              receivedAmount: state.receivedAmount,
+              receivedAmountController: notifier.receivedAmountController,
               onPaymentMethodChanged: (val) => notifier.setPaymentMethod(val),
+              onPaymentStatusChanged: (status) => notifier.setPaymentStatus(status),
               onPrintPressed: () => notifier.printBill(context),
             ),
           ],

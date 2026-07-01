@@ -95,6 +95,11 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
       receiptBuffer.writeln('Bill Discount:      -${billDiscountAmount.toCurrency()}');
     }
     receiptBuffer.writeln('Grand Total:        ${widget.billDetail.totalAmount.toCurrency()}');
+    if (widget.billDetail.balance > 0.0) {
+      final paidAmount = (widget.billDetail.totalAmount - widget.billDetail.balance).clamp(0.0, widget.billDetail.totalAmount);
+      receiptBuffer.writeln('Amount Paid:        ${paidAmount.toCurrency()}');
+      receiptBuffer.writeln('Remaining Balance:  ${widget.billDetail.balance.toCurrency()}');
+    }
     receiptBuffer.writeln('----------------------------------');
     receiptBuffer.writeln('Thank you for shopping with us!');
     receiptBuffer.writeln('Billed via Thuga App');
@@ -384,6 +389,44 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
                           ),
                         ],
                       ),
+                      if (widget.billDetail.balance > 0.0) ...[
+                        6.verticalSpace,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Amount Paid',
+                              style: FontPalette.base500(
+                                13,
+                                color: colors.secondaryText,
+                              ),
+                            ),
+                            Text(
+                              (widget.billDetail.totalAmount - widget.billDetail.balance)
+                                  .clamp(0.0, widget.billDetail.totalAmount)
+                                  .toCurrency(),
+                              style: FontPalette.base600(13, color: colors.primaryText),
+                            ),
+                          ],
+                        ),
+                        6.verticalSpace,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Remaining Balance',
+                              style: FontPalette.base700(
+                                13,
+                                color: colors.errorText,
+                              ),
+                            ),
+                            Text(
+                              widget.billDetail.balance.toCurrency(),
+                              style: FontPalette.base700(13, color: colors.errorText),
+                            ),
+                          ],
+                        ),
+                      ],
                       const DottedDivider(),
                       16.verticalSpace,
                       Text(

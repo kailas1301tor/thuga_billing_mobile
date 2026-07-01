@@ -26,6 +26,8 @@ sealed class NewBillState with _$NewBillState {
     @Default(1) int currentPage,
     @Default(1) int totalPages,
     @Default(false) bool isLoadingMore,
+    @Default('Paid') String paymentStatus,
+    @Default(0.0) double receivedAmount,
     DropdownCustomerModel? selectedCustomer,
     String? errorMessage,
   }) = _NewBillState;

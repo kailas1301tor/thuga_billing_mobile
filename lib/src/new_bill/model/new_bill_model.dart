@@ -153,6 +153,7 @@ class BillResponseData {
   final String paymentStatus;
   final double totalAmount;
   final double discountAmount;
+  final double balance;
 
   const BillResponseData({
     required this.id,
@@ -162,6 +163,7 @@ class BillResponseData {
     required this.paymentStatus,
     required this.totalAmount,
     required this.discountAmount,
+    required this.balance,
   });
 
   factory BillResponseData.fromJson(Map<String, dynamic> json) => BillResponseData(
@@ -172,6 +174,7 @@ class BillResponseData {
         paymentStatus: convertToString(json['payment_status']),
         totalAmount: convertToDouble(json['total_amount']),
         discountAmount: convertToDouble(json['discount_amount']),
+        balance: convertToDouble(json['balance']),
       );
 }
 

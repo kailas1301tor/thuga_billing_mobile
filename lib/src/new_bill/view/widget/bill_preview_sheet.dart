@@ -26,6 +26,7 @@ class BillPreviewSheet extends ConsumerStatefulWidget {
     required this.subtotal,
     required this.itemDiscountAmount,
     required this.billDiscountAmount,
+    required this.balance,
   });
 
   final String orderNumber;
@@ -36,6 +37,7 @@ class BillPreviewSheet extends ConsumerStatefulWidget {
   final double subtotal;
   final double itemDiscountAmount;
   final double billDiscountAmount;
+  final double balance;
 
   @override
   ConsumerState<BillPreviewSheet> createState() => _BillPreviewSheetState();
@@ -102,7 +104,13 @@ class _BillPreviewSheetState extends ConsumerState<BillPreviewSheet> {
       receiptBuffer.writeln('Bill Discount:      -${widget.billDiscountAmount.toCurrency()}');
     }
     final totalDiscount = widget.itemDiscountAmount + widget.billDiscountAmount;
-    receiptBuffer.writeln('Grand Total:        ${(widget.subtotal - totalDiscount).clamp(0.0, double.infinity).toCurrency()}');
+    final grandTotal = (widget.subtotal - totalDiscount).clamp(0.0, double.infinity);
+    receiptBuffer.writeln('Grand Total:        ${grandTotal.toCurrency()}');
+    if (widget.balance > 0) {
+      final paidAmount = (grandTotal - widget.balance).clamp(0.0, double.infinity);
+      receiptBuffer.writeln('Amount Paid:        ${paidAmount.toCurrency()}');
+      receiptBuffer.writeln('Remaining Balance:  ${widget.balance.toCurrency()}');
+    }
     receiptBuffer.writeln('----------------------------------');
     receiptBuffer.writeln('Thank you for shopping with us!');
     receiptBuffer.writeln('Billed via Thuga App');
@@ -420,6 +428,44 @@ class _BillPreviewSheetState extends ConsumerState<BillPreviewSheet> {
                     ),
                   ],
                 ),
+                if (widget.balance > 0.0) ...[
+                  6.verticalSpace,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Amount Paid',
+                        style: FontPalette.base500(
+                          13,
+                          color: colors.secondaryText,
+                        ),
+                      ),
+                      Text(
+                        ((subtotal - totalDiscount) - widget.balance)
+                            .clamp(0.0, double.infinity)
+                            .toCurrency(),
+                        style: FontPalette.base600(13, color: colors.primaryText),
+                      ),
+                    ],
+                  ),
+                  6.verticalSpace,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Remaining Balance',
+                        style: FontPalette.base700(
+                          13,
+                          color: colors.errorText,
+                        ),
+                      ),
+                      Text(
+                        widget.balance.toCurrency(),
+                        style: FontPalette.base700(13, color: colors.errorText),
+                      ),
+                    ],
+                  ),
+                ],
                 const DottedDivider(),
                 16.verticalSpace,
                 Text(

@@ -26,6 +26,7 @@ class NewBillNotifier extends _$NewBillNotifier {
   late final TextEditingController customQtyController;
   late final TextEditingController customPriceController;
   late final TextEditingController quantityController;
+  late final TextEditingController receivedAmountController;
   late final FocusNode searchFocusNode;
   Timer? _searchDebounce;
 
@@ -38,9 +39,11 @@ class NewBillNotifier extends _$NewBillNotifier {
     customQtyController = TextEditingController();
     customPriceController = TextEditingController();
     quantityController = TextEditingController();
+    receivedAmountController = TextEditingController();
     searchFocusNode = FocusNode();
 
     searchController.addListener(_onSearchChanged);
+    receivedAmountController.addListener(_onReceivedAmountChanged);
 
     ref.onDispose(() {
       _searchDebounce?.cancel();
@@ -51,6 +54,7 @@ class NewBillNotifier extends _$NewBillNotifier {
       customQtyController.dispose();
       customPriceController.dispose();
       quantityController.dispose();
+      receivedAmountController.dispose();
       searchFocusNode.dispose();
     });
 
@@ -68,6 +72,12 @@ class NewBillNotifier extends _$NewBillNotifier {
         categoryId: state.selectedCategoryId,
       );
     });
+  }
+
+  void _onReceivedAmountChanged() {
+    final text = receivedAmountController.text.trim();
+    final val = double.tryParse(text) ?? 0.0;
+    state = state.copyWith(receivedAmount: val);
   }
 
   Future<void> fetchProducts({
@@ -163,7 +173,36 @@ class NewBillNotifier extends _$NewBillNotifier {
   void setPaymentMethod(String method) => state = state.copyWith(paymentMethod: method);
 
   void selectCustomer(DropdownCustomerModel? customer) {
-    state = state.copyWith(selectedCustomer: customer);
+    receivedAmountController.clear();
+    state = state.copyWith(
+      selectedCustomer: customer,
+      paymentStatus: customer == null ? 'Paid' : state.paymentStatus,
+      receivedAmount: 0.0,
+    );
+  }
+
+  void setPaymentStatus(String status) {
+    if (status != 'Partial') {
+      receivedAmountController.clear();
+    }
+    state = state.copyWith(
+      paymentStatus: status,
+      receivedAmount: status == 'Paid' ? 0.0 : state.receivedAmount,
+    );
+  }
+
+  void setReceivedAmount(double amount) {
+    state = state.copyWith(receivedAmount: amount);
+  }
+
+  double calculateBalance(double totalAmount) {
+    if (state.selectedCustomer == null || state.paymentStatus == 'Paid') {
+      return 0.0;
+    }
+    if (state.paymentStatus == 'Unpaid') {
+      return totalAmount;
+    }
+    return (totalAmount - state.receivedAmount).clamp(0.0, totalAmount);
   }
 
   // ── Search & Cart Expansion Toggles ────────────────────────────
@@ -339,12 +378,14 @@ class NewBillNotifier extends _$NewBillNotifier {
     final total = (subtotalAfterItemDiscounts - state.discountAmount)
         .clamp(0.0, double.infinity);
     final totalDiscount = itemDiscountTotal + state.discountAmount;
+    final balance = calculateBalance(total);
 
     final payload = {
       'customer': state.selectedCustomer?.id,
       'payment_method': state.paymentMethod,
       'total_amount': total.toStringAsFixed(2),
       'discount_amount': totalDiscount.toStringAsFixed(2),
+      'balance': balance,
       'items': state.cart.map((item) => {
         'product': item.productId,
         'qty': item.quantity,
@@ -377,6 +418,7 @@ class NewBillNotifier extends _$NewBillNotifier {
         final previewItemDiscount = state.cart.fold<double>(
           0, (sum, item) => sum + item.discountAmount,
         );
+        final previewBalance = right.data?.balance ?? balance;
 
         // Show the professional bill preview bottom sheet
         if (context.mounted) {
@@ -393,6 +435,7 @@ class NewBillNotifier extends _$NewBillNotifier {
               subtotal: previewSubtotal,
               itemDiscountAmount: previewItemDiscount,
               billDiscountAmount: state.discountAmount,
+              balance: previewBalance,
             ),
           );
         }
@@ -405,6 +448,8 @@ class NewBillNotifier extends _$NewBillNotifier {
           isCartExpanded: false,
           isSavingBill: false,
           discountAmount: 0.0,
+          paymentStatus: 'Paid',
+          receivedAmount: 0.0,
         );
       },
     ).catchError((Object e) {

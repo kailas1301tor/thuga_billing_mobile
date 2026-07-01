@@ -37,6 +37,8 @@ mixin _$NewBillState {
   int get currentPage => throw _privateConstructorUsedError;
   int get totalPages => throw _privateConstructorUsedError;
   bool get isLoadingMore => throw _privateConstructorUsedError;
+  String get paymentStatus => throw _privateConstructorUsedError;
+  double get receivedAmount => throw _privateConstructorUsedError;
   DropdownCustomerModel? get selectedCustomer =>
       throw _privateConstructorUsedError;
   String? get errorMessage => throw _privateConstructorUsedError;
@@ -73,6 +75,8 @@ abstract class $NewBillStateCopyWith<$Res> {
     int currentPage,
     int totalPages,
     bool isLoadingMore,
+    String paymentStatus,
+    double receivedAmount,
     DropdownCustomerModel? selectedCustomer,
     String? errorMessage,
   });
@@ -110,6 +114,8 @@ class _$NewBillStateCopyWithImpl<$Res, $Val extends NewBillState>
     Object? currentPage = null,
     Object? totalPages = null,
     Object? isLoadingMore = null,
+    Object? paymentStatus = null,
+    Object? receivedAmount = null,
     Object? selectedCustomer = freezed,
     Object? errorMessage = freezed,
   }) {
@@ -183,6 +189,14 @@ class _$NewBillStateCopyWithImpl<$Res, $Val extends NewBillState>
                 ? _value.isLoadingMore
                 : isLoadingMore // ignore: cast_nullable_to_non_nullable
                       as bool,
+            paymentStatus: null == paymentStatus
+                ? _value.paymentStatus
+                : paymentStatus // ignore: cast_nullable_to_non_nullable
+                      as String,
+            receivedAmount: null == receivedAmount
+                ? _value.receivedAmount
+                : receivedAmount // ignore: cast_nullable_to_non_nullable
+                      as double,
             selectedCustomer: freezed == selectedCustomer
                 ? _value.selectedCustomer
                 : selectedCustomer // ignore: cast_nullable_to_non_nullable
@@ -224,6 +238,8 @@ abstract class _$$NewBillStateImplCopyWith<$Res>
     int currentPage,
     int totalPages,
     bool isLoadingMore,
+    String paymentStatus,
+    double receivedAmount,
     DropdownCustomerModel? selectedCustomer,
     String? errorMessage,
   });
@@ -260,6 +276,8 @@ class __$$NewBillStateImplCopyWithImpl<$Res>
     Object? currentPage = null,
     Object? totalPages = null,
     Object? isLoadingMore = null,
+    Object? paymentStatus = null,
+    Object? receivedAmount = null,
     Object? selectedCustomer = freezed,
     Object? errorMessage = freezed,
   }) {
@@ -333,6 +351,14 @@ class __$$NewBillStateImplCopyWithImpl<$Res>
             ? _value.isLoadingMore
             : isLoadingMore // ignore: cast_nullable_to_non_nullable
                   as bool,
+        paymentStatus: null == paymentStatus
+            ? _value.paymentStatus
+            : paymentStatus // ignore: cast_nullable_to_non_nullable
+                  as String,
+        receivedAmount: null == receivedAmount
+            ? _value.receivedAmount
+            : receivedAmount // ignore: cast_nullable_to_non_nullable
+                  as double,
         selectedCustomer: freezed == selectedCustomer
             ? _value.selectedCustomer
             : selectedCustomer // ignore: cast_nullable_to_non_nullable
@@ -367,6 +393,8 @@ class _$NewBillStateImpl implements _NewBillState {
     this.currentPage = 1,
     this.totalPages = 1,
     this.isLoadingMore = false,
+    this.paymentStatus = 'Paid',
+    this.receivedAmount = 0.0,
     this.selectedCustomer,
     this.errorMessage,
   }) : _categories = categories,
@@ -445,13 +473,19 @@ class _$NewBillStateImpl implements _NewBillState {
   @JsonKey()
   final bool isLoadingMore;
   @override
+  @JsonKey()
+  final String paymentStatus;
+  @override
+  @JsonKey()
+  final double receivedAmount;
+  @override
   final DropdownCustomerModel? selectedCustomer;
   @override
   final String? errorMessage;
 
   @override
   String toString() {
-    return 'NewBillState(loaderState: $loaderState, billingMode: $billingMode, selectedCategory: $selectedCategory, selectedCategoryId: $selectedCategoryId, searchQuery: $searchQuery, isSearchExpanded: $isSearchExpanded, isCartExpanded: $isCartExpanded, categories: $categories, products: $products, cart: $cart, paymentMethod: $paymentMethod, billNumber: $billNumber, isSavingBill: $isSavingBill, discountAmount: $discountAmount, currentPage: $currentPage, totalPages: $totalPages, isLoadingMore: $isLoadingMore, selectedCustomer: $selectedCustomer, errorMessage: $errorMessage)';
+    return 'NewBillState(loaderState: $loaderState, billingMode: $billingMode, selectedCategory: $selectedCategory, selectedCategoryId: $selectedCategoryId, searchQuery: $searchQuery, isSearchExpanded: $isSearchExpanded, isCartExpanded: $isCartExpanded, categories: $categories, products: $products, cart: $cart, paymentMethod: $paymentMethod, billNumber: $billNumber, isSavingBill: $isSavingBill, discountAmount: $discountAmount, currentPage: $currentPage, totalPages: $totalPages, isLoadingMore: $isLoadingMore, paymentStatus: $paymentStatus, receivedAmount: $receivedAmount, selectedCustomer: $selectedCustomer, errorMessage: $errorMessage)';
   }
 
   @override
@@ -493,6 +527,10 @@ class _$NewBillStateImpl implements _NewBillState {
                 other.totalPages == totalPages) &&
             (identical(other.isLoadingMore, isLoadingMore) ||
                 other.isLoadingMore == isLoadingMore) &&
+            (identical(other.paymentStatus, paymentStatus) ||
+                other.paymentStatus == paymentStatus) &&
+            (identical(other.receivedAmount, receivedAmount) ||
+                other.receivedAmount == receivedAmount) &&
             (identical(other.selectedCustomer, selectedCustomer) ||
                 other.selectedCustomer == selectedCustomer) &&
             (identical(other.errorMessage, errorMessage) ||
@@ -519,6 +557,8 @@ class _$NewBillStateImpl implements _NewBillState {
     currentPage,
     totalPages,
     isLoadingMore,
+    paymentStatus,
+    receivedAmount,
     selectedCustomer,
     errorMessage,
   ]);
@@ -551,6 +591,8 @@ abstract class _NewBillState implements NewBillState {
     final int currentPage,
     final int totalPages,
     final bool isLoadingMore,
+    final String paymentStatus,
+    final double receivedAmount,
     final DropdownCustomerModel? selectedCustomer,
     final String? errorMessage,
   }) = _$NewBillStateImpl;
@@ -589,6 +631,10 @@ abstract class _NewBillState implements NewBillState {
   int get totalPages;
   @override
   bool get isLoadingMore;
+  @override
+  String get paymentStatus;
+  @override
+  double get receivedAmount;
   @override
   DropdownCustomerModel? get selectedCustomer;
   @override
