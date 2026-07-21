@@ -18,6 +18,8 @@ class BottomSheetContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeOutBack,
@@ -26,7 +28,7 @@ class BottomSheetContent extends StatelessWidget {
         padding:
             padding ?? EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
         decoration: BoxDecoration(
-          color: ColorPalette.white,
+          color: colors.surface,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(40.r),
             topRight: Radius.circular(40.r),
@@ -40,7 +42,7 @@ class BottomSheetContent extends StatelessWidget {
               width: 35.w,
               height: 6.h,
               decoration: BoxDecoration(
-                color: ColorPalette.fE7E7E7,
+                color: colors.inputBorder,
                 borderRadius: BorderRadius.circular(12.r),
               ),
             ),
@@ -141,11 +143,9 @@ class _SingleSelectBottomSheetBodyState<T>
             onClose: () => Navigator.pop(context),
           ),
           16.verticalSpace,
-          // Search bar
           CommonSearchBar(
             controller: _searchController,
             hintText: 'Search...',
-
             onChanged: (val) {
               setState(() {
                 _searchQuery = val;
@@ -162,7 +162,7 @@ class _SingleSelectBottomSheetBodyState<T>
             child: widget.loaderState == LoaderState.loading
                 ? Column(
                     children: List.generate(
-                      3, // Show 3 placeholder items
+                      3,
                       (index) => Padding(
                         padding: EdgeInsets.symmetric(vertical: 8.h),
                         child: Row(
@@ -172,8 +172,8 @@ class _SingleSelectBottomSheetBodyState<T>
                               child: Container(
                                 height: 25.h,
                                 width: double.infinity,
-                                color: ColorPalette.white,
-                              ).showGradientShimmer(),
+                                color: colors.inputBackground,
+                              ).showGradientShimmer(colors),
                             ),
                             const Spacer(),
                             Container(
@@ -183,7 +183,7 @@ class _SingleSelectBottomSheetBodyState<T>
                               decoration: const BoxDecoration(
                                 shape: BoxShape.circle,
                               ),
-                            ).showGradientShimmer(),
+                            ).showGradientShimmer(colors),
                           ],
                         ),
                       ),
@@ -195,7 +195,10 @@ class _SingleSelectBottomSheetBodyState<T>
                       padding: EdgeInsets.symmetric(vertical: 32.h),
                       child: Text(
                         'No data found',
-                        style: FontPalette.base500(14, color: colors.secondaryText),
+                        style: FontPalette.base500(
+                          14,
+                          color: colors.secondaryText,
+                        ),
                       ),
                     ),
                   )
@@ -205,7 +208,10 @@ class _SingleSelectBottomSheetBodyState<T>
                       padding: EdgeInsets.symmetric(vertical: 32.h),
                       child: Text(
                         'No results found',
-                        style: FontPalette.base500(14, color: colors.secondaryText),
+                        style: FontPalette.base500(
+                          14,
+                          color: colors.secondaryText,
+                        ),
                       ),
                     ),
                   )
@@ -267,7 +273,6 @@ class _SingleSelectBottomSheetBodyState<T>
   }
 }
 
-// Generic Single Select Options List
 class SingleSelectOptionsList<T> extends StatelessWidget {
   final List<T> options;
   final ValueNotifier<T?> selectedOptionNotifier;
@@ -284,6 +289,8 @@ class SingleSelectOptionsList<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
+
     return ValueListenableBuilder<T?>(
       valueListenable: selectedOptionNotifier,
       builder: (context, selectedOption, child) {
@@ -311,13 +318,15 @@ class SingleSelectOptionsList<T> extends StatelessWidget {
                       color: ColorPalette.transparent,
                     ),
                     child: Row(
-                      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           displayText(option),
-                          style: FontPalette.fBlack_16_500,
+                          style: FontPalette.base500(
+                            16,
+                            color: colors.primaryText,
+                          ),
                         ),
-                        Spacer(),
+                        const Spacer(),
                         AnimatedContainer(
                           duration: const Duration(milliseconds: 300),
                           width: 21.w,
@@ -326,8 +335,8 @@ class SingleSelectOptionsList<T> extends StatelessWidget {
                             shape: BoxShape.circle,
                             border: Border.all(
                               color: isSelected
-                                  ? ColorPalette.secondaryColor
-                                  : const Color(0xFFD1D1D1),
+                                  ? colors.primary
+                                  : colors.inputBorder,
                               width: 1,
                             ),
                           ),
@@ -338,7 +347,7 @@ class SingleSelectOptionsList<T> extends StatelessWidget {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: isSelected
-                                  ? ColorPalette.secondaryColor
+                                  ? colors.primary
                                   : Colors.transparent,
                             ),
                           ),
@@ -349,7 +358,7 @@ class SingleSelectOptionsList<T> extends StatelessWidget {
                   ),
                 ),
                 if (option != options.last)
-                  const Divider(color: ColorPalette.fF1F1F1, height: 1),
+                  Divider(color: colors.inputBorder, height: 1),
               ],
             );
           }).toList(),
@@ -359,7 +368,6 @@ class SingleSelectOptionsList<T> extends StatelessWidget {
   }
 }
 
-// Reusable Multi Select Bottom Sheet with Generic Type T
 void showMultiSelectBottomSheet<T>({
   required BuildContext context,
   required WidgetRef ref,
@@ -403,9 +411,7 @@ void showMultiSelectBottomSheet<T>({
                 onValuesChanged(selectedOptionsNotifier.value);
                 Navigator.pop(context);
               },
-              text: "Save",
-              backgroundColor: ColorPalette.secondaryColor,
-              fontStyle: FontPalette.fWhite_16_600,
+              text: 'Save',
             ),
           ),
         ],
@@ -414,7 +420,6 @@ void showMultiSelectBottomSheet<T>({
   ).then((_) => selectedOptionsNotifier.dispose());
 }
 
-// Generic Multi Select Options List
 class MultiSelectOptionsList<T> extends StatelessWidget {
   final List<T> options;
   final ValueNotifier<List<T>> selectedOptionsNotifier;
@@ -432,20 +437,16 @@ class MultiSelectOptionsList<T> extends StatelessWidget {
   void _toggleOption(T option) {
     final currentSelections = List<T>.from(selectedOptionsNotifier.value);
 
-    // If "None" is selected, clear all other selections
-    if (displayText(option) == "None") {
+    if (displayText(option) == 'None') {
       selectedOptionsNotifier.value = [option];
     } else {
-      // Remove "None" if any other option is selected
-      currentSelections.removeWhere((item) => displayText(item) == "None");
+      currentSelections.removeWhere((item) => displayText(item) == 'None');
 
       if (currentSelections.contains(option)) {
         currentSelections.remove(option);
-        // If no options are selected, default to "None"
         if (currentSelections.isEmpty) {
-          // Try to find the "None" option in the list
           final noneOption = options.firstWhere(
-            (item) => displayText(item) == "None",
+            (item) => displayText(item) == 'None',
             orElse: () => option,
           );
           currentSelections.add(noneOption);
@@ -461,6 +462,8 @@ class MultiSelectOptionsList<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
+
     return ValueListenableBuilder<List<T>>(
       valueListenable: selectedOptionsNotifier,
       builder: (context, selectedOptions, child) {
@@ -485,9 +488,15 @@ class MultiSelectOptionsList<T> extends StatelessWidget {
                         Expanded(
                           child: Text(
                             displayText(option),
-                            style: isSelected
-                                ? FontPalette.fBlack_16_600
-                                : FontPalette.fBlack_16_500,
+                            style:
+                                FontPalette.base500(
+                                  16,
+                                  color: colors.primaryText,
+                                ).copyWith(
+                                  fontWeight: isSelected
+                                      ? FontWeight.w600
+                                      : FontWeight.w500,
+                                ),
                           ),
                         ),
                         AnimatedContainer(
@@ -499,18 +508,18 @@ class MultiSelectOptionsList<T> extends StatelessWidget {
                             border: Border.all(
                               color: isSelected
                                   ? Colors.transparent
-                                  : ColorPalette.fD1D1D1,
+                                  : colors.inputBorder,
                               width: 1,
                             ),
                             color: isSelected
-                                ? ColorPalette.secondaryColor
+                                ? colors.primary
                                 : Colors.transparent,
                           ),
                           child: isSelected
-                              ? const Icon(
+                              ? Icon(
                                   Icons.check,
-                                  size: 14,
-                                  color: Colors.white,
+                                  size: 14.r,
+                                  color: colors.surface,
                                 )
                               : null,
                         ),
@@ -519,7 +528,7 @@ class MultiSelectOptionsList<T> extends StatelessWidget {
                   ),
                 ),
                 if (option != options.last)
-                  Divider(color: ColorPalette.fF1F1F1, height: 1),
+                  Divider(color: colors.inputBorder, height: 1),
               ],
             );
           }).toList(),
@@ -541,22 +550,29 @@ class BottomSheetHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(title, style: FontPalette.fBlack_18_600),
+        Expanded(
+          child: Text(
+            title,
+            style: FontPalette.base600(18, color: colors.primaryText),
+          ),
+        ),
         GestureDetector(
           onTap: onClose,
           child: Container(
             padding: EdgeInsets.all(6.r),
-            decoration: const BoxDecoration(
-              color: ColorPalette.fF6F6F6,
+            decoration: BoxDecoration(
+              color: colors.inputBackground,
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child: Icon(
               Icons.close_rounded,
-              size: 16,
-              color: ColorPalette.black,
+              size: 16.r,
+              color: colors.primaryText,
             ),
           ),
         ),
@@ -566,10 +582,10 @@ class BottomSheetHeader extends StatelessWidget {
 }
 
 extension ShimmerExtension on Widget {
-  Widget showGradientShimmer() {
+  Widget showGradientShimmer(AppColors colors) {
     return Shimmer.fromColors(
-      baseColor: const Color(0xFFE5E7EB),
-      highlightColor: const Color(0xFFF3F4F6),
+      baseColor: colors.inputBackground,
+      highlightColor: colors.inputBorder,
       child: this,
     );
   }

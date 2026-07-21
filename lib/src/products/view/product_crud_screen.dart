@@ -31,6 +31,33 @@ import 'package:vyapapp/utils/helpers/extensions.dart';
 class ProductCrudScreen extends ConsumerWidget {
   const ProductCrudScreen({super.key});
 
+  Widget _buildFieldLabel(BuildContext context, String label) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 8.h),
+      child: Text(
+        label,
+        style: FontPalette.base600(
+          13,
+          color: context.appColors.primaryText,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLabeledField({
+    required BuildContext context,
+    required String label,
+    required Widget child,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildFieldLabel(context, label),
+        child,
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
@@ -185,12 +212,30 @@ class ProductCrudScreen extends ConsumerWidget {
     ProductsNotifier notifier,
   ) {
     final products = state.response?.results.data ?? [];
+    final isLoadingMore = state.isLoadingMore;
     return CommonRefreshIndicator(
       onRefresh: () => notifier.fetchProducts(),
       child: ListView.builder(
+        controller: notifier.scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-        itemCount: products.length,
+        itemCount: products.length + (isLoadingMore ? 1 : 0),
         itemBuilder: (context, index) {
+          if (index == products.length) {
+            return Padding(
+              padding: EdgeInsets.symmetric(vertical: 16.h),
+              child: Center(
+                child: SizedBox(
+                  width: 24.r,
+                  height: 24.r,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.w,
+                    color: colors.primary,
+                  ),
+                ),
+              ),
+            );
+          }
           final product = products[index];
           final isToggling = state.togglingProductIds.contains(product.id);
           return ProductCardWidget(
@@ -216,7 +261,15 @@ class ProductCrudScreen extends ConsumerWidget {
       notifier.nameController.text = product.name;
       notifier.priceController.text = product.price.toString();
       notifier.barcodeController.text = product.barcode ?? '';
-      notifier.qtyController.text = product.quantity == 0 ? '' : (product.quantity % 1 == 0 ? product.quantity.toInt().toString() : product.quantity.toString());
+      notifier.qtyController.text = product.quantity == null
+          ? ''
+          : (product.quantity! % 1 == 0
+              ? product.quantity!.toInt().toString()
+              : product.quantity.toString());
+      notifier.sgstController.text =
+          product.sgst == null ? '' : product.sgst!.toString();
+      notifier.cgstController.text =
+          product.cgst == null ? '' : product.cgst!.toString();
       notifier.selectCategory(product.categoryId);
       notifier.initializeEdit(isQuickProduct: product.isQuickProduct);
     } else {
@@ -356,10 +409,14 @@ class ProductCrudScreen extends ConsumerWidget {
                 },
               ),
               16.verticalSpace,
-              CommonTextFormField(
-                controller: notifier.nameController,
-                hintText: Strings.productName,
-                inputAction: TextInputAction.next,
+              _buildLabeledField(
+                context: context,
+                label: Strings.productName,
+                child: CommonTextFormField(
+                  controller: notifier.nameController,
+                  hintText: Strings.productName,
+                  inputAction: TextInputAction.next,
+                ),
               ),
               16.verticalSpace,
               Consumer(
@@ -377,73 +434,111 @@ class ProductCrudScreen extends ConsumerWidget {
                     (c) => c.id == state.selectedCategoryId,
                   );
 
-                  return GestureDetector(
-                    onTap: () {
-                      showSingleSelectBottomSheet<CategoryModel>(
-                        context: context,
-                        ref: ref,
-                        title: Strings.selectCategory,
-                        options: categories,
-                        currentValue: selectedCategory,
-                        onSelected: (cat) => notifier.selectCategory(cat.id),
-                        displayText: (cat) => cat.name,
-                      );
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16.w,
-                        vertical: 16.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: context.appColors.inputBackground,
-                        borderRadius: BorderRadius.circular(14.r),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              selectedCategory?.name ?? Strings.selectCategory,
-                              style: FontPalette.base400(
-                                14,
-                                color: selectedCategory != null
-                                    ? context.appColors.primaryText
-                                    : context.appColors.secondaryText,
+                  return _buildLabeledField(
+                    context: context,
+                    label: Strings.categoryName,
+                    child: GestureDetector(
+                      onTap: () {
+                        showSingleSelectBottomSheet<CategoryModel>(
+                          context: context,
+                          ref: ref,
+                          title: Strings.selectCategory,
+                          options: categories,
+                          currentValue: selectedCategory,
+                          onSelected: (cat) => notifier.selectCategory(cat.id),
+                          displayText: (cat) => cat.name,
+                        );
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16.w,
+                          vertical: 16.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: context.appColors.inputBackground,
+                          borderRadius: BorderRadius.circular(14.r),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                selectedCategory?.name ?? Strings.selectCategory,
+                                style: FontPalette.base400(
+                                  14,
+                                  color: selectedCategory != null
+                                      ? context.appColors.primaryText
+                                      : context.appColors.secondaryText,
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              overflow: TextOverflow.ellipsis,
                             ),
-                          ),
-                          Icon(
-                            Icons.keyboard_arrow_down_rounded,
-                            color: context.appColors.secondaryText,
-                            size: 20.r,
-                          ),
-                        ],
+                            Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              color: context.appColors.secondaryText,
+                              size: 20.r,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   );
                 },
               ),
               16.verticalSpace,
-              CommonTextFormField(
-                controller: notifier.priceController,
-                hintText: Strings.price,
-                inputType: const TextInputType.numberWithOptions(decimal: true),
-                inputAction: TextInputAction.next,
+              _buildLabeledField(
+                context: context,
+                label: Strings.price,
+                child: CommonTextFormField(
+                  controller: notifier.priceController,
+                  hintText: Strings.price,
+                  inputType: const TextInputType.numberWithOptions(decimal: true),
+                  inputAction: TextInputAction.next,
+                ),
               ),
               16.verticalSpace,
-              CommonTextFormField(
-                controller: notifier.barcodeController,
-                hintText: 'Barcode',
-                inputType: TextInputType.text,
-                inputAction: TextInputAction.next,
+              _buildLabeledField(
+                context: context,
+                label: Strings.barcode,
+                child: CommonTextFormField(
+                  controller: notifier.barcodeController,
+                  hintText: Strings.barcode,
+                  inputType: TextInputType.text,
+                  inputAction: TextInputAction.next,
+                ),
               ),
               16.verticalSpace,
-              CommonTextFormField(
-                controller: notifier.qtyController,
-                hintText: 'Quantity',
-                inputType: const TextInputType.numberWithOptions(decimal: true),
-                inputAction: TextInputAction.done,
+              _buildLabeledField(
+                context: context,
+                label: Strings.quantity,
+                child: CommonTextFormField(
+                  controller: notifier.qtyController,
+                  hintText: Strings.quantity,
+                  inputType: const TextInputType.numberWithOptions(decimal: true),
+                  inputAction: TextInputAction.next,
+                ),
+              ),
+              16.verticalSpace,
+              _buildLabeledField(
+                context: context,
+                label: Strings.sgst,
+                child: CommonTextFormField(
+                  controller: notifier.sgstController,
+                  hintText: Strings.sgstPercentHint,
+                  inputType: const TextInputType.numberWithOptions(decimal: true),
+                  inputAction: TextInputAction.next,
+                ),
+              ),
+              16.verticalSpace,
+              _buildLabeledField(
+                context: context,
+                label: Strings.cgst,
+                child: CommonTextFormField(
+                  controller: notifier.cgstController,
+                  hintText: Strings.cgstPercentHint,
+                  inputType: const TextInputType.numberWithOptions(decimal: true),
+                  inputAction: TextInputAction.done,
+                ),
               ),
               16.verticalSpace,
               // Quick Product Toggle

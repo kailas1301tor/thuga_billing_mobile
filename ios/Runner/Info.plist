@@ -66,5 +66,11 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Bluetooth is used to connect and print to receipt printers.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Bluetooth is used to connect and print to receipt printers.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Location access helps discover nearby Bluetooth receipt printers.</string>
 </dict>
 </plist>

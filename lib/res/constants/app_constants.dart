@@ -26,6 +26,7 @@ class AppConstants {
   static String customers = "$api/customers";
   static String categoriesWithProducts = "$api/categories-with-products";
   static String bills = "$api/bills";
+  static String billPaymentStatus = "$api/bill-payment-status";
   static String purchase = "$api/purchase";
   static String dashboard = "$api/dashboard";
   static String reports = "$api/reports";

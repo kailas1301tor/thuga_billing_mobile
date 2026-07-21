@@ -81,6 +81,8 @@ dependencies:
   image: ^4.3.0
   path: ^1.9.0
   share_plus: ^12.0.2
+  flutter_thermal_printer_plus:
+    path: packages/flutter_thermal_printer_plus
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -93,6 +95,15 @@ dev_dependencies:
   riverpod_generator: ^2.6.3
   freezed: ^2.5.7
   json_serializable: ^6.9.4
+  flutter_launcher_icons: ^0.14.3
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/png/thuga_logo.png"
+  adaptive_icon_background: "#05B064"
+  adaptive_icon_foreground: "assets/images/png/thuga_logo.png"
+  remove_alpha_ios: true
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

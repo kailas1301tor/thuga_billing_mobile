@@ -7,7 +7,11 @@ import 'package:vyapapp/utils/helpers/safe_converters.dart';
 import '../model/category_model.dart';
 
 abstract class CategoriesRepo {
-  Future<Either<ResponseError, CategoryResponse>> getCategories({String? search});
+  Future<Either<ResponseError, CategoryResponse>> getCategories({
+    required String search,
+    required int page,
+    required int pageSize,
+  });
   Future<Either<ResponseError, CategoryAddResponse>> createCategory(String name);
   Future<Either<ResponseError, CategoryAddResponse>> updateCategory(int id, String name);
   Future<Either<ResponseError, CategoryDeleteResponse>> deleteCategory(int id);
@@ -18,11 +22,16 @@ class CategoriesRepoImpl implements CategoriesRepo {
   CategoriesRepoImpl(this._services);
 
   @override
-  Future<Either<ResponseError, CategoryResponse>> getCategories({String? search}) async {
-    final Map<String, dynamic> queryParameters = {};
-    if (search != null && search.isNotEmpty) {
-      queryParameters['search'] = search;
-    }
+  Future<Either<ResponseError, CategoryResponse>> getCategories({
+    required String search,
+    required int page,
+    required int pageSize,
+  }) async {
+    final queryParameters = <String, dynamic>{
+      'search': search,
+      'page': page,
+      'page_size': pageSize,
+    };
 
     return await _services
         .safe(_services.getRequest(

@@ -205,5 +205,24 @@ final purchasesRepositoryProvider = AutoDisposeProvider<PurchasesRepo>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef PurchasesRepositoryRef = AutoDisposeProviderRef<PurchasesRepo>;
+String _$calculationRepositoryHash() =>
+    r'4d71f63cd9d78f589555d12c62c5c011e4af949f';
+
+/// See also [calculationRepository].
+@ProviderFor(calculationRepository)
+final calculationRepositoryProvider =
+    AutoDisposeProvider<CalculationRepo>.internal(
+      calculationRepository,
+      name: r'calculationRepositoryProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$calculationRepositoryHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef CalculationRepositoryRef = AutoDisposeProviderRef<CalculationRepo>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

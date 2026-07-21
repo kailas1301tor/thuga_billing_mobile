@@ -7,8 +7,15 @@ import 'package:flutter/services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:vyapapp/res/enums/enums.dart';
 import 'package:vyapapp/services/repo_di.dart';
+import 'package:vyapapp/src/printer/notifier/printer_notifier.dart';
+import 'package:vyapapp/src/settings/notifier/settings_notifier.dart';
 import 'package:vyapapp/utils/helpers/api_error_handler.dart';
+import 'package:vyapapp/utils/helpers/bill_tax_helper.dart';
+import 'package:vyapapp/utils/helpers/extensions.dart';
+import 'package:vyapapp/utils/helpers/product_stock_helper.dart';
+import 'package:vyapapp/utils/helpers/receipt_print_helper.dart';
 import 'package:vyapapp/utils/helpers/toast_helper.dart';
+import 'package:vyapapp/res/constants/string_constants.dart';
 import 'package:vyapapp/utils/common_widgets/common_bottom_sheet.dart';
 import 'package:vyapapp/src/new_bill/view/widget/bill_preview_sheet.dart';
 import '../../main/model/dropdown_model.dart';
@@ -84,14 +91,16 @@ class NewBillNotifier extends _$NewBillNotifier {
     String? search,
     int? categoryId,
     int page = 1,
+    bool showLoader = true,
   }) async {
-    if (page == 1) {
+    if (page == 1 && showLoader) {
       state = state.copyWith(loaderState: LoaderState.loading);
-    } else {
+    } else if (page > 1) {
       state = state.copyWith(isLoadingMore: true);
     }
 
-    return await ref.read(newBillRepositoryProvider)
+    return await ref
+        .read(newBillRepositoryProvider)
         .getCategoriesWithProducts(
           search: search,
           categoryId: categoryId,
@@ -99,53 +108,70 @@ class NewBillNotifier extends _$NewBillNotifier {
           pageSize: 9,
         )
         .fold(
-      (left) {
-        state = state.copyWith(
-          loaderState: handleResponseError(left.key),
-          isLoadingMore: false,
-          errorMessage: left.message,
-        );
-      },
-      (right) {
-        final categories = right.results.data;
+          (left) {
+            if (showLoader || page > 1) {
+              state = state.copyWith(
+                loaderState: handleResponseError(left.key),
+                isLoadingMore: false,
+                errorMessage: left.message,
+              );
+            } else {
+              debugPrint(
+                "🔴 Silent product refresh failed: ${left.message}",
+              );
+            }
+          },
+          (right) {
+            final categories = right.results.data;
 
-        // Find the selected category's products
-        final selectedCatId = categoryId ?? state.selectedCategoryId;
-        final selectedCat = categories.firstWhere(
-          (c) => c.id == selectedCatId,
-          orElse: () => categories.first,
-        );
-        final newProducts = selectedCat.products;
+            // Find the selected category's products
+            final selectedCatId = categoryId ?? state.selectedCategoryId;
+            final selectedCat = categories.firstWhere(
+              (c) => c.id == selectedCatId,
+              orElse: () => categories.first,
+            );
+            final newProducts = selectedCat.products;
 
-        // Page 1 → replace; page > 1 → append
-        final allProducts = page == 1
-            ? newProducts
-            : [...state.products, ...newProducts];
+            // Page 1 → replace; page > 1 → append
+            final allProducts = page == 1
+                ? newProducts
+                : [...state.products, ...newProducts];
 
-        // On first load, default selection to the first category
-        final selectedName = page == 1 && state.selectedCategory.isEmpty
-            ? selectedCat.name
-            : state.selectedCategory;
+            // On first load, default selection to the first category
+            final selectedName = page == 1 && state.selectedCategory.isEmpty
+                ? selectedCat.name
+                : state.selectedCategory;
 
-        state = state.copyWith(
-          loaderState: allProducts.isEmpty
-              ? LoaderState.noData
-              : LoaderState.loaded,
-          isLoadingMore: false,
-          categories: categories,
-          products: allProducts,
-          selectedCategory: selectedName,
-          currentPage: right.results.currentPage,
-          totalPages: right.results.totalPages,
-        );
-      },
-    ).catchError((Object e) {
-      debugPrint("🔴 Error fetching categories with products: $e");
-      state = state.copyWith(
-        loaderState: LoaderState.error,
-        isLoadingMore: false,
-      );
-    });
+            state = state.copyWith(
+              loaderState: allProducts.isEmpty
+                  ? LoaderState.noData
+                  : LoaderState.loaded,
+              isLoadingMore: false,
+              categories: categories,
+              products: allProducts,
+              selectedCategory: selectedName,
+              currentPage: right.results.currentPage,
+              totalPages: right.results.totalPages,
+            );
+          },
+        )
+        .catchError((Object e) {
+          debugPrint("🔴 Error fetching categories with products: $e");
+          if (showLoader) {
+            state = state.copyWith(
+              loaderState: LoaderState.error,
+              isLoadingMore: false,
+            );
+          }
+        });
+  }
+
+  Future<void> _refreshProductsAfterBill() {
+    return fetchProducts(
+      categoryId: state.selectedCategoryId,
+      search: state.searchQuery.isNotEmpty ? state.searchQuery : null,
+      showLoader: false,
+    );
   }
 
   // ── Mode & Filter ──────────────────────────────────────────────
@@ -170,7 +196,9 @@ class NewBillNotifier extends _$NewBillNotifier {
       page: state.currentPage + 1,
     );
   }
-  void setPaymentMethod(String method) => state = state.copyWith(paymentMethod: method);
+
+  void setPaymentMethod(String method) =>
+      state = state.copyWith(paymentMethod: method);
 
   void selectCustomer(DropdownCustomerModel? customer) {
     receivedAmountController.clear();
@@ -182,7 +210,7 @@ class NewBillNotifier extends _$NewBillNotifier {
   }
 
   void setPaymentStatus(String status) {
-    if (status != 'Partial') {
+    if (status != 'Partially Paid') {
       receivedAmountController.clear();
     }
     state = state.copyWith(
@@ -195,14 +223,13 @@ class NewBillNotifier extends _$NewBillNotifier {
     state = state.copyWith(receivedAmount: amount);
   }
 
-  double calculateBalance(double totalAmount) {
-    if (state.selectedCustomer == null || state.paymentStatus == 'Paid') {
-      return 0.0;
-    }
-    if (state.paymentStatus == 'Unpaid') {
-      return totalAmount;
-    }
-    return (totalAmount - state.receivedAmount).clamp(0.0, totalAmount);
+  BillTotals get billTotals =>
+      computeBillTotals(state.cart, state.discountAmount);
+
+  double calculateBalance(double grandTotal) {
+    if (state.paymentStatus == 'Paid') return 0.0;
+    if (state.paymentStatus == 'Credit') return grandTotal;
+    return (grandTotal - state.receivedAmount).clamp(0.0, grandTotal);
   }
 
   // ── Search & Cart Expansion Toggles ────────────────────────────
@@ -222,40 +249,143 @@ class NewBillNotifier extends _$NewBillNotifier {
   }
 
   // ── Cart Operations ────────────────────────────────────────────
+  ProductModel? _productById(int id) {
+    for (final product in state.products) {
+      if (product.id == id) return product;
+    }
+    return null;
+  }
+
+  void _showInsufficientStockToast(double? stockQuantity) {
+    final maxQty = maxPurchasableQuantity(stockQuantity);
+    if (maxQty != null) {
+      showCustomErrorToast(message: Strings.productInsufficientStock(maxQty));
+    }
+  }
+
   void addToCart(ProductModel prod) {
+    if (isOutOfStock(prod.quantity)) {
+      showCustomErrorToast(message: Strings.productOutOfStock);
+      return;
+    }
+
     HapticFeedback.lightImpact();
     final index = state.cart.indexWhere((item) => item.productId == prod.id);
+    final currentQty = index >= 0 ? state.cart[index].quantity : 0;
+
+    if (!canIncreaseCartQuantity(
+      stockQuantity: prod.quantity,
+      cartQuantity: currentQty,
+    )) {
+      _showInsufficientStockToast(prod.quantity);
+      return;
+    }
+
     if (index >= 0) {
       final updated = List<CartItemModel>.from(state.cart);
-      updated[index] = updated[index].copyWith(quantity: updated[index].quantity + 1);
+      updated[index] = updated[index].copyWith(
+        quantity: updated[index].quantity + 1,
+      );
       state = state.copyWith(cart: updated);
     } else {
       state = state.copyWith(
-        cart: [...state.cart, CartItemModel(productId: prod.id, name: prod.name, price: prod.price, quantity: 1, emoji: '📦', imageUrl: prod.imageUrl)],
+        cart: [
+          ...state.cart,
+          CartItemModel(
+            productId: prod.id,
+            name: prod.name,
+            price: prod.price,
+            quantity: 1,
+            emoji: '📦',
+            imageUrl: prod.imageUrl,
+            sgst: prod.sgst,
+            cgst: prod.cgst,
+          ),
+        ],
       );
     }
   }
 
   void setProductQuantity(ProductModel prod, int qty) {
-    HapticFeedback.lightImpact();
     if (qty <= 0) {
-      state = state.copyWith(cart: state.cart.where((i) => i.productId != prod.id).toList());
+      HapticFeedback.lightImpact();
+      state = state.copyWith(
+        cart: state.cart.where((i) => i.productId != prod.id).toList(),
+      );
       return;
     }
+
+    if (isOutOfStock(prod.quantity)) {
+      showCustomErrorToast(message: Strings.productOutOfStock);
+      return;
+    }
+
+    final cappedQty = clampCartQuantity(
+      stockQuantity: prod.quantity,
+      requestedQty: qty,
+    );
+
+    if (cappedQty <= 0) {
+      showCustomErrorToast(message: Strings.productOutOfStock);
+      return;
+    }
+
+    if (cappedQty < qty) {
+      _showInsufficientStockToast(prod.quantity);
+    }
+
+    HapticFeedback.lightImpact();
     final index = state.cart.indexWhere((item) => item.productId == prod.id);
     if (index >= 0) {
       final updated = List<CartItemModel>.from(state.cart);
-      updated[index] = updated[index].copyWith(quantity: qty);
+      updated[index] = updated[index].copyWith(quantity: cappedQty);
       state = state.copyWith(cart: updated);
     } else {
       state = state.copyWith(
-        cart: [...state.cart, CartItemModel(productId: prod.id, name: prod.name, price: prod.price, quantity: qty, emoji: '📦', imageUrl: prod.imageUrl)],
+        cart: [
+          ...state.cart,
+          CartItemModel(
+            productId: prod.id,
+            name: prod.name,
+            price: prod.price,
+            quantity: cappedQty,
+            emoji: '📦',
+            imageUrl: prod.imageUrl,
+            sgst: prod.sgst,
+            cgst: prod.cgst,
+          ),
+        ],
       );
     }
   }
 
   void incrementQuantity(CartItemModel item) {
-    final updated = state.cart.map((i) => i == item ? i.copyWith(quantity: i.quantity + 1) : i).toList();
+    if (item.productId == null) {
+      final updated = state.cart
+          .map((i) => i == item ? i.copyWith(quantity: i.quantity + 1) : i)
+          .toList();
+      state = state.copyWith(cart: updated);
+      return;
+    }
+
+    final product = _productById(item.productId!);
+    if (product != null) {
+      if (isOutOfStock(product.quantity)) {
+        showCustomErrorToast(message: Strings.productOutOfStock);
+        return;
+      }
+      if (!canIncreaseCartQuantity(
+        stockQuantity: product.quantity,
+        cartQuantity: item.quantity,
+      )) {
+        _showInsufficientStockToast(product.quantity);
+        return;
+      }
+    }
+
+    final updated = state.cart
+        .map((i) => i == item ? i.copyWith(quantity: i.quantity + 1) : i)
+        .toList();
     state = state.copyWith(cart: updated);
   }
 
@@ -263,7 +393,9 @@ class NewBillNotifier extends _$NewBillNotifier {
     if (item.quantity <= 1) {
       removeCartItem(item);
     } else {
-      final updated = state.cart.map((i) => i == item ? i.copyWith(quantity: i.quantity - 1) : i).toList();
+      final updated = state.cart
+          .map((i) => i == item ? i.copyWith(quantity: i.quantity - 1) : i)
+          .toList();
       state = state.copyWith(cart: updated);
     }
   }
@@ -360,8 +492,104 @@ class NewBillNotifier extends _$NewBillNotifier {
     showCustomToast(message: 'Custom item added');
   }
 
-  // ── Print Bill ─────────────────────────────────────────────────
-  Future<void> printBill(BuildContext context) async {
+  ReceiptPrintData _buildReceiptPrintData({
+    required String orderNumber,
+    required String dateString,
+    required String paymentStatus,
+    required double subtotal,
+    required double itemDiscountAmount,
+    required double billDiscountAmount,
+    required double sgstTotal,
+    required double cgstTotal,
+    required double grandTotal,
+    required double balance,
+  }) {
+    final storeName = ref.read(settingsNotifierProvider).settings.storeName;
+    final amountPaid = (grandTotal - balance).clamp(0.0, grandTotal);
+
+    return ReceiptPrintData(
+      storeName: storeName,
+      orderNumber: orderNumber,
+      dateString: dateString,
+      customerName: state.selectedCustomer?.name ?? Strings.walkInCustomer,
+      paymentMethod: state.paymentMethod,
+      paymentStatus: paymentStatus,
+      subtotalText: subtotal.toCurrency(),
+      grandTotalText: grandTotal.toCurrency(),
+      balanceText: balance.toCurrency(),
+      amountPaidText: amountPaid.toCurrency(),
+      itemDiscountText:
+          itemDiscountAmount > 0 ? itemDiscountAmount.toCurrency() : null,
+      billDiscountText:
+          billDiscountAmount > 0 ? billDiscountAmount.toCurrency() : null,
+      sgstTotalText: sgstTotal > 0 ? sgstTotal.toCurrency() : null,
+      cgstTotalText: cgstTotal > 0 ? cgstTotal.toCurrency() : null,
+      items: state.cart
+          .map(
+            (item) => ReceiptPrintLineItem(
+              name: item.name,
+              unitPriceText: item.price.toCurrency(),
+              quantityText: item.quantity.toString(),
+              lineTotalText: item.totalPrice.toCurrency(),
+              discountLabel: item.hasDiscount ? item.discountLabel : null,
+            ),
+          )
+          .toList(),
+    );
+  }
+
+  Future<void> _showBillPreview({
+    required BuildContext context,
+    required String orderNumber,
+    required String dateString,
+    required String paymentStatus,
+    required double subtotal,
+    required double itemDiscountAmount,
+    required double balance,
+    required BillTotals totals,
+  }) async {
+    await CommonBottomSheet.show(
+      context: context,
+      title: 'Bill Invoice',
+      isScrollControlled: true,
+      child: BillPreviewSheet(
+        orderNumber: orderNumber,
+        dateString: dateString,
+        paymentMethod: state.paymentMethod,
+        paymentStatus: paymentStatus,
+        customerName: state.selectedCustomer?.name ?? Strings.walkInCustomer,
+        cartItems: state.cart,
+        subtotal: subtotal,
+        itemDiscountAmount: itemDiscountAmount,
+        billDiscountAmount: state.discountAmount,
+        sgstTotal: totals.sgstTotal,
+        cgstTotal: totals.cgstTotal,
+        grandTotal: totals.grandTotal,
+        balance: balance,
+      ),
+    );
+  }
+
+  Future<void> _resetAfterBillSave() async {
+    state = state.copyWith(
+      billNumber: state.billNumber + 1,
+      cart: const [],
+      selectedCustomer: null,
+      isCartExpanded: false,
+      isSavingBill: false,
+      discountAmount: 0.0,
+      paymentStatus: 'Paid',
+      receivedAmount: 0.0,
+    );
+
+    await _refreshProductsAfterBill();
+  }
+
+  // ── Save / Print Bill ──────────────────────────────────────────
+  Future<void> saveAndMaybePrint(
+    BuildContext context, {
+    required bool printWhenPossible,
+  }) async {
     if (state.cart.isEmpty) {
       showCustomErrorToast(message: 'Your bill cart is empty');
       return;
@@ -370,92 +598,117 @@ class NewBillNotifier extends _$NewBillNotifier {
     state = state.copyWith(isSavingBill: true);
 
     final itemDiscountTotal = state.cart.fold<double>(
-      0, (sum, item) => sum + item.discountAmount,
+      0,
+      (sum, item) => sum + item.discountAmount,
     );
-    final subtotalAfterItemDiscounts = state.cart.fold<double>(
-      0, (sum, item) => sum + item.totalPrice,
-    );
-    final total = (subtotalAfterItemDiscounts - state.discountAmount)
-        .clamp(0.0, double.infinity);
+    final totals = billTotals;
     final totalDiscount = itemDiscountTotal + state.discountAmount;
-    final balance = calculateBalance(total);
+    final balance = calculateBalance(totals.grandTotal);
+    final paymentStatus =
+        resolvePaymentStatus(totals.grandTotal, balance);
 
     final payload = {
       'customer': state.selectedCustomer?.id,
       'payment_method': state.paymentMethod,
-      'total_amount': total.toStringAsFixed(2),
+      'payment_status': paymentStatus,
+      'total_amount': totals.grandTotal.toStringAsFixed(2),
       'discount_amount': totalDiscount.toStringAsFixed(2),
-      'balance': balance,
-      'items': state.cart.map((item) => {
-        'product': item.productId,
-        'qty': item.quantity,
-        'price': item.price.toStringAsFixed(2),
-        'discount_type': item.discountType,
-        'discount_value': item.discountValue.toStringAsFixed(2),
-        'discount_amount': item.discountAmount.toStringAsFixed(2),
-        'bogo_buy_qty': item.bogoBuyQty,
-        'bogo_get_qty': item.bogoGetQty,
-        'total_price': item.totalPrice.toStringAsFixed(2),
-      }).toList(),
+      'sgst_amount': totals.sgstTotal.toStringAsFixed(2),
+      'cgst_amount': totals.cgstTotal.toStringAsFixed(2),
+      'balance': balance.toStringAsFixed(2),
+      'items': state.cart
+          .map(
+            (item) => {
+              'product': item.productId,
+              'qty': item.quantity,
+              'price': item.price.toStringAsFixed(2),
+              'discount_type': item.discountType,
+              'discount_value': item.discountValue.toStringAsFixed(2),
+              'discount_amount': item.discountAmount.toStringAsFixed(2),
+              'bogo_buy_qty': item.bogoBuyQty,
+              'bogo_get_qty': item.bogoGetQty,
+              'sgst': item.sgst.toStringAsFixed(2),
+              'cgst': item.cgst.toStringAsFixed(2),
+              'total_price': item.totalPrice.toStringAsFixed(2),
+            },
+          )
+          .toList(),
     };
 
-    return await ref.read(newBillRepositoryProvider).createBill(payload).fold(
-      (left) {
-        debugPrint("🔴 API ERROR: ${left.message}");
-        showCustomErrorToast(message: left.message ?? 'Failed to save bill');
-        state = state.copyWith(isSavingBill: false);
-      },
-      (right) async {
-        debugPrint("🟢 API SUCCESS: ${right.message}");
-        showCustomToast(message: right.message);
+    return await ref
+        .read(newBillRepositoryProvider)
+        .createBill(payload)
+        .fold(
+          (left) {
+            debugPrint("🔴 API ERROR: ${left.message}");
+            showCustomErrorToast(
+              message: left.message ?? 'Failed to save bill',
+            );
+            state = state.copyWith(isSavingBill: false);
+          },
+          (right) async {
+            debugPrint("🟢 API SUCCESS: ${right.message}");
+            showCustomToast(message: right.message);
 
-        // Construct preview data
-        final previewOrderNumber = right.data?.orderNumber ?? 'ORD-TEMP-${state.billNumber}';
-        final previewDate = right.data?.dateString ?? DateTime.now().toString();
-        final previewSubtotal = state.cart.fold<double>(
-          0, (sum, item) => sum + item.lineTotal,
-        );
-        final previewItemDiscount = state.cart.fold<double>(
-          0, (sum, item) => sum + item.discountAmount,
-        );
-        final previewBalance = right.data?.balance ?? balance;
-
-        // Show the professional bill preview bottom sheet
-        if (context.mounted) {
-          await CommonBottomSheet.show(
-            context: context,
-            title: 'Bill Invoice',
-            isScrollControlled: true,
-            child: BillPreviewSheet(
+            // Construct preview data
+            final previewOrderNumber =
+                right.data?.orderNumber ?? 'ORD-TEMP-${state.billNumber}';
+            final previewDate =
+                right.data?.dateString ?? DateTime.now().toString();
+            final previewSubtotal = state.cart.fold<double>(
+              0,
+              (sum, item) => sum + item.lineTotal,
+            );
+            final previewItemDiscount = state.cart.fold<double>(
+              0,
+              (sum, item) => sum + item.discountAmount,
+            );
+            final previewBalance = right.data?.balance ?? balance;
+            final receiptData = _buildReceiptPrintData(
               orderNumber: previewOrderNumber,
               dateString: previewDate,
-              paymentMethod: state.paymentMethod,
-              customerName: state.selectedCustomer?.name ?? 'Walk-in Customer',
-              cartItems: state.cart,
+              paymentStatus: paymentStatus,
               subtotal: previewSubtotal,
               itemDiscountAmount: previewItemDiscount,
               billDiscountAmount: state.discountAmount,
+              sgstTotal: totals.sgstTotal,
+              cgstTotal: totals.cgstTotal,
+              grandTotal: totals.grandTotal,
               balance: previewBalance,
-            ),
-          );
-        }
+            );
 
-        // Reset state and clear cart after the sheet closes
-        state = state.copyWith(
-          billNumber: state.billNumber + 1,
-          cart: const [],
-          selectedCustomer: null,
-          isCartExpanded: false,
-          isSavingBill: false,
-          discountAmount: 0.0,
-          paymentStatus: 'Paid',
-          receivedAmount: 0.0,
-        );
-      },
-    ).catchError((Object e) {
-      debugPrint("🔴 Error saving bill: $e");
-      showCustomErrorToast(message: 'Unexpected error saving bill');
-      state = state.copyWith(isSavingBill: false);
-    });
+            var printed = false;
+            if (printWhenPossible) {
+              printed = await ref
+                  .read(printerNotifierProvider.notifier)
+                  .printReceiptData(receiptData);
+              if (printed) {
+                showCustomToast(message: Strings.printerSavedSuccess);
+              } else {
+                showCustomErrorToast(message: Strings.printerFallbackPreview);
+              }
+            }
+
+            if (context.mounted && !printed) {
+              await _showBillPreview(
+                context: context,
+                orderNumber: previewOrderNumber,
+                dateString: previewDate,
+                paymentStatus: paymentStatus,
+                subtotal: previewSubtotal,
+                itemDiscountAmount: previewItemDiscount,
+                balance: previewBalance,
+                totals: totals,
+              );
+            }
+
+            await _resetAfterBillSave();
+          },
+        )
+        .catchError((Object e) {
+          debugPrint("🔴 Error saving bill: $e");
+          showCustomErrorToast(message: 'Unexpected error saving bill');
+          state = state.copyWith(isSavingBill: false);
+        });
   }
 }

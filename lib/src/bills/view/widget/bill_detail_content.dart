@@ -7,14 +7,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:vyapapp/res/constants/string_constants.dart';
 import 'package:vyapapp/res/styles/color_palette.dart';
 import 'package:vyapapp/res/styles/font_palette.dart';
 import 'package:vyapapp/src/bills/model/bill_detail_model.dart';
+import 'package:vyapapp/src/bills/notifier/bills_notifier.dart';
+import 'package:vyapapp/src/bills/view/widget/bill_payment_status_action.dart';
 import 'package:vyapapp/src/main/notifier/dropdowns_notifier.dart';
 import 'package:vyapapp/src/main/model/dropdown_model.dart';
+import 'package:vyapapp/src/printer/notifier/printer_notifier.dart';
 import 'package:vyapapp/src/settings/notifier/settings_notifier.dart';
 import 'package:vyapapp/utils/common_widgets/primary_button.dart';
 import 'package:vyapapp/utils/helpers/extensions.dart';
+import 'package:vyapapp/utils/helpers/receipt_print_helper.dart';
 import 'package:vyapapp/utils/helpers/toast_helper.dart';
 
 class BillDetailContent extends ConsumerStatefulWidget {
@@ -28,6 +33,46 @@ class BillDetailContent extends ConsumerStatefulWidget {
 
 class _BillDetailContentState extends ConsumerState<BillDetailContent> {
   final GlobalKey _repaintKey = GlobalKey();
+
+  ReceiptPrintData _buildReceiptData({
+    required String storeName,
+    required String customerName,
+    required double subtotal,
+    required double itemDiscountAmount,
+    required double billDiscountAmount,
+  }) {
+    final amountPaid = (widget.billDetail.totalAmount - widget.billDetail.balance)
+        .clamp(0.0, widget.billDetail.totalAmount);
+
+    return ReceiptPrintData(
+      storeName: storeName,
+      orderNumber: widget.billDetail.orderNumber,
+      dateString: widget.billDetail.dateString,
+      customerName: customerName,
+      customerPhone: widget.billDetail.customerPhone,
+      paymentMethod: widget.billDetail.paymentMethod,
+      paymentStatus: widget.billDetail.paymentStatus,
+      subtotalText: subtotal.toCurrency(),
+      grandTotalText: widget.billDetail.totalAmount.toCurrency(),
+      balanceText: widget.billDetail.balance.toCurrency(),
+      amountPaidText: amountPaid.toCurrency(),
+      itemDiscountText:
+          itemDiscountAmount > 0 ? itemDiscountAmount.toCurrency() : null,
+      billDiscountText:
+          billDiscountAmount > 0 ? billDiscountAmount.toCurrency() : null,
+      items: widget.billDetail.items
+          .map(
+            (item) => ReceiptPrintLineItem(
+              name: item.productName,
+              unitPriceText: item.price.toCurrency(),
+              quantityText: item.quantity.toString(),
+              lineTotalText: item.totalPrice.toCurrency(),
+              discountLabel: item.hasDiscount ? item.discountLabel : null,
+            ),
+          )
+          .toList(),
+    );
+  }
 
   Future<void> _shareImage() async {
     try {
@@ -63,50 +108,27 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
   }
 
   void _shareText(String displayName, String customerName) {
-    final receiptBuffer = StringBuffer();
-    receiptBuffer.writeln('----------------------------------');
-    receiptBuffer.writeln(displayName);
-    receiptBuffer.writeln('             RECEIPT');
-    receiptBuffer.writeln('----------------------------------');
-    receiptBuffer.writeln('Invoice No: ${widget.billDetail.orderNumber}');
-    receiptBuffer.writeln('Date: ${widget.billDetail.dateString}');
-    receiptBuffer.writeln('Customer: $customerName');
-    receiptBuffer.writeln('Payment: ${widget.billDetail.paymentMethod}');
-    receiptBuffer.writeln('----------------------------------');
-    for (final item in widget.billDetail.items) {
-      receiptBuffer.writeln(
-        '${item.productName} x${item.quantity}    ${item.totalPrice.toCurrency()}',
-      );
-    }
-    receiptBuffer.writeln('----------------------------------');
     final itemDiscountAmount = widget.billDetail.items.fold<double>(
       0.0, (sum, item) => sum + item.discountAmount,
     );
     final subtotal = widget.billDetail.items.fold<double>(
       0.0, (sum, item) => sum + (item.price * item.quantity),
     );
-    final billDiscountAmount = (widget.billDetail.discountAmount - itemDiscountAmount).clamp(0.0, double.infinity);
-
-    receiptBuffer.writeln('Subtotal:           ${subtotal.toCurrency()}');
-    if (itemDiscountAmount > 0) {
-      receiptBuffer.writeln('Item Discounts:     -${itemDiscountAmount.toCurrency()}');
-    }
-    if (billDiscountAmount > 0) {
-      receiptBuffer.writeln('Bill Discount:      -${billDiscountAmount.toCurrency()}');
-    }
-    receiptBuffer.writeln('Grand Total:        ${widget.billDetail.totalAmount.toCurrency()}');
-    if (widget.billDetail.balance > 0.0) {
-      final paidAmount = (widget.billDetail.totalAmount - widget.billDetail.balance).clamp(0.0, widget.billDetail.totalAmount);
-      receiptBuffer.writeln('Amount Paid:        ${paidAmount.toCurrency()}');
-      receiptBuffer.writeln('Remaining Balance:  ${widget.billDetail.balance.toCurrency()}');
-    }
-    receiptBuffer.writeln('----------------------------------');
-    receiptBuffer.writeln('Thank you for shopping with us!');
-    receiptBuffer.writeln('Billed via Thuga App');
+    final billDiscountAmount = (widget.billDetail.discountAmount - itemDiscountAmount)
+        .clamp(0.0, double.infinity);
+    final receiptBuffer = buildReceiptShareText(
+      _buildReceiptData(
+        storeName: displayName,
+        customerName: customerName,
+        subtotal: subtotal,
+        itemDiscountAmount: itemDiscountAmount,
+        billDiscountAmount: billDiscountAmount,
+      ),
+    );
 
     SharePlus.instance.share(
       ShareParams(
-        text: receiptBuffer.toString(),
+        text: receiptBuffer,
         subject: 'Invoice ${widget.billDetail.orderNumber}',
       ),
     );
@@ -162,22 +184,22 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
     final storeName = ref.watch(
       settingsNotifierProvider.select((s) => s.settings.storeName),
     );
-    final displayName = storeName.isNotEmpty ? storeName.toUpperCase() : 'THUKA';
+    final displayName = normalizeReceiptStoreName(storeName);
+    final isPrinterConnected = ref.watch(
+      printerNotifierProvider.select((value) => value.isConnected),
+    );
+    final isUpdatingPayment = ref.watch(
+      billsNotifierProvider.select(
+        (s) => s.updatingBillId == widget.billDetail.id,
+      ),
+    );
+    final billsNotifier = ref.read(billsNotifierProvider.notifier);
 
     final customers = ref.watch(
       dropdownsNotifierProvider.select((s) => s.data.customers),
     );
-    final customerName = widget.billDetail.customerId != null
-        ? customers
-            .firstWhere(
-              (c) => c.id == widget.billDetail.customerId,
-              orElse: () => DropdownCustomerModel(
-                id: widget.billDetail.customerId!,
-                name: 'Customer #${widget.billDetail.customerId}',
-              ),
-            )
-            .name
-        : 'Walk-in Customer';
+    final customerName = _resolveCustomerName(customers);
+    final customerPhone = widget.billDetail.customerPhone;
 
     final itemDiscountAmount = widget.billDetail.items.fold<double>(
       0.0, (sum, item) => sum + item.discountAmount,
@@ -230,6 +252,11 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
                                 12.verticalSpace,
                                 _buildMetaLabel(context, 'Customer'),
                                 _buildMetaValue(context, customerName),
+                                if (customerPhone?.isNotEmpty == true) ...[
+                                  12.verticalSpace,
+                                  _buildMetaLabel(context, 'Phone'),
+                                  _buildMetaValue(context, customerPhone!),
+                                ],
                               ],
                             ),
                           ),
@@ -242,6 +269,17 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
                                 12.verticalSpace,
                                 _buildMetaLabel(context, 'Payment Method'),
                                 _buildMetaValue(context, '${widget.billDetail.paymentMethod} (${widget.billDetail.paymentStatus})'),
+                                if (billShowsPaidDate(
+                                  widget.billDetail.paymentStatus,
+                                  widget.billDetail.paidDate,
+                                )) ...[
+                                  12.verticalSpace,
+                                  _buildMetaLabel(context, Strings.paidOn),
+                                  _buildMetaValue(
+                                    context,
+                                    widget.billDetail.paidDate!,
+                                  ),
+                                ],
                               ],
                             ),
                           ),
@@ -443,7 +481,7 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
                             style: FontPalette.base400(10, color: colors.secondaryText),
                           ),
                           Text(
-                            'Thuga App',
+                            'Thuka App',
                             style: FontPalette.base700(10, color: colors.primary),
                           ),
                         ],
@@ -455,6 +493,14 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
             ),
           ),
           20.verticalSpace,
+          BillPaymentStatusAction(
+            paymentStatus: widget.billDetail.paymentStatus,
+            isLoading: isUpdatingPayment,
+            onMarkPaid: () => billsNotifier.markBillAsPaid(widget.billDetail.id),
+            onMarkUnpaid: () =>
+                billsNotifier.markBillAsUnpaid(widget.billDetail.id),
+          ),
+          12.verticalSpace,
           Row(
             children: [
               Expanded(
@@ -482,15 +528,38 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
               Expanded(
                 flex: 2,
                 child: PrimaryButton(
-                  text: 'Print Invoice',
+                  text: Strings.printInvoice,
                   radius: 12,
                   prefixIcon: Icon(
                     Icons.print_rounded,
                     size: 20.r,
                     color: Colors.white,
                   ),
-                  onPressed: () {
-                    showCustomToast(message: 'Sending invoice to printer...');
+                  onPressed: () async {
+                    if (!isPrinterConnected) {
+                      showCustomErrorToast(message: Strings.noPrinterConnected);
+                      return;
+                    }
+                    final success = await ref
+                        .read(printerNotifierProvider.notifier)
+                        .printReceiptData(
+                          _buildReceiptData(
+                            storeName: storeName,
+                            customerName: customerName,
+                            subtotal: subtotal,
+                            itemDiscountAmount: itemDiscountAmount,
+                            billDiscountAmount: billDiscountAmount,
+                          ),
+                        );
+                    if (success) {
+                      showCustomToast(message: Strings.printerSavedSuccess);
+                    } else {
+                      showCustomErrorToast(
+                        message:
+                            ref.read(printerNotifierProvider).errorMessage ??
+                            Strings.printerFallbackPreview,
+                      );
+                    }
                   },
                 ),
               ),
@@ -499,6 +568,24 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
         ],
       ),
     );
+  }
+
+  String _resolveCustomerName(List<DropdownCustomerModel> customers) {
+    if (widget.billDetail.customerName?.isNotEmpty == true) {
+      return widget.billDetail.customerName!;
+    }
+    if (widget.billDetail.customerId != null) {
+      return customers
+          .firstWhere(
+            (c) => c.id == widget.billDetail.customerId,
+            orElse: () => DropdownCustomerModel(
+              id: widget.billDetail.customerId!,
+              name: 'Customer #${widget.billDetail.customerId}',
+            ),
+          )
+          .name;
+    }
+    return Strings.walkInCustomer;
   }
 
   Widget _buildMetaLabel(BuildContext context, String text) {

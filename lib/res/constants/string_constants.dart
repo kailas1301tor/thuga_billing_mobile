@@ -106,7 +106,7 @@ class Strings {
   static const String invalidEmail = "Enter a valid email address";
   static const String passwordRequired = "Password is required";
   static const String passwordTooShort =
-      "Password must be at least 8 characters";
+      "Password must be at least 6 characters";
   static const String passwordTooWeak = "Password is too weak";
   static const String passwordsDoNotMatch = "Passwords do not match";
   static const String fieldRequired = "This field is required";
@@ -134,6 +134,11 @@ class Strings {
   static const String newBillPlaceholder =
       "Create a new bill for your customer.";
   static const String createBill = "Create Bill";
+  static const String productOutOfStock = "This product is out of stock";
+  static String productInsufficientStock(int count) =>
+      "Only $count units available";
+  static String productAvailableStock(int count) => "Available: $count";
+  static const String outOfStock = "Out of stock";
 
   // Home dashboard
   static const String goodMorning = "Good Morning";
@@ -154,10 +159,29 @@ class Strings {
   static const String newItem = "New Item";
   static const String topProductsToday = "Top Products Today";
   static const String recentBills = "Recent Bills";
+  static const String noTopProductsToday = "No products sold today";
+  static const String noRecentBills = "No recent bills";
   static const String paid = "Paid";
+  static const String credit = "Credit";
+  static const String partiallyPaid = "Partially Paid";
+  static const String markAsPaid = "Mark as Paid";
+  static const String markAsUnpaid = "Mark as Unpaid";
+  static const String paidOn = "Paid on";
+  static const String paymentStatusUpdated = "Payment status updated";
+  static const String totalAmount = "Total Amount";
+  static const String discount = "Discount";
+  static const String paidAmount = "Paid Amount";
+  static const String balanceDue = "Balance Due";
+  static const String phone = "Phone";
+  static const String viewFullDetails = "View Full Details";
   static const String open = "Open";
   static const String closed = "Closed";
   static const String walkInCustomer = "Walk-in Customer";
+  static const String noCustomerSelectedTitle = "No Customer Selected";
+  static const String continueWithoutCustomerMessage =
+      "No customer is selected. Do you want to continue without a customer?";
+  static const String walkInCreditBalanceMessage =
+      "will be recorded as outstanding balance for this walk-in bill";
   static const String cups = "Cups";
   static const String pcs = "Pcs";
   static const String ofSales = "of sales";
@@ -170,17 +194,76 @@ class Strings {
   static const String customersTitle = "Customers";
   static const String addCategory = "Add Category";
   static const String editCategory = "Edit Category";
-  static const String deleteCategoryConfirm = "Are you sure you want to delete this category?";
+  static const String deleteCategoryConfirm =
+      "Are you sure you want to delete this category?";
   static const String editProduct = "Edit Product";
-  static const String deleteProductConfirm = "Are you sure you want to delete this product?";
+  static const String deleteProductConfirm =
+      "Are you sure you want to delete this product?";
   static const String addCustomer = "Add Customer";
   static const String editCustomer = "Edit Customer";
-  static const String deleteCustomerConfirm = "Are you sure you want to delete this customer?";
+  static const String deleteCustomerConfirm =
+      "Are you sure you want to delete this customer?";
   static const String categoryName = "Category Name";
   static const String productName = "Product Name";
   static const String quantity = "Quantity";
+  static const String barcode = "Barcode";
+  static const String sgst = "SGST";
+  static const String cgst = "CGST";
+  static const String sgstPercentHint = "SGST (%) — optional";
+  static const String cgstPercentHint = "CGST (%) — optional";
+  static const String sgstTotal = "SGST Total";
+  static const String cgstTotal = "CGST Total";
+  static const String notAvailable = "—";
   static const String price = "Price";
   static const String selectCategory = "Select Category";
   static const String customerName = "Customer Name";
   static const String phoneNumber = "Phone Number";
+
+  // Estimates
+  static const String calculationTitle = "Estimates";
+  static const String calculationSubtitle = "Multi-customer order bills";
+  static const String newCalculationBill = "New Bill";
+  static const String editCalculationBill = "Edit Bill";
+  static const String billName = "Bill Name";
+  static const String billNameHint = "e.g. Monday Morning Orders";
+  static const String addCustomerToBill = "Add Customer";
+  static const String customerAlreadyInBill =
+      "This customer is already in the bill";
+  static const String removeCustomerConfirm =
+      "Remove this customer and all their products from the bill?";
+  static const String grandTotal = "Grand Total";
+  static const String customerSubtotal = "Subtotal";
+  static const String saveBill = "Save Bill";
+  static const String deleteBillConfirm =
+      "Are you sure you want to delete this estimate?";
+  static const String noCalculationBills = "No estimates yet";
+  static const String noCalculationBillsHint =
+      "Create an estimate to save customer product lists and totals";
+  static const String billSavedSuccess = "Estimate saved successfully";
+  static const String productUnavailable = "Price unavailable";
+  static const String selectCustomerFirst = "Select a customer first";
+  static const String eachCustomerNeedsProduct =
+      "Each customer needs at least one product";
+  static const String enterBillName = "Enter a bill name";
+  static const String calculationBillDetails = "Estimate Details";
+
+  // Printer
+  static const String printBill = "Print Bill";
+  static const String saveBillLabel = "Save Bill";
+  static const String printInvoice = "Print Invoice";
+  static const String printerSettingsTitle = "Printer";
+  static const String startWorkingHour = "Start Working Hour";
+  static const String endWorkingHour = "End Working Hour";
+  static const String selectStartTime = "Select start time";
+  static const String selectEndTime = "Select end time";
+  static const String managePrinter = "Manage Printer";
+  static const String noPrinterConnected = "No printer connected";
+  static const String printerConnected = "Printer connected";
+  static const String bluetoothPrinterHint =
+      "Connect a Bluetooth receipt printer to enable direct bill printing.";
+  static const String scanPrinters = "Scan Printers";
+  static const String disconnectPrinter = "Disconnect Printer";
+  static const String printerSavedSuccess = "Receipt sent to printer";
+  static const String printerFallbackPreview =
+      "Printer unavailable. Showing bill preview instead.";
 }

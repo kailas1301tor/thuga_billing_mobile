@@ -21,6 +21,8 @@ abstract class SettingsRepo {
     required String companyName,
     required String address,
     required String phoneNumber,
+    required String startWorkingHour,
+    required String endWorkingHour,
   });
 }
 
@@ -35,13 +37,25 @@ class SettingsRepoImpl implements SettingsRepo {
   static const _kDefaultPaymentMethodKey = 'pref_default_payment';
   static const _kTaxRateKey = 'pref_tax_rate';
 
+  String _normalizeStoreName(String? value) {
+    final trimmed = value?.trim() ?? '';
+    if (trimmed.isEmpty) return 'Thuka';
+
+    final normalized = trimmed.toLowerCase();
+    if (normalized == 'tortilon bakery' || normalized == 'tortillon') {
+      return 'Thuka';
+    }
+
+    return trimmed;
+  }
+
   @override
   Future<Either<ResponseError, SettingsModel>> getSettings() async {
     try {
       final prefs = await SharedPreferences.getInstance();
 
-      final storeName = prefs.getString(_kStoreNameKey) ?? 'Tortilon Bakery';
-      final email = prefs.getString(_kEmailKey) ?? 'contact@tortilon.com';
+      final storeName = _normalizeStoreName(prefs.getString(_kStoreNameKey));
+      final email = prefs.getString(_kEmailKey) ?? 'contact@thuka.com';
       final autoPrint = prefs.getBool(_kAutoPrintKey) ?? false;
       final defaultPayment = prefs.getString(_kDefaultPaymentMethodKey) ?? 'Cash';
       final taxRate = prefs.getDouble(_kTaxRateKey) ?? 5.0;
@@ -116,12 +130,14 @@ class SettingsRepoImpl implements SettingsRepo {
   CompanyDetailsModel _getMockCompany(int id) {
     return CompanyDetailsModel(
       id: id,
-      companyName: 'tortillon',
+      companyName: 'Thuka',
       status: 'Active',
       address: 'thrissur',
       phoneNumber: '9987654656',
       isActive: true,
-      email: 'tortillon@info.in',
+      email: 'contact@thuka.com',
+      startWorkingHour: '00:00:00',
+      endWorkingHour: '12:00:00',
     );
   }
 
@@ -133,6 +149,8 @@ class SettingsRepoImpl implements SettingsRepo {
     required String companyName,
     required String address,
     required String phoneNumber,
+    required String startWorkingHour,
+    required String endWorkingHour,
   }) async {
     final Map<String, dynamic> params = {
       'id': companyId,
@@ -140,6 +158,8 @@ class SettingsRepoImpl implements SettingsRepo {
       'company_name': companyName,
       'address': address,
       'phone_number': phoneNumber,
+      'start_working_hour': startWorkingHour,
+      'end_working_hour': endWorkingHour,
     };
     if (password != null && password.isNotEmpty) {
       params['password'] = password;

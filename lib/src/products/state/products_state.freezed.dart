@@ -25,8 +25,10 @@ mixin _$ProductsState {
   bool get saveProductLoader => throw _privateConstructorUsedError;
   bool get updateProductLoader => throw _privateConstructorUsedError;
   bool get deleteProductLoader => throw _privateConstructorUsedError;
-  int get page => throw _privateConstructorUsedError;
+  int get currentPage => throw _privateConstructorUsedError;
+  int get totalPages => throw _privateConstructorUsedError;
   int get pageSize => throw _privateConstructorUsedError;
+  bool get isLoadingMore => throw _privateConstructorUsedError;
   String get sort => throw _privateConstructorUsedError;
   int? get filterCategoryId => throw _privateConstructorUsedError;
   bool get isQuickProduct => throw _privateConstructorUsedError;
@@ -56,8 +58,10 @@ abstract class $ProductsStateCopyWith<$Res> {
     bool saveProductLoader,
     bool updateProductLoader,
     bool deleteProductLoader,
-    int page,
+    int currentPage,
+    int totalPages,
     int pageSize,
+    bool isLoadingMore,
     String sort,
     int? filterCategoryId,
     bool isQuickProduct,
@@ -89,8 +93,10 @@ class _$ProductsStateCopyWithImpl<$Res, $Val extends ProductsState>
     Object? saveProductLoader = null,
     Object? updateProductLoader = null,
     Object? deleteProductLoader = null,
-    Object? page = null,
+    Object? currentPage = null,
+    Object? totalPages = null,
     Object? pageSize = null,
+    Object? isLoadingMore = null,
     Object? sort = null,
     Object? filterCategoryId = freezed,
     Object? isQuickProduct = null,
@@ -131,14 +137,22 @@ class _$ProductsStateCopyWithImpl<$Res, $Val extends ProductsState>
                 ? _value.deleteProductLoader
                 : deleteProductLoader // ignore: cast_nullable_to_non_nullable
                       as bool,
-            page: null == page
-                ? _value.page
-                : page // ignore: cast_nullable_to_non_nullable
+            currentPage: null == currentPage
+                ? _value.currentPage
+                : currentPage // ignore: cast_nullable_to_non_nullable
+                      as int,
+            totalPages: null == totalPages
+                ? _value.totalPages
+                : totalPages // ignore: cast_nullable_to_non_nullable
                       as int,
             pageSize: null == pageSize
                 ? _value.pageSize
                 : pageSize // ignore: cast_nullable_to_non_nullable
                       as int,
+            isLoadingMore: null == isLoadingMore
+                ? _value.isLoadingMore
+                : isLoadingMore // ignore: cast_nullable_to_non_nullable
+                      as bool,
             sort: null == sort
                 ? _value.sort
                 : sort // ignore: cast_nullable_to_non_nullable
@@ -183,8 +197,10 @@ abstract class _$$ProductsStateImplCopyWith<$Res>
     bool saveProductLoader,
     bool updateProductLoader,
     bool deleteProductLoader,
-    int page,
+    int currentPage,
+    int totalPages,
     int pageSize,
+    bool isLoadingMore,
     String sort,
     int? filterCategoryId,
     bool isQuickProduct,
@@ -215,8 +231,10 @@ class __$$ProductsStateImplCopyWithImpl<$Res>
     Object? saveProductLoader = null,
     Object? updateProductLoader = null,
     Object? deleteProductLoader = null,
-    Object? page = null,
+    Object? currentPage = null,
+    Object? totalPages = null,
     Object? pageSize = null,
+    Object? isLoadingMore = null,
     Object? sort = null,
     Object? filterCategoryId = freezed,
     Object? isQuickProduct = null,
@@ -257,14 +275,22 @@ class __$$ProductsStateImplCopyWithImpl<$Res>
             ? _value.deleteProductLoader
             : deleteProductLoader // ignore: cast_nullable_to_non_nullable
                   as bool,
-        page: null == page
-            ? _value.page
-            : page // ignore: cast_nullable_to_non_nullable
+        currentPage: null == currentPage
+            ? _value.currentPage
+            : currentPage // ignore: cast_nullable_to_non_nullable
+                  as int,
+        totalPages: null == totalPages
+            ? _value.totalPages
+            : totalPages // ignore: cast_nullable_to_non_nullable
                   as int,
         pageSize: null == pageSize
             ? _value.pageSize
             : pageSize // ignore: cast_nullable_to_non_nullable
                   as int,
+        isLoadingMore: null == isLoadingMore
+            ? _value.isLoadingMore
+            : isLoadingMore // ignore: cast_nullable_to_non_nullable
+                  as bool,
         sort: null == sort
             ? _value.sort
             : sort // ignore: cast_nullable_to_non_nullable
@@ -302,8 +328,10 @@ class _$ProductsStateImpl implements _ProductsState {
     this.saveProductLoader = false,
     this.updateProductLoader = false,
     this.deleteProductLoader = false,
-    this.page = 1,
+    this.currentPage = 1,
+    this.totalPages = 1,
     this.pageSize = 10,
+    this.isLoadingMore = false,
     this.sort = 'lowest',
     this.filterCategoryId,
     this.isQuickProduct = true,
@@ -334,10 +362,16 @@ class _$ProductsStateImpl implements _ProductsState {
   final bool deleteProductLoader;
   @override
   @JsonKey()
-  final int page;
+  final int currentPage;
+  @override
+  @JsonKey()
+  final int totalPages;
   @override
   @JsonKey()
   final int pageSize;
+  @override
+  @JsonKey()
+  final bool isLoadingMore;
   @override
   @JsonKey()
   final String sort;
@@ -360,7 +394,7 @@ class _$ProductsStateImpl implements _ProductsState {
 
   @override
   String toString() {
-    return 'ProductsState(loaderState: $loaderState, response: $response, errorMessage: $errorMessage, selectedCategoryId: $selectedCategoryId, searchQuery: $searchQuery, saveProductLoader: $saveProductLoader, updateProductLoader: $updateProductLoader, deleteProductLoader: $deleteProductLoader, page: $page, pageSize: $pageSize, sort: $sort, filterCategoryId: $filterCategoryId, isQuickProduct: $isQuickProduct, selectedImagePath: $selectedImagePath, togglingProductIds: $togglingProductIds)';
+    return 'ProductsState(loaderState: $loaderState, response: $response, errorMessage: $errorMessage, selectedCategoryId: $selectedCategoryId, searchQuery: $searchQuery, saveProductLoader: $saveProductLoader, updateProductLoader: $updateProductLoader, deleteProductLoader: $deleteProductLoader, currentPage: $currentPage, totalPages: $totalPages, pageSize: $pageSize, isLoadingMore: $isLoadingMore, sort: $sort, filterCategoryId: $filterCategoryId, isQuickProduct: $isQuickProduct, selectedImagePath: $selectedImagePath, togglingProductIds: $togglingProductIds)';
   }
 
   @override
@@ -384,9 +418,14 @@ class _$ProductsStateImpl implements _ProductsState {
                 other.updateProductLoader == updateProductLoader) &&
             (identical(other.deleteProductLoader, deleteProductLoader) ||
                 other.deleteProductLoader == deleteProductLoader) &&
-            (identical(other.page, page) || other.page == page) &&
+            (identical(other.currentPage, currentPage) ||
+                other.currentPage == currentPage) &&
+            (identical(other.totalPages, totalPages) ||
+                other.totalPages == totalPages) &&
             (identical(other.pageSize, pageSize) ||
                 other.pageSize == pageSize) &&
+            (identical(other.isLoadingMore, isLoadingMore) ||
+                other.isLoadingMore == isLoadingMore) &&
             (identical(other.sort, sort) || other.sort == sort) &&
             (identical(other.filterCategoryId, filterCategoryId) ||
                 other.filterCategoryId == filterCategoryId) &&
@@ -411,8 +450,10 @@ class _$ProductsStateImpl implements _ProductsState {
     saveProductLoader,
     updateProductLoader,
     deleteProductLoader,
-    page,
+    currentPage,
+    totalPages,
     pageSize,
+    isLoadingMore,
     sort,
     filterCategoryId,
     isQuickProduct,
@@ -439,8 +480,10 @@ abstract class _ProductsState implements ProductsState {
     final bool saveProductLoader,
     final bool updateProductLoader,
     final bool deleteProductLoader,
-    final int page,
+    final int currentPage,
+    final int totalPages,
     final int pageSize,
+    final bool isLoadingMore,
     final String sort,
     final int? filterCategoryId,
     final bool isQuickProduct,
@@ -465,9 +508,13 @@ abstract class _ProductsState implements ProductsState {
   @override
   bool get deleteProductLoader;
   @override
-  int get page;
+  int get currentPage;
+  @override
+  int get totalPages;
   @override
   int get pageSize;
+  @override
+  bool get isLoadingMore;
   @override
   String get sort;
   @override

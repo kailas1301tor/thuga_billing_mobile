@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:vyapapp/res/styles/color_palette.dart';
 import 'package:vyapapp/res/styles/font_palette.dart';
 import 'package:vyapapp/utils/common_widgets/common_cached_network_image.dart';
+import 'package:vyapapp/utils/helpers/extensions.dart';
 import '../../model/new_bill_model.dart';
 
 class QuickTapCartList extends StatelessWidget {
@@ -119,7 +120,7 @@ class QuickTapCartList extends StatelessWidget {
                               borderRadius: BorderRadius.circular(4.r),
                             ),
                             child: Text(
-                              '${item.discountLabel} · Save ₹${item.discountAmount.toStringAsFixed(0)}',
+                              '${item.discountLabel} · Save ${item.discountAmount.toCurrency()}',
                               style: FontPalette.base600(
                                 10,
                                 color: Colors.green.shade700,
@@ -192,7 +193,7 @@ class QuickTapCartList extends StatelessWidget {
                     children: [
                       if (item.hasDiscount) ...[
                         Text(
-                          '₹${item.lineTotal.toStringAsFixed(0)}',
+                          item.lineTotal.toCurrency(),
                           style: FontPalette.base400(
                             11,
                             color: colors.secondaryText,
@@ -200,7 +201,7 @@ class QuickTapCartList extends StatelessWidget {
                         ),
                       ],
                       Text(
-                        '₹${item.totalPrice.toStringAsFixed(0)}',
+                        item.totalPrice.toCurrency(),
                         style: FontPalette.base700(
                           15,
                           color: item.hasDiscount

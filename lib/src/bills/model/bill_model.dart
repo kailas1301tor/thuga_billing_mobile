@@ -13,6 +13,9 @@ class BillModel {
     required this.balance,
     required this.dateString,
     required this.createdAt,
+    this.paidDate,
+    this.customerName,
+    this.customerPhone,
   });
 
   final int id;
@@ -25,11 +28,20 @@ class BillModel {
   final double balance;
   final String dateString;
   final DateTime createdAt;
+  final String? paidDate;
+  final String? customerName;
+  final String? customerPhone;
 
   factory BillModel.fromJson(Map<String, dynamic> json) {
+    final customerDetails = json['customer_details'] != null
+        ? convertToMap(json['customer_details'])
+        : null;
+
     return BillModel(
       id: convertToInt(json['id']),
-      customerId: json['customer'] == null ? null : convertToInt(json['customer']),
+      customerId: json['customer'] == null
+          ? null
+          : convertToInt(json['customer']),
       orderNumber: convertToString(json['order_number']),
       paymentMethod: convertToString(json['payment_method']),
       paymentStatus: convertToString(json['payment_status']),
@@ -37,9 +49,24 @@ class BillModel {
       discountAmount: convertToDouble(json['discount_amount']),
       balance: convertToDouble(json['balance']),
       dateString: convertToString(json['date']),
-      createdAt: DateTime.tryParse(convertToString(json['created_at'])) ?? DateTime.now(),
+      paidDate: json['paid_date'] == null
+          ? null
+          : convertToString(json['paid_date']),
+      createdAt: DateTime.tryParse(
+            convertToString(json['created_at']),
+          ) ??
+          DateTime.now(),
+      customerName: customerDetails != null
+          ? convertToString(customerDetails['name'])
+          : null,
+      customerPhone: customerDetails != null
+          ? convertToString(customerDetails['phone_number'])
+          : null,
     );
   }
+
+  /// Computed paid amount (total minus outstanding balance).
+  double get paidAmount => totalAmount - balance;
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -51,6 +78,7 @@ class BillModel {
         'discount_amount': discountAmount.toString(),
         'balance': balance.toString(),
         'date': dateString,
+        if (paidDate != null) 'paid_date': paidDate,
         'created_at': createdAt.toIso8601String(),
       };
 }

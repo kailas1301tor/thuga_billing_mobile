@@ -2,11 +2,14 @@
 import 'package:either_dart/either.dart';
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:vyapapp/res/constants/string_constants.dart';
 import 'package:vyapapp/res/enums/enums.dart';
 import 'package:vyapapp/services/repo_di.dart';
 import 'package:vyapapp/utils/helpers/api_error_handler.dart';
-import 'package:vyapapp/src/main/model/dropdown_model.dart';
+import 'package:vyapapp/utils/helpers/debounce_helper.dart';
+import 'package:vyapapp/utils/helpers/toast_helper.dart';
 import '../model/bill_model.dart';
+import '../notifier/bill_detail_notifier.dart';
 import '../repo/bills_repository.dart';
 import '../state/bills_state.dart';
 
@@ -15,35 +18,58 @@ part 'bills_notifier.g.dart';
 @Riverpod(keepAlive: false)
 class BillsNotifier extends _$BillsNotifier {
   late final TextEditingController searchController;
+  late final ScrollController scrollController;
   late final BillsRepo _billsRepo;
 
   @override
   BillsState build() {
     searchController = TextEditingController();
+    scrollController = ScrollController();
     _billsRepo = ref.read(billsRepositoryProvider);
 
+    scrollController.addListener(_onScroll);
+
     ref.onDispose(() {
+      scrollController.removeListener(_onScroll);
       searchController.dispose();
+      scrollController.dispose();
     });
 
     searchController.addListener(_onSearchChanged);
 
-    // Fetch initial bills data
     Future.microtask(() => fetchBills());
-
     return const BillsState();
   }
 
-  void _onSearchChanged() {
-    final query = searchController.text.trim();
-    state = state.copyWith(searchQuery: query);
+  void _onScroll() {
+    if (!scrollController.hasClients) return;
+    final position = scrollController.position;
+    if (position.pixels >= position.maxScrollExtent - 200) {
+      loadMoreBills();
+    }
   }
 
-  Future<void> fetchBills() async {
-    state = state.copyWith(loaderState: LoaderState.loading);
+  void _onSearchChanged() {
+    state = state.copyWith(searchQuery: searchController.text.trim());
+    debounce(const Duration(milliseconds: 900), () {
+      fetchBills();
+    });
+  }
+
+  Future<void> fetchBills({int page = 1, bool showLoader = true}) async {
+    if (page == 1 && showLoader) {
+      state = state.copyWith(loaderState: LoaderState.loading);
+    } else if (page > 1) {
+      state = state.copyWith(isLoadingMore: true);
+    }
 
     return await _billsRepo
-        .getBills(dateFilter: state.dateRangeFilter)
+        .getBills(
+          dateFilter: state.dateRangeFilter,
+          search: state.searchQuery,
+          page: page,
+          pageSize: state.pageSize,
+        )
         .fold(
           (left) {
             final loader = handleResponseError(left.key);
@@ -51,21 +77,47 @@ class BillsNotifier extends _$BillsNotifier {
             state = state.copyWith(
               loaderState: loader,
               errorMessage: left.message,
+              isLoadingMore: false,
             );
           },
           (right) {
-            debugPrint("🟢 API SUCCESS: bills fetched");
-            if (right.results.data.isEmpty) {
+            final mergedData = page == 1
+                ? right.results.data
+                : [
+                    ...state.data?.results.data ?? <BillModel>[],
+                    ...right.results.data,
+                  ];
+
+            if (mergedData.isEmpty) {
               state = state.copyWith(
-                loaderState: LoaderState.noData,
-                data: right,
+                loaderState: state.searchQuery.isNotEmpty
+                    ? LoaderState.noSearchData
+                    : LoaderState.noData,
+                data: null,
+                currentPage: right.results.currentPage,
+                totalPages: right.results.totalPages,
+                isLoadingMore: false,
               );
-            } else {
-              state = state.copyWith(
-                loaderState: LoaderState.loaded,
-                data: right,
-              );
+              return;
             }
+
+            debugPrint("🟢 API SUCCESS: bills fetched (page $page)");
+            state = state.copyWith(
+              loaderState: LoaderState.loaded,
+              data: BillsResponseModel(
+                message: right.message,
+                results: BillsResults(
+                  totalCount: right.results.totalCount,
+                  totalPages: right.results.totalPages,
+                  currentPage: right.results.currentPage,
+                  itemPerPage: right.results.itemPerPage,
+                  data: mergedData,
+                ),
+              ),
+              currentPage: right.results.currentPage,
+              totalPages: right.results.totalPages,
+              isLoadingMore: false,
+            );
           },
         )
         .catchError((Object e) {
@@ -73,8 +125,18 @@ class BillsNotifier extends _$BillsNotifier {
           state = state.copyWith(
             loaderState: LoaderState.error,
             errorMessage: e.toString(),
+            isLoadingMore: false,
           );
         });
+  }
+
+  void loadMoreBills() {
+    if (state.isLoadingMore ||
+        state.loaderState == LoaderState.loading ||
+        state.currentPage >= state.totalPages) {
+      return;
+    }
+    fetchBills(page: state.currentPage + 1, showLoader: false);
   }
 
   void setDateRangeFilter(String value) {
@@ -86,46 +148,64 @@ class BillsNotifier extends _$BillsNotifier {
     state = state.copyWith(isNewestFirst: !state.isNewestFirst);
   }
 
+  void clearSearch() {
+    searchController.clear();
+  }
+
   void clearFilters() {
     searchController.clear();
     state = state.copyWith(searchQuery: '', dateRangeFilter: 'Today');
     fetchBills();
   }
 
-  /// Computed method to get filtered bills list based on state filters.
-  List<BillModel> getFilteredBills(List<DropdownCustomerModel> customers) {
-    if (state.data == null) return [];
+  Future<bool> updateBillPaymentStatus({
+    required int billId,
+    required String paymentStatus,
+  }) async {
+    state = state.copyWith(updatingBillId: billId);
 
-    var list = List<BillModel>.from(state.data!.results.data);
+    return await _billsRepo
+        .updateBillPaymentStatus(id: billId, paymentStatus: paymentStatus)
+        .fold(
+          (left) {
+            final loader = handleResponseError(left.key);
+            debugPrint("🔴 API ERROR: ${left.message}");
+            showCustomErrorToast(message: left.message ?? Strings.somethingWentWrong);
+            state = state.copyWith(
+              updatingBillId: null,
+              loaderState: loader,
+              errorMessage: left.message,
+            );
+            return false;
+          },
+          (right) async {
+            debugPrint("🟢 API SUCCESS: ${right.message}");
+            showCustomToast(message: Strings.paymentStatusUpdated);
+            ref.invalidate(billDetailNotifierProvider(billId));
+            await fetchBills(page: 1, showLoader: false);
+            state = state.copyWith(updatingBillId: null);
+            return true;
+          },
+        )
+        .catchError((Object e) {
+          debugPrint("🔴 UNEXPECTED ERROR: $e");
+          showCustomErrorToast(message: Strings.somethingWentWrong);
+          state = state.copyWith(updatingBillId: null);
+          return false;
+        });
+  }
 
-    // Search query
-    if (state.searchQuery.isNotEmpty) {
-      final query = state.searchQuery.toLowerCase();
-      list = list.where((b) {
-        final customerName = b.customerId != null
-            ? customers
-                  .firstWhere(
-                    (c) => c.id == b.customerId,
-                    orElse: () =>
-                        DropdownCustomerModel(id: b.customerId!, name: ''),
-                  )
-                  .name
-                  .toLowerCase()
-            : 'walk-in customer';
+  Future<bool> markBillAsPaid(int billId) {
+    return updateBillPaymentStatus(
+      billId: billId,
+      paymentStatus: Strings.paid,
+    );
+  }
 
-        return b.orderNumber.toLowerCase().contains(query) ||
-            customerName.contains(query) ||
-            b.totalAmount.toString().contains(query);
-      }).toList();
-    }
-
-    // Sorting
-    if (state.isNewestFirst) {
-      list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-    } else {
-      list.sort((a, b) => a.createdAt.compareTo(b.createdAt));
-    }
-
-    return list;
+  Future<bool> markBillAsUnpaid(int billId) {
+    return updateBillPaymentStatus(
+      billId: billId,
+      paymentStatus: Strings.credit,
+    );
   }
 }

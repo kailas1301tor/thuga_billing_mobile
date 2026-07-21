@@ -6,6 +6,7 @@ import 'package:vyapapp/res/styles/color_palette.dart';
 import 'package:vyapapp/res/styles/font_palette.dart';
 import 'package:vyapapp/utils/common_widgets/common_container.dart';
 import 'package:vyapapp/utils/helpers/date_formatter.dart';
+import 'package:vyapapp/utils/helpers/extensions.dart';
 import '../../model/reports_model.dart';
 
 class ReportsSalesChart extends StatelessWidget {
@@ -101,7 +102,7 @@ class _YAxisPainter extends CustomPainter {
     for (int i = 0; i <= gridLinesCount; i++) {
       final double y = chartHeight - (i * (chartHeight / gridLinesCount));
       final double gridValue = (i * (limitMax / gridLinesCount));
-      final labelText = '₹${gridValue.toStringAsFixed(0)}';
+      final labelText = gridValue.toCurrency();
 
       final textPainter = TextPainter(
         text: TextSpan(text: labelText, style: labelStyle),

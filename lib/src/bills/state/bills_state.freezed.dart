@@ -22,6 +22,11 @@ mixin _$BillsState {
   String get searchQuery => throw _privateConstructorUsedError;
   String get dateRangeFilter => throw _privateConstructorUsedError;
   bool get isNewestFirst => throw _privateConstructorUsedError;
+  int get currentPage => throw _privateConstructorUsedError;
+  int get totalPages => throw _privateConstructorUsedError;
+  int get pageSize => throw _privateConstructorUsedError;
+  bool get isLoadingMore => throw _privateConstructorUsedError;
+  int? get updatingBillId => throw _privateConstructorUsedError;
   String? get errorMessage => throw _privateConstructorUsedError;
 
   /// Create a copy of BillsState
@@ -44,6 +49,11 @@ abstract class $BillsStateCopyWith<$Res> {
     String searchQuery,
     String dateRangeFilter,
     bool isNewestFirst,
+    int currentPage,
+    int totalPages,
+    int pageSize,
+    bool isLoadingMore,
+    int? updatingBillId,
     String? errorMessage,
   });
 }
@@ -68,6 +78,11 @@ class _$BillsStateCopyWithImpl<$Res, $Val extends BillsState>
     Object? searchQuery = null,
     Object? dateRangeFilter = null,
     Object? isNewestFirst = null,
+    Object? currentPage = null,
+    Object? totalPages = null,
+    Object? pageSize = null,
+    Object? isLoadingMore = null,
+    Object? updatingBillId = freezed,
     Object? errorMessage = freezed,
   }) {
     return _then(
@@ -92,6 +107,26 @@ class _$BillsStateCopyWithImpl<$Res, $Val extends BillsState>
                 ? _value.isNewestFirst
                 : isNewestFirst // ignore: cast_nullable_to_non_nullable
                       as bool,
+            currentPage: null == currentPage
+                ? _value.currentPage
+                : currentPage // ignore: cast_nullable_to_non_nullable
+                      as int,
+            totalPages: null == totalPages
+                ? _value.totalPages
+                : totalPages // ignore: cast_nullable_to_non_nullable
+                      as int,
+            pageSize: null == pageSize
+                ? _value.pageSize
+                : pageSize // ignore: cast_nullable_to_non_nullable
+                      as int,
+            isLoadingMore: null == isLoadingMore
+                ? _value.isLoadingMore
+                : isLoadingMore // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            updatingBillId: freezed == updatingBillId
+                ? _value.updatingBillId
+                : updatingBillId // ignore: cast_nullable_to_non_nullable
+                      as int?,
             errorMessage: freezed == errorMessage
                 ? _value.errorMessage
                 : errorMessage // ignore: cast_nullable_to_non_nullable
@@ -117,6 +152,11 @@ abstract class _$$BillsStateImplCopyWith<$Res>
     String searchQuery,
     String dateRangeFilter,
     bool isNewestFirst,
+    int currentPage,
+    int totalPages,
+    int pageSize,
+    bool isLoadingMore,
+    int? updatingBillId,
     String? errorMessage,
   });
 }
@@ -140,6 +180,11 @@ class __$$BillsStateImplCopyWithImpl<$Res>
     Object? searchQuery = null,
     Object? dateRangeFilter = null,
     Object? isNewestFirst = null,
+    Object? currentPage = null,
+    Object? totalPages = null,
+    Object? pageSize = null,
+    Object? isLoadingMore = null,
+    Object? updatingBillId = freezed,
     Object? errorMessage = freezed,
   }) {
     return _then(
@@ -164,6 +209,26 @@ class __$$BillsStateImplCopyWithImpl<$Res>
             ? _value.isNewestFirst
             : isNewestFirst // ignore: cast_nullable_to_non_nullable
                   as bool,
+        currentPage: null == currentPage
+            ? _value.currentPage
+            : currentPage // ignore: cast_nullable_to_non_nullable
+                  as int,
+        totalPages: null == totalPages
+            ? _value.totalPages
+            : totalPages // ignore: cast_nullable_to_non_nullable
+                  as int,
+        pageSize: null == pageSize
+            ? _value.pageSize
+            : pageSize // ignore: cast_nullable_to_non_nullable
+                  as int,
+        isLoadingMore: null == isLoadingMore
+            ? _value.isLoadingMore
+            : isLoadingMore // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        updatingBillId: freezed == updatingBillId
+            ? _value.updatingBillId
+            : updatingBillId // ignore: cast_nullable_to_non_nullable
+                  as int?,
         errorMessage: freezed == errorMessage
             ? _value.errorMessage
             : errorMessage // ignore: cast_nullable_to_non_nullable
@@ -182,6 +247,11 @@ class _$BillsStateImpl implements _BillsState {
     this.searchQuery = '',
     this.dateRangeFilter = 'Today',
     this.isNewestFirst = true,
+    this.currentPage = 1,
+    this.totalPages = 1,
+    this.pageSize = 10,
+    this.isLoadingMore = false,
+    this.updatingBillId,
     this.errorMessage,
   });
 
@@ -200,11 +270,25 @@ class _$BillsStateImpl implements _BillsState {
   @JsonKey()
   final bool isNewestFirst;
   @override
+  @JsonKey()
+  final int currentPage;
+  @override
+  @JsonKey()
+  final int totalPages;
+  @override
+  @JsonKey()
+  final int pageSize;
+  @override
+  @JsonKey()
+  final bool isLoadingMore;
+  @override
+  final int? updatingBillId;
+  @override
   final String? errorMessage;
 
   @override
   String toString() {
-    return 'BillsState(loaderState: $loaderState, data: $data, searchQuery: $searchQuery, dateRangeFilter: $dateRangeFilter, isNewestFirst: $isNewestFirst, errorMessage: $errorMessage)';
+    return 'BillsState(loaderState: $loaderState, data: $data, searchQuery: $searchQuery, dateRangeFilter: $dateRangeFilter, isNewestFirst: $isNewestFirst, currentPage: $currentPage, totalPages: $totalPages, pageSize: $pageSize, isLoadingMore: $isLoadingMore, updatingBillId: $updatingBillId, errorMessage: $errorMessage)';
   }
 
   @override
@@ -221,6 +305,16 @@ class _$BillsStateImpl implements _BillsState {
                 other.dateRangeFilter == dateRangeFilter) &&
             (identical(other.isNewestFirst, isNewestFirst) ||
                 other.isNewestFirst == isNewestFirst) &&
+            (identical(other.currentPage, currentPage) ||
+                other.currentPage == currentPage) &&
+            (identical(other.totalPages, totalPages) ||
+                other.totalPages == totalPages) &&
+            (identical(other.pageSize, pageSize) ||
+                other.pageSize == pageSize) &&
+            (identical(other.isLoadingMore, isLoadingMore) ||
+                other.isLoadingMore == isLoadingMore) &&
+            (identical(other.updatingBillId, updatingBillId) ||
+                other.updatingBillId == updatingBillId) &&
             (identical(other.errorMessage, errorMessage) ||
                 other.errorMessage == errorMessage));
   }
@@ -233,6 +327,11 @@ class _$BillsStateImpl implements _BillsState {
     searchQuery,
     dateRangeFilter,
     isNewestFirst,
+    currentPage,
+    totalPages,
+    pageSize,
+    isLoadingMore,
+    updatingBillId,
     errorMessage,
   );
 
@@ -252,6 +351,11 @@ abstract class _BillsState implements BillsState {
     final String searchQuery,
     final String dateRangeFilter,
     final bool isNewestFirst,
+    final int currentPage,
+    final int totalPages,
+    final int pageSize,
+    final bool isLoadingMore,
+    final int? updatingBillId,
     final String? errorMessage,
   }) = _$BillsStateImpl;
 
@@ -265,6 +369,16 @@ abstract class _BillsState implements BillsState {
   String get dateRangeFilter;
   @override
   bool get isNewestFirst;
+  @override
+  int get currentPage;
+  @override
+  int get totalPages;
+  @override
+  int get pageSize;
+  @override
+  bool get isLoadingMore;
+  @override
+  int? get updatingBillId;
   @override
   String? get errorMessage;
 

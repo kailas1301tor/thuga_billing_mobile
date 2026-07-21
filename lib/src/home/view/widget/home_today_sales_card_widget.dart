@@ -52,13 +52,15 @@ class HomeTodaySalesCardWidget extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
-                    Icons.trending_up_rounded,
+                    salesChangePercent < 0
+                        ? Icons.trending_down_rounded
+                        : Icons.trending_up_rounded,
                     size: 14.r,
                     color: ColorPalette.white,
                   ),
                   4.horizontalSpace,
                   Text(
-                    '+${salesChangePercent.toStringAsFixed(1)}%',
+                    '${salesChangePercent >= 0 ? '+' : ''}${salesChangePercent.toStringAsFixed(1)}%',
                     style: FontPalette.base600(
                       12,
                       color: ColorPalette.white,

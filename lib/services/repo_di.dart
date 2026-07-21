@@ -12,6 +12,8 @@ import 'package:vyapapp/src/categories/repo/categories_repository.dart';
 import 'package:vyapapp/src/products/repo/products_repository.dart';
 import 'package:vyapapp/src/customers/repo/customers_repository.dart';
 import 'package:vyapapp/src/purchase/repo/purchase_repository.dart';
+import 'package:vyapapp/data/local/sembast_services.dart';
+import 'package:vyapapp/src/calculation/repo/calculation_repository.dart';
 
 part 'repo_di.g.dart';
 
@@ -84,4 +86,11 @@ CustomersRepo customersRepository(Ref ref) {
 PurchasesRepo purchasesRepository(Ref ref) {
   final services = ref.watch(networkServicesProvider);
   return PurchasesRepoImpl(services);
+}
+
+@Riverpod(keepAlive: false)
+CalculationRepo calculationRepository(Ref ref) {
+  final services = ref.watch(networkServicesProvider);
+  final sembast = ref.watch(sembastServicesProvider);
+  return CalculationRepoImpl(services, sembast);
 }

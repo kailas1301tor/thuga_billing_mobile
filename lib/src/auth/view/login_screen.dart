@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:vyapapp/res/styles/color_palette.dart';
 import 'package:vyapapp/utils/common_widgets/common_scaffold.dart';
-import 'widget/login_footer_widget.dart';
 import 'widget/login_form_widget.dart';
 
 class LoginScreen extends ConsumerWidget {
@@ -27,8 +26,6 @@ class LoginScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const LoginFormWidget(),
-                  32.verticalSpace,
-                  const LoginFooterWidget(),
                 ],
               ),
             ),

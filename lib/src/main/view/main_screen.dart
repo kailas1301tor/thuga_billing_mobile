@@ -12,8 +12,8 @@ import 'package:vyapapp/src/settings/view/settings_screen.dart';
 import 'package:vyapapp/utils/common_widgets/custom_toast.dart';
 
 import '../../../utils/common_widgets/common_scaffold.dart';
-import '../notifier/selected_tab_notifier.dart';
 import '../notifier/dropdowns_notifier.dart';
+import '../notifier/selected_tab_notifier.dart';
 import 'widget/vyap_bottom_nav_bar.dart';
 import 'widget/main_sidebar_drawer.dart';
 
@@ -30,8 +30,11 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   @override
   void initState() {
     super.initState();
+    // Pre-fetch global dropdown options (customers, products, payment methods) on startup
     Future.microtask(() {
-      ref.read(dropdownsNotifierProvider.notifier).fetchDropdowns();
+      if (mounted) {
+        ref.read(dropdownsNotifierProvider.notifier).fetchDropdowns();
+      }
     });
   }
 

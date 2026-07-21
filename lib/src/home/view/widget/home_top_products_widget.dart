@@ -8,6 +8,8 @@ import 'package:vyapapp/src/home/model/home_top_product_model.dart';
 import 'package:vyapapp/utils/common_widgets/common_cached_network_image.dart';
 import 'package:vyapapp/utils/common_widgets/common_container.dart';
 import 'package:vyapapp/utils/common_widgets/common_section_header.dart';
+
+import 'home_section_empty_text.dart';
 import 'package:vyapapp/utils/helpers/extensions.dart';
 
 class HomeTopProductsWidget extends StatelessWidget {
@@ -23,14 +25,17 @@ class HomeTopProductsWidget extends StatelessWidget {
         children: [
           CommonSectionHeader(title: Strings.topProductsToday),
           10.verticalSpace,
-          Column(
-            children: [
-              for (final p in products) ...[
-                _ProductRow(product: p),
-                10.verticalSpace,
+          if (products.isEmpty)
+            const HomeSectionEmptyText(message: Strings.noTopProductsToday)
+          else
+            Column(
+              children: [
+                for (final p in products) ...[
+                  _ProductRow(product: p),
+                  10.verticalSpace,
+                ],
               ],
-            ],
-          ),
+            ),
         ],
       ),
     );

@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:vyapapp/res/styles/color_palette.dart';
 import 'package:vyapapp/res/styles/font_palette.dart';
 import 'package:vyapapp/utils/common_widgets/common_container.dart';
+import 'package:vyapapp/utils/helpers/extensions.dart';
 import '../../model/reports_model.dart';
 
 class ReportsMetricsGrid extends StatelessWidget {
@@ -27,7 +28,7 @@ class ReportsMetricsGrid extends StatelessWidget {
         _buildMetricCard(
           context: context,
           title: 'Total Sales',
-          value: '₹${summary?.totalSales.toStringAsFixed(0)}',
+          value: summary != null ? summary!.totalSales.toCurrency() : '—',
           icon: Icons.auto_graph_rounded,
           color: colors.primary,
           bgColor: colors.primary.withValues(alpha: 0.08),
@@ -45,7 +46,7 @@ class ReportsMetricsGrid extends StatelessWidget {
         _buildMetricCard(
           context: context,
           title: 'Avg. Bill Value',
-          value: '₹${summary?.avgBillValue.toStringAsFixed(0)}',
+          value: summary != null ? summary!.avgBillValue.toCurrency() : '—',
           icon: Icons.analytics_outlined,
           color: Colors.blueAccent,
           bgColor: Colors.blueAccent.withValues(alpha: 0.08),

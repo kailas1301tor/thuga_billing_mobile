@@ -9,10 +9,13 @@ import '../state/dropdowns_state.dart';
 
 part 'dropdowns_notifier.g.dart';
 
-@Riverpod(keepAlive: false)
+@Riverpod(keepAlive: true)
 class DropdownsNotifier extends _$DropdownsNotifier {
   @override
-  DropdownsState build() => const DropdownsState();
+  DropdownsState build() {
+    Future.microtask(fetchDropdowns);
+    return const DropdownsState();
+  }
 
   Future<void> fetchDropdowns() async {
     state = state.copyWith(loaderState: LoaderState.loading);

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:vyapapp/res/styles/color_palette.dart';
 import 'package:vyapapp/res/styles/font_palette.dart';
+import 'package:vyapapp/utils/helpers/extensions.dart';
 import '../../notifier/new_bill_notifier.dart';
 
 class QuickTapCartStrip extends ConsumerWidget {
@@ -15,15 +16,16 @@ class QuickTapCartStrip extends ConsumerWidget {
     
     final isExpanded = ref.watch(newBillNotifierProvider.select((s) => s.isCartExpanded));
     final cart = ref.watch(newBillNotifierProvider.select((s) => s.cart));
-    final discountAmount = ref.watch(newBillNotifierProvider.select((s) => s.discountAmount));
+    ref.watch(newBillNotifierProvider.select((s) => s.discountAmount));
+    final notifier = ref.read(newBillNotifierProvider.notifier);
+    final totals = notifier.billTotals;
+    final totalPrice = totals.grandTotal;
 
     if (cart.isEmpty) {
       return const SizedBox.shrink();
     }
 
     final totalItems = cart.fold<int>(0, (sum, item) => sum + item.quantity);
-    final subtotal = cart.fold<double>(0.0, (sum, item) => sum + item.totalPrice);
-    final totalPrice = (subtotal - discountAmount).clamp(0.0, double.infinity);
 
     return GestureDetector(
       onTap: () {
@@ -95,7 +97,7 @@ class QuickTapCartStrip extends ConsumerWidget {
             
             // Total Price
             Text(
-              '₹${totalPrice.toStringAsFixed(2)}',
+              totalPrice.toCurrency(),
               style: FontPalette.base700(16, color: colors.primary),
             ),
             8.horizontalSpace,

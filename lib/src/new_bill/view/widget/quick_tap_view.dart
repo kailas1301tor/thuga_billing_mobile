@@ -2,12 +2,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:vyapapp/res/constants/string_constants.dart';
 import 'package:vyapapp/res/styles/color_palette.dart';
 import 'package:vyapapp/res/styles/font_palette.dart';
 import 'package:vyapapp/utils/common_widgets/common_bottom_sheet.dart';
 import 'package:vyapapp/utils/common_widgets/common_search_bar.dart';
 import 'package:vyapapp/utils/common_widgets/common_text_form_field.dart';
 import 'package:vyapapp/utils/common_widgets/primary_button.dart';
+import 'package:vyapapp/utils/helpers/extensions.dart';
+import 'package:vyapapp/utils/helpers/product_stock_helper.dart';
 import 'package:vyapapp/utils/helpers/toast_helper.dart';
 import 'package:vyapapp/utils/common_widgets/bottomsheet_content.dart';
 import '../../../main/model/dropdown_model.dart';
@@ -258,6 +261,7 @@ class QuickTapView extends ConsumerWidget {
                         return QuickTapProductCard(
                           product: product,
                           quantity: qty,
+                          isOutOfStock: isOutOfStock(product.quantity),
                           onTap: () => notifier.addToCart(product),
                           onReduce: () => notifier.setProductQuantity(product, qty - 1),
                           onLongPress: () {
@@ -346,10 +350,8 @@ class QuickTapView extends ConsumerWidget {
                         // Pricing Summary block
                         Builder(
                           builder: (context) {
-                            final subtotal = cartItems.fold<double>(
-                              0.0,
-                              (sum, item) => sum + item.totalPrice,
-                            );
+                            final totals = notifier.billTotals;
+                            final subtotal = totals.subtotal;
                             return Container(
                               padding: EdgeInsets.symmetric(
                                 horizontal: 20.w,
@@ -375,7 +377,7 @@ class QuickTapView extends ConsumerWidget {
                                         ),
                                       ),
                                       Text(
-                                        '₹${subtotal.toStringAsFixed(2)}',
+                                        subtotal.toCurrency(),
                                         style: FontPalette.base600(
                                           12,
                                           color: colors.primaryText,
@@ -413,8 +415,8 @@ class QuickTapView extends ConsumerWidget {
                                         ),
                                         Text(
                                           discountAmount > 0
-                                              ? '- ₹${discountAmount.toStringAsFixed(2)}'
-                                              : '₹0.00',
+                                              ? '- ${discountAmount.toCurrency()}'
+                                              : 0.toCurrency(),
                                           style: FontPalette.base700(
                                             12,
                                             color: discountAmount > 0
@@ -424,6 +426,73 @@ class QuickTapView extends ConsumerWidget {
                                         ),
                                       ],
                                     ),
+                                  ),
+                                  if (totals.sgstTotal > 0) ...[
+                                    6.verticalSpace,
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          Strings.sgstTotal,
+                                          style: FontPalette.base500(
+                                            12,
+                                            color: colors.secondaryText,
+                                          ),
+                                        ),
+                                        Text(
+                                          totals.sgstTotal.toCurrency(),
+                                          style: FontPalette.base600(
+                                            12,
+                                            color: colors.primaryText,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                  if (totals.cgstTotal > 0) ...[
+                                    6.verticalSpace,
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          Strings.cgstTotal,
+                                          style: FontPalette.base500(
+                                            12,
+                                            color: colors.secondaryText,
+                                          ),
+                                        ),
+                                        Text(
+                                          totals.cgstTotal.toCurrency(),
+                                          style: FontPalette.base600(
+                                            12,
+                                            color: colors.primaryText,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                  6.verticalSpace,
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Total',
+                                        style: FontPalette.base700(
+                                          13,
+                                          color: colors.primaryText,
+                                        ),
+                                      ),
+                                      Text(
+                                        totals.grandTotal.toCurrency(),
+                                        style: FontPalette.base700(
+                                          14,
+                                          color: colors.primary,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
@@ -527,7 +596,7 @@ class QuickTapView extends ConsumerWidget {
                 ),
                 16.verticalSpace,
                 Text(
-                  'Enter discount amount to apply on subtotal of ₹${subtotal.toStringAsFixed(2)}',
+                  'Enter discount amount to apply on subtotal of ${subtotal.toCurrency()}',
                   textAlign: TextAlign.center,
                   style: FontPalette.base400(13, color: colors.secondaryText),
                 ),

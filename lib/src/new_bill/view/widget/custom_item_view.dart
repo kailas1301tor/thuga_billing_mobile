@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:vyapapp/res/styles/color_palette.dart';
 import 'package:vyapapp/res/styles/font_palette.dart';
+import 'package:vyapapp/utils/helpers/extensions.dart';
 import 'package:vyapapp/utils/common_widgets/common_text_form_field.dart';
 import 'package:vyapapp/utils/common_widgets/primary_button.dart';
 
@@ -85,7 +86,7 @@ class CustomItemView extends StatelessWidget {
                     final price = double.tryParse(priceController.text) ?? 0.0;
                     final total = qty * price;
                     return Text(
-                      '₹${total.toStringAsFixed(2)}',
+                      total.toCurrency(),
                       style: FontPalette.base700(16, color: colors.primary),
                     );
                   },

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
+import 'amount_formatter.dart';
 import '../common_widgets/common_shimmer_box.dart';
 
 // ════════════════════════════════════════════════════════════════
@@ -24,7 +25,7 @@ import '../common_widgets/common_shimmer_box.dart';
 // 'john@gmail.com'.isValidEmail       → true
 // '+919876543210'.isValidPhone        → true
 // 'https://google.com'.isValidUrl     → true
-// 'Pass@1234'.isValidPassword         → true
+// 'Pass12'.isValidPassword            → true
 // 'copy me'.copyToClipboard()         → copies to clipboard
 extension StringExtension on String {
   String get capitalize =>
@@ -48,11 +49,7 @@ extension StringExtension on String {
   bool get isValidUrl =>
       RegExp(r'^https?://[^\s/$.?#].[^\s]*$').hasMatch(this);
 
-  bool get isValidPassword =>
-      length >= 8 &&
-      contains(RegExp(r'[A-Z]')) &&
-      contains(RegExp(r'[0-9]')) &&
-      contains(RegExp(r'[!@#\$%^&*]'));
+  bool get isValidPassword => trim().length >= 6;
 
   bool get isNumeric => RegExp(r'^\d+$').hasMatch(this);
 
@@ -96,17 +93,20 @@ extension NullableStringExtension on String? {
 // ════════════════════════════════════════════════════════════════
 // NUM EXTENSIONS
 // ════════════════════════════════════════════════════════════════
-// 1500.toCurrency()            → '₹1,500.00'
-// 1500.toCurrency(symbol: '$') → '$1,500.00'
+// 1500.toCurrency()            → '₹1,500'
+// 1500.5.toCurrency()          → '₹1,500.5'
+// 5.toDisplayPercent()         → '5%'
 // 1200000.compact              → '1.2M'
 // 0.75.asProgress              → 0.75  (clamped 0.0–1.0)
 // (-5).isNegative              → true
 // 2.seconds                    → Duration(seconds: 2)
 // await 2.seconds.delay        → pauses 2 seconds
 extension NumExtension on num {
-  String toCurrency({String symbol = '₹', int decimalDigits = 2}) =>
-      NumberFormat.currency(symbol: symbol, decimalDigits: decimalDigits)
-          .format(this);
+  String toCurrency({String symbol = '₹', int maxDecimalDigits = 2}) =>
+      formatDisplayCurrency(this, symbol: symbol, maxDecimalDigits: maxDecimalDigits);
+
+  String toDisplayPercent({int maxDecimalDigits = 2}) =>
+      formatDisplayPercent(this, maxDecimalDigits: maxDecimalDigits);
 
   String get compact => NumberFormat.compact().format(this);
 

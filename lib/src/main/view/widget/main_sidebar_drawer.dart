@@ -1,12 +1,14 @@
 // lib/src/main/view/widget/main_sidebar_drawer.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:vyapapp/res/constants/string_constants.dart';
 import 'package:vyapapp/res/styles/color_palette.dart';
 import 'package:vyapapp/res/styles/font_palette.dart';
 import 'package:vyapapp/src/categories/view/category_crud_screen.dart';
 import 'package:vyapapp/src/products/view/product_crud_screen.dart';
 import 'package:vyapapp/src/customers/view/customer_crud_screen.dart';
 import 'package:vyapapp/src/purchase/view/purchases_screen.dart';
+import 'package:vyapapp/src/calculation/view/calculation_screen.dart';
 
 class MainSidebarDrawer extends StatelessWidget {
   const MainSidebarDrawer({super.key});
@@ -102,6 +104,21 @@ class MainSidebarDrawer extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const CustomerCrudScreen()),
+                );
+              },
+            ),
+            _buildMenuItem(
+              context: context,
+              icon: Icons.calculate_rounded,
+              title: Strings.calculationTitle,
+              subtitle: Strings.calculationSubtitle,
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const CalculationScreen(),
+                  ),
                 );
               },
             ),

@@ -13,6 +13,11 @@ sealed class BillsState with _$BillsState {
     @Default('') String searchQuery,
     @Default('Today') String dateRangeFilter,
     @Default(true) bool isNewestFirst,
+    @Default(1) int currentPage,
+    @Default(1) int totalPages,
+    @Default(10) int pageSize,
+    @Default(false) bool isLoadingMore,
+    int? updatingBillId,
     String? errorMessage,
   }) = _BillsState;
 }

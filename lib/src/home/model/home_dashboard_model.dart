@@ -1,6 +1,6 @@
 // lib/src/home/model/home_dashboard_model.dart
 import 'package:vyapapp/utils/helpers/safe_converters.dart';
-import 'home_recent_bill_model.dart';
+import 'package:vyapapp/src/bills/model/bill_model.dart';
 import 'home_top_product_model.dart';
 
 class HomeDashboardModel {
@@ -30,13 +30,13 @@ class HomeDashboardModel {
   final String bestSellerName;
   final int bestSellerQty;
   final List<HomeTopProductModel> topProducts;
-  final List<HomeRecentBillModel> recentBills;
+  final List<BillModel> recentBills;
 
   factory HomeDashboardModel.fromJson(
     Map<String, dynamic> json, {
     required String shopName,
     required List<HomeTopProductModel> topProducts,
-    required List<HomeRecentBillModel> recentBills,
+    required List<BillModel> recentBills,
   }) {
     final todaySalesJson = convertToMap(json['today_sales']);
     final todayBillsJson = convertToMap(json['today_bills']);

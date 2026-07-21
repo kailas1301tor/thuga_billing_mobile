@@ -21,8 +21,11 @@ class ProductsNotifier extends _$ProductsNotifier {
   late final TextEditingController priceController;
   late final TextEditingController barcodeController;
   late final TextEditingController qtyController;
+  late final TextEditingController sgstController;
+  late final TextEditingController cgstController;
   late final TextEditingController searchController;
   late final FocusNode searchFocusNode;
+  late final ScrollController scrollController;
 
   @override
   ProductsState build() {
@@ -30,16 +33,25 @@ class ProductsNotifier extends _$ProductsNotifier {
     priceController = TextEditingController();
     barcodeController = TextEditingController();
     qtyController = TextEditingController();
+    sgstController = TextEditingController();
+    cgstController = TextEditingController();
     searchController = TextEditingController();
     searchFocusNode = FocusNode();
+    scrollController = ScrollController();
+
+    scrollController.addListener(_onScroll);
 
     ref.onDispose(() {
+      scrollController.removeListener(_onScroll);
       nameController.dispose();
       priceController.dispose();
       barcodeController.dispose();
       qtyController.dispose();
+      sgstController.dispose();
+      cgstController.dispose();
       searchController.dispose();
       searchFocusNode.dispose();
+      scrollController.dispose();
     });
 
     searchController.addListener(_onSearchChanged);
@@ -48,34 +60,92 @@ class ProductsNotifier extends _$ProductsNotifier {
     return const ProductsState();
   }
 
-  Future<void> fetchProducts({bool showLoader = true}) async {
-    if (showLoader) {
-      state = state.copyWith(loaderState: LoaderState.loading);
+  void _onScroll() {
+    if (!scrollController.hasClients) return;
+    final position = scrollController.position;
+    if (position.pixels >= position.maxScrollExtent - 200) {
+      loadMoreProducts();
     }
+  }
+
+  Future<void> fetchProducts({int page = 1, bool showLoader = true}) async {
+    if (page == 1 && showLoader) {
+      state = state.copyWith(loaderState: LoaderState.loading);
+    } else if (page > 1) {
+      state = state.copyWith(isLoadingMore: true);
+    }
+
     return await ref.read(productsRepositoryProvider).getProducts(
           search: state.searchQuery,
           categoryId: state.filterCategoryId,
           sort: state.sort,
-          page: state.page,
+          page: page,
           pageSize: state.pageSize,
         ).fold(
       (left) {
         final loaderState = handleResponseError(left.key);
         debugPrint("🔴 API ERROR: ${left.message}");
-        state = state.copyWith(loaderState: loaderState, errorMessage: left.message);
+        state = state.copyWith(
+          loaderState: loaderState,
+          errorMessage: left.message,
+          isLoadingMore: false,
+        );
       },
       (right) {
-        if (right.results.data.isEmpty) {
-          state = state.copyWith(loaderState: LoaderState.noData);
+        final mergedData = page == 1
+            ? right.results.data
+            : [
+                ...state.response?.results.data ?? <ProductCrudModel>[],
+                ...right.results.data,
+              ];
+
+        if (mergedData.isEmpty) {
+          state = state.copyWith(
+            loaderState: state.searchQuery.isNotEmpty
+                ? LoaderState.noSearchData
+                : LoaderState.noData,
+            response: null,
+            currentPage: right.results.currentPage,
+            totalPages: right.results.totalPages,
+            isLoadingMore: false,
+          );
           return;
         }
-        debugPrint("🟢 API SUCCESS: products fetched");
-        state = state.copyWith(loaderState: LoaderState.loaded, response: right);
+
+        debugPrint("🟢 API SUCCESS: products fetched (page $page)");
+        state = state.copyWith(
+          loaderState: LoaderState.loaded,
+          response: ProductResponse(
+            message: right.message,
+            results: ProductResults(
+              totalCount: right.results.totalCount,
+              totalPages: right.results.totalPages,
+              currentPage: right.results.currentPage,
+              itemPerPage: right.results.itemPerPage,
+              data: mergedData,
+            ),
+          ),
+          currentPage: right.results.currentPage,
+          totalPages: right.results.totalPages,
+          isLoadingMore: false,
+        );
       },
     ).catchError((e) {
       debugPrint("🔴 UNEXPECTED ERROR: $e");
-      state = state.copyWith(loaderState: LoaderState.error);
+      state = state.copyWith(
+        loaderState: LoaderState.error,
+        isLoadingMore: false,
+      );
     });
+  }
+
+  void loadMoreProducts() {
+    if (state.isLoadingMore ||
+        state.loaderState == LoaderState.loading ||
+        state.currentPage >= state.totalPages) {
+      return;
+    }
+    fetchProducts(page: state.currentPage + 1, showLoader: false);
   }
 
   void _onSearchChanged() {
@@ -109,6 +179,8 @@ class ProductsNotifier extends _$ProductsNotifier {
     priceController.clear();
     barcodeController.clear();
     qtyController.clear();
+    sgstController.clear();
+    cgstController.clear();
     state = state.copyWith(
       selectedCategoryId: null,
       isQuickProduct: true,
@@ -143,6 +215,40 @@ class ProductsNotifier extends _$ProductsNotifier {
     );
   }
 
+  bool _validateOptionalTaxFields() {
+    for (final entry in [
+      ('SGST', sgstController.text.trim()),
+      ('CGST', cgstController.text.trim()),
+    ]) {
+      final label = entry.$1;
+      final value = entry.$2;
+      if (value.isEmpty) continue;
+
+      final parsed = double.tryParse(value);
+      if (parsed == null) {
+        showCustomErrorToast(message: '$label must be a valid number');
+        return false;
+      }
+      if (parsed < 0 || parsed > 100) {
+        showCustomErrorToast(message: '$label must be between 0 and 100');
+        return false;
+      }
+    }
+    return true;
+  }
+
+  void _appendOptionalTaxFields(Map<String, dynamic> map) {
+    final sgst = sgstController.text.trim();
+    if (sgst.isNotEmpty) {
+      map['sgst'] = sgst;
+    }
+
+    final cgst = cgstController.text.trim();
+    if (cgst.isNotEmpty) {
+      map['cgst'] = cgst;
+    }
+  }
+
   Future<bool> createProduct() async {
     final name = nameController.text.trim();
     final priceStr = priceController.text.trim();
@@ -150,6 +256,10 @@ class ProductsNotifier extends _$ProductsNotifier {
 
     if (name.isEmpty || priceStr.isEmpty || categoryId == null) {
       showCustomErrorToast(message: 'Please fill all required fields');
+      return false;
+    }
+
+    if (!_validateOptionalTaxFields()) {
       return false;
     }
 
@@ -170,6 +280,7 @@ class ProductsNotifier extends _$ProductsNotifier {
     if (qty.isNotEmpty) {
       map['qty'] = qty;
     }
+    _appendOptionalTaxFields(map);
 
     if (state.selectedImagePath != null) {
       map['image'] = await MultipartFile.fromFile(
@@ -209,6 +320,10 @@ class ProductsNotifier extends _$ProductsNotifier {
       return false;
     }
 
+    if (!_validateOptionalTaxFields()) {
+      return false;
+    }
+
     state = state.copyWith(updateProductLoader: true);
 
     final Map<String, dynamic> map = {
@@ -226,6 +341,7 @@ class ProductsNotifier extends _$ProductsNotifier {
     if (qty.isNotEmpty) {
       map['qty'] = qty;
     }
+    _appendOptionalTaxFields(map);
 
     if (state.selectedImagePath != null) {
       map['image'] = await MultipartFile.fromFile(
@@ -294,6 +410,8 @@ class ProductsNotifier extends _$ProductsNotifier {
             barcode: product.barcode,
             quantity: product.quantity,
             price: product.price,
+            sgst: product.sgst,
+            cgst: product.cgst,
             isQuickProduct: product.isQuickProduct,
             isActive: isActive,
             deleted: product.deleted,

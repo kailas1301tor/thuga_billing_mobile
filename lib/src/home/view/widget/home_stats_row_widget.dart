@@ -42,8 +42,10 @@ class HomeStatsRowWidget extends StatelessWidget {
               icon: Icons.receipt_long_outlined,
               label: Strings.bills,
               value: '$billCount',
-              delta: '+$billCountDelta ${Strings.vsYesterday}',
-              deltaColor: colors.primary,
+              delta: '${billCountDelta >= 0 ? '+' : ''}$billCountDelta ${Strings.vsYesterday}',
+              deltaColor: billCountDelta >= 0
+                  ? colors.primary
+                  : ColorPalette.formValidationErrorColor,
             ),
           ),
           10.horizontalSpace,
@@ -55,8 +57,10 @@ class HomeStatsRowWidget extends StatelessWidget {
               label: Strings.avgBillValue,
               value: avgBillValue.toCurrency(),
               delta:
-                  '+${avgBillChangePercent.toStringAsFixed(1)}% ${Strings.vsYesterday}',
-              deltaColor: colors.primary,
+                  '${avgBillChangePercent >= 0 ? '+' : ''}${avgBillChangePercent.toStringAsFixed(1)}% ${Strings.vsYesterday}',
+              deltaColor: avgBillChangePercent >= 0
+                  ? colors.primary
+                  : ColorPalette.formValidationErrorColor,
             ),
           ),
           10.horizontalSpace,

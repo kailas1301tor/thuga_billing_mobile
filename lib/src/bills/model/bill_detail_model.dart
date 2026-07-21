@@ -85,6 +85,9 @@ class BillDetailModel {
     required this.dateString,
     required this.createdAt,
     required this.items,
+    this.paidDate,
+    this.customerName,
+    this.customerPhone,
   });
 
   final int id;
@@ -97,9 +100,16 @@ class BillDetailModel {
   final double balance;
   final String dateString;
   final DateTime createdAt;
+  final String? paidDate;
   final List<BillDetailItemModel> items;
+  final String? customerName;
+  final String? customerPhone;
 
   factory BillDetailModel.fromJson(Map<String, dynamic> json) {
+    final customerDetails = json['customer_details'] != null
+        ? convertToMap(json['customer_details'])
+        : null;
+
     return BillDetailModel(
       id: convertToInt(json['id']),
       customerId: json['customer'] == null ? null : convertToInt(json['customer']),
@@ -110,10 +120,19 @@ class BillDetailModel {
       discountAmount: convertToDouble(json['discount_amount']),
       balance: convertToDouble(json['balance']),
       dateString: convertToString(json['date']),
+      paidDate: json['paid_date'] == null
+          ? null
+          : convertToString(json['paid_date']),
       createdAt: DateTime.tryParse(convertToString(json['created_at'])) ?? DateTime.now(),
       items: convertToList(json['items'])
           .map((e) => BillDetailItemModel.fromJson(convertToMap(e)))
           .toList(),
+      customerName: customerDetails != null
+          ? convertToString(customerDetails['name'])
+          : null,
+      customerPhone: customerDetails != null
+          ? convertToString(customerDetails['phone_number'])
+          : null,
     );
   }
 }

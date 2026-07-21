@@ -3,10 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:vyapapp/res/enums/enums.dart';
 import 'package:vyapapp/res/styles/color_palette.dart';
 import 'package:vyapapp/res/styles/font_palette.dart';
 import 'package:vyapapp/utils/common_widgets/common_text_form_field.dart';
+import 'package:vyapapp/utils/common_widgets/common_loader.dart';
 import 'package:vyapapp/utils/common_widgets/primary_button.dart';
+import 'package:vyapapp/utils/helpers/extensions.dart';
 import 'package:vyapapp/utils/helpers/toast_helper.dart';
 import 'package:vyapapp/utils/common_widgets/common_cached_network_image.dart';
 import '../../../main/notifier/dropdowns_notifier.dart';
@@ -81,7 +84,7 @@ class _ItemDiscountSheetState extends ConsumerState<ItemDiscountSheet> {
         if (value <= 0 || value > rawTotal) {
           showCustomErrorToast(
             message:
-                'Amount must be between ₹1 and ₹${rawTotal.toStringAsFixed(0)}',
+                'Amount must be between ${1.toCurrency()} and ${rawTotal.toCurrency()}',
           );
           return false;
         }
@@ -90,7 +93,7 @@ class _ItemDiscountSheetState extends ConsumerState<ItemDiscountSheet> {
         if (value <= 0 || value >= widget.item.price) {
           showCustomErrorToast(
             message:
-                'Slab price must be less than ₹${widget.item.price.toStringAsFixed(0)}',
+                'Slab price must be less than ${widget.item.price.toCurrency()}',
           );
           return false;
         }
@@ -115,6 +118,9 @@ class _ItemDiscountSheetState extends ConsumerState<ItemDiscountSheet> {
     final colors = context.appColors;
     final dropdownsState = ref.watch(dropdownsNotifierProvider);
     final discountTypes = dropdownsState.data.discountTypes;
+    final isDropdownsLoading =
+        dropdownsState.loaderState == LoaderState.loading &&
+        discountTypes.isEmpty;
 
     return SingleChildScrollView(
       child: Column(
@@ -131,10 +137,21 @@ class _ItemDiscountSheetState extends ConsumerState<ItemDiscountSheet> {
             style: FontPalette.base600(13, color: colors.secondaryText),
           ),
           10.verticalSpace,
-          Wrap(
-            spacing: 8.w,
-            runSpacing: 8.h,
-            children: discountTypes.map((type) {
+          if (isDropdownsLoading)
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 24.h),
+              child: const Center(child: CommonLoader()),
+            )
+          else if (discountTypes.isEmpty)
+            Text(
+              'Discount types unavailable. Pull to refresh and try again.',
+              style: FontPalette.base400(13, color: colors.secondaryText),
+            )
+          else
+            Wrap(
+              spacing: 8.w,
+              runSpacing: 8.h,
+              children: discountTypes.map((type) {
               final isSelected = _selectedType == type.id;
               return GestureDetector(
                 onTap: () {
@@ -286,7 +303,7 @@ class _ItemDiscountSheetState extends ConsumerState<ItemDiscountSheet> {
                 ),
                 4.verticalSpace,
                 Text(
-                  '₹${widget.item.price.toStringAsFixed(2)} × ${widget.item.quantity} = ₹${widget.item.lineTotal.toStringAsFixed(2)}',
+                  '${widget.item.price.toCurrency()} × ${widget.item.quantity} = ${widget.item.lineTotal.toCurrency()}',
                   style: FontPalette.base400(12, color: colors.secondaryText),
                 ),
               ],
@@ -349,7 +366,7 @@ class _ItemDiscountSheetState extends ConsumerState<ItemDiscountSheet> {
               controller: _valueController,
               title: 'Slab Unit Price (₹)',
               hintText:
-                  'e.g. 80 (original: ₹${widget.item.price.toStringAsFixed(0)})',
+                  'e.g. 80 (original: ${widget.item.price.toCurrency()})',
               inputType:
                   const TextInputType.numberWithOptions(decimal: true),
               inputFormatters: [
@@ -437,7 +454,7 @@ class _ItemDiscountSheetState extends ConsumerState<ItemDiscountSheet> {
           8.horizontalSpace,
           Expanded(
             child: Text(
-              'You save ₹${preview.discountAmount.toStringAsFixed(2)} · Final: ₹${preview.totalPrice.toStringAsFixed(2)}',
+              'You save ${preview.discountAmount.toCurrency()} · Final: ${preview.totalPrice.toCurrency()}',
               style: FontPalette.base600(12, color: Colors.green.shade700),
             ),
           ),

@@ -2,7 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:vyapapp/res/constants/string_constants.dart';
 import 'package:vyapapp/res/styles/color_palette.dart';
+import 'package:vyapapp/src/printer/notifier/printer_notifier.dart';
+import 'package:vyapapp/utils/common_widgets/common_dialog_box.dart';
 import 'package:vyapapp/utils/common_widgets/common_scaffold.dart';
 import 'package:vyapapp/utils/common_widgets/common_switch_state.dart';
 
@@ -12,6 +15,33 @@ import 'widget/new_bill_footer.dart';
 import 'widget/new_bill_header.dart';
 import 'widget/quick_tap_view.dart';
 
+void _onPaymentStatusChanged(
+  BuildContext context,
+  WidgetRef ref,
+  String status,
+) {
+  final state = ref.read(newBillNotifierProvider);
+  final notifier = ref.read(newBillNotifierProvider.notifier);
+
+  final needsConfirm = state.selectedCustomer == null &&
+      status != 'Paid' &&
+      state.paymentStatus == 'Paid';
+
+  if (!needsConfirm) {
+    notifier.setPaymentStatus(status);
+    return;
+  }
+
+  CommonDialogBox.show(
+    context: context,
+    title: Strings.noCustomerSelectedTitle,
+    message: Strings.continueWithoutCustomerMessage,
+    primaryLabel: Strings.continueLabel,
+    secondaryLabel: Strings.cancel,
+    onPrimary: () => notifier.setPaymentStatus(status),
+  );
+}
+
 class NewBillScreen extends ConsumerWidget {
   const NewBillScreen({super.key});
 
@@ -20,13 +50,13 @@ class NewBillScreen extends ConsumerWidget {
     final colors = context.appColors;
     final state = ref.watch(newBillNotifierProvider);
     final notifier = ref.read(newBillNotifierProvider.notifier);
-
-    // Compute total amount in cart
-    final subtotal = state.cart.fold<double>(
-      0,
-      (sum, item) => sum + item.totalPrice,
+    final isPrinterConnected = ref.watch(
+      printerNotifierProvider.select((value) => value.isConnected),
     );
-    final totalAmount = (subtotal - state.discountAmount).clamp(0.0, double.infinity);
+
+    // Compute tax-inclusive grand total
+    final totals = notifier.billTotals;
+    final totalAmount = totals.grandTotal;
 
     return CommonScaffold(
       backgroundColor: colors.background,
@@ -60,14 +90,19 @@ class NewBillScreen extends ConsumerWidget {
             // Footer Section
             NewBillFooter(
               totalAmount: totalAmount,
+              isPrinterConnected: isPrinterConnected,
               paymentMethod: state.paymentMethod,
               selectedCustomer: state.selectedCustomer,
               paymentStatus: state.paymentStatus,
               receivedAmount: state.receivedAmount,
               receivedAmountController: notifier.receivedAmountController,
               onPaymentMethodChanged: (val) => notifier.setPaymentMethod(val),
-              onPaymentStatusChanged: (status) => notifier.setPaymentStatus(status),
-              onPrintPressed: () => notifier.printBill(context),
+              onPaymentStatusChanged: (status) =>
+                  _onPaymentStatusChanged(context, ref, status),
+              onSubmitPressed: () => notifier.saveAndMaybePrint(
+                context,
+                printWhenPossible: isPrinterConnected,
+              ),
             ),
           ],
         ),

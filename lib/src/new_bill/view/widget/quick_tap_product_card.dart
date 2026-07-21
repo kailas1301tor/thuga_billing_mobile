@@ -1,9 +1,11 @@
 // lib/src/new_bill/view/widget/quick_tap_product_card.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:vyapapp/res/constants/string_constants.dart';
 import 'package:vyapapp/res/styles/color_palette.dart';
 import 'package:vyapapp/res/styles/font_palette.dart';
 import 'package:vyapapp/utils/common_widgets/common_cached_network_image.dart';
+import 'package:vyapapp/utils/helpers/extensions.dart';
 import '../../model/new_bill_model.dart';
 
 class QuickTapProductCard extends StatefulWidget {
@@ -14,6 +16,7 @@ class QuickTapProductCard extends StatefulWidget {
     required this.onTap,
     required this.onReduce,
     this.onLongPress,
+    this.isOutOfStock = false,
   });
 
   final ProductModel product;
@@ -21,6 +24,7 @@ class QuickTapProductCard extends StatefulWidget {
   final VoidCallback onTap;
   final VoidCallback onReduce;
   final VoidCallback? onLongPress;
+  final bool isOutOfStock;
 
   @override
   State<QuickTapProductCard> createState() => _QuickTapProductCardState();
@@ -52,8 +56,11 @@ class _QuickTapProductCardState extends State<QuickTapProductCard>
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final isSelected = widget.quantity > 0;
+    final isDisabled = widget.isOutOfStock;
 
-    return GestureDetector(
+    return Opacity(
+      opacity: isDisabled ? 0.5 : 1,
+      child: GestureDetector(
       onTapDown: (_) => _animCtrl.reverse(),
       onTapUp: (_) {
         _animCtrl.forward();
@@ -110,7 +117,7 @@ class _QuickTapProductCardState extends State<QuickTapProductCard>
                           ),
                           2.verticalSpace,
                           Text(
-                            '₹${widget.product.price.toStringAsFixed(0)}',
+                            widget.product.price.toCurrency(),
                             style: FontPalette.base600(11, color: colors.primary),
                           ),
                         ],
@@ -194,9 +201,35 @@ class _QuickTapProductCardState extends State<QuickTapProductCard>
                   ),
                 ),
               ),
+
+              if (isDisabled)
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.25),
+                      borderRadius: BorderRadius.circular(14.r),
+                    ),
+                    alignment: Alignment.center,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 8.w,
+                        vertical: 4.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colors.surface.withValues(alpha: 0.9),
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                      child: Text(
+                        Strings.outOfStock,
+                        style: FontPalette.base600(9, color: colors.errorText),
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
         ),
+      ),
       ),
     );
   }

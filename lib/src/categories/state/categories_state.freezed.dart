@@ -21,6 +21,10 @@ mixin _$CategoriesState {
   CategoryResponse? get response => throw _privateConstructorUsedError;
   String? get errorMessage => throw _privateConstructorUsedError;
   String get searchQuery => throw _privateConstructorUsedError;
+  int get currentPage => throw _privateConstructorUsedError;
+  int get totalPages => throw _privateConstructorUsedError;
+  int get pageSize => throw _privateConstructorUsedError;
+  bool get isLoadingMore => throw _privateConstructorUsedError;
   bool get saveCategoryLoader => throw _privateConstructorUsedError;
   bool get updateCategoryLoader => throw _privateConstructorUsedError;
   bool get deleteCategoryLoader => throw _privateConstructorUsedError;
@@ -44,6 +48,10 @@ abstract class $CategoriesStateCopyWith<$Res> {
     CategoryResponse? response,
     String? errorMessage,
     String searchQuery,
+    int currentPage,
+    int totalPages,
+    int pageSize,
+    bool isLoadingMore,
     bool saveCategoryLoader,
     bool updateCategoryLoader,
     bool deleteCategoryLoader,
@@ -69,6 +77,10 @@ class _$CategoriesStateCopyWithImpl<$Res, $Val extends CategoriesState>
     Object? response = freezed,
     Object? errorMessage = freezed,
     Object? searchQuery = null,
+    Object? currentPage = null,
+    Object? totalPages = null,
+    Object? pageSize = null,
+    Object? isLoadingMore = null,
     Object? saveCategoryLoader = null,
     Object? updateCategoryLoader = null,
     Object? deleteCategoryLoader = null,
@@ -91,6 +103,22 @@ class _$CategoriesStateCopyWithImpl<$Res, $Val extends CategoriesState>
                 ? _value.searchQuery
                 : searchQuery // ignore: cast_nullable_to_non_nullable
                       as String,
+            currentPage: null == currentPage
+                ? _value.currentPage
+                : currentPage // ignore: cast_nullable_to_non_nullable
+                      as int,
+            totalPages: null == totalPages
+                ? _value.totalPages
+                : totalPages // ignore: cast_nullable_to_non_nullable
+                      as int,
+            pageSize: null == pageSize
+                ? _value.pageSize
+                : pageSize // ignore: cast_nullable_to_non_nullable
+                      as int,
+            isLoadingMore: null == isLoadingMore
+                ? _value.isLoadingMore
+                : isLoadingMore // ignore: cast_nullable_to_non_nullable
+                      as bool,
             saveCategoryLoader: null == saveCategoryLoader
                 ? _value.saveCategoryLoader
                 : saveCategoryLoader // ignore: cast_nullable_to_non_nullable
@@ -123,6 +151,10 @@ abstract class _$$CategoriesStateImplCopyWith<$Res>
     CategoryResponse? response,
     String? errorMessage,
     String searchQuery,
+    int currentPage,
+    int totalPages,
+    int pageSize,
+    bool isLoadingMore,
     bool saveCategoryLoader,
     bool updateCategoryLoader,
     bool deleteCategoryLoader,
@@ -147,6 +179,10 @@ class __$$CategoriesStateImplCopyWithImpl<$Res>
     Object? response = freezed,
     Object? errorMessage = freezed,
     Object? searchQuery = null,
+    Object? currentPage = null,
+    Object? totalPages = null,
+    Object? pageSize = null,
+    Object? isLoadingMore = null,
     Object? saveCategoryLoader = null,
     Object? updateCategoryLoader = null,
     Object? deleteCategoryLoader = null,
@@ -169,6 +205,22 @@ class __$$CategoriesStateImplCopyWithImpl<$Res>
             ? _value.searchQuery
             : searchQuery // ignore: cast_nullable_to_non_nullable
                   as String,
+        currentPage: null == currentPage
+            ? _value.currentPage
+            : currentPage // ignore: cast_nullable_to_non_nullable
+                  as int,
+        totalPages: null == totalPages
+            ? _value.totalPages
+            : totalPages // ignore: cast_nullable_to_non_nullable
+                  as int,
+        pageSize: null == pageSize
+            ? _value.pageSize
+            : pageSize // ignore: cast_nullable_to_non_nullable
+                  as int,
+        isLoadingMore: null == isLoadingMore
+            ? _value.isLoadingMore
+            : isLoadingMore // ignore: cast_nullable_to_non_nullable
+                  as bool,
         saveCategoryLoader: null == saveCategoryLoader
             ? _value.saveCategoryLoader
             : saveCategoryLoader // ignore: cast_nullable_to_non_nullable
@@ -194,6 +246,10 @@ class _$CategoriesStateImpl implements _CategoriesState {
     this.response,
     this.errorMessage,
     this.searchQuery = '',
+    this.currentPage = 1,
+    this.totalPages = 1,
+    this.pageSize = 10,
+    this.isLoadingMore = false,
     this.saveCategoryLoader = false,
     this.updateCategoryLoader = false,
     this.deleteCategoryLoader = false,
@@ -211,6 +267,18 @@ class _$CategoriesStateImpl implements _CategoriesState {
   final String searchQuery;
   @override
   @JsonKey()
+  final int currentPage;
+  @override
+  @JsonKey()
+  final int totalPages;
+  @override
+  @JsonKey()
+  final int pageSize;
+  @override
+  @JsonKey()
+  final bool isLoadingMore;
+  @override
+  @JsonKey()
   final bool saveCategoryLoader;
   @override
   @JsonKey()
@@ -221,7 +289,7 @@ class _$CategoriesStateImpl implements _CategoriesState {
 
   @override
   String toString() {
-    return 'CategoriesState(loaderState: $loaderState, response: $response, errorMessage: $errorMessage, searchQuery: $searchQuery, saveCategoryLoader: $saveCategoryLoader, updateCategoryLoader: $updateCategoryLoader, deleteCategoryLoader: $deleteCategoryLoader)';
+    return 'CategoriesState(loaderState: $loaderState, response: $response, errorMessage: $errorMessage, searchQuery: $searchQuery, currentPage: $currentPage, totalPages: $totalPages, pageSize: $pageSize, isLoadingMore: $isLoadingMore, saveCategoryLoader: $saveCategoryLoader, updateCategoryLoader: $updateCategoryLoader, deleteCategoryLoader: $deleteCategoryLoader)';
   }
 
   @override
@@ -237,6 +305,14 @@ class _$CategoriesStateImpl implements _CategoriesState {
                 other.errorMessage == errorMessage) &&
             (identical(other.searchQuery, searchQuery) ||
                 other.searchQuery == searchQuery) &&
+            (identical(other.currentPage, currentPage) ||
+                other.currentPage == currentPage) &&
+            (identical(other.totalPages, totalPages) ||
+                other.totalPages == totalPages) &&
+            (identical(other.pageSize, pageSize) ||
+                other.pageSize == pageSize) &&
+            (identical(other.isLoadingMore, isLoadingMore) ||
+                other.isLoadingMore == isLoadingMore) &&
             (identical(other.saveCategoryLoader, saveCategoryLoader) ||
                 other.saveCategoryLoader == saveCategoryLoader) &&
             (identical(other.updateCategoryLoader, updateCategoryLoader) ||
@@ -252,6 +328,10 @@ class _$CategoriesStateImpl implements _CategoriesState {
     response,
     errorMessage,
     searchQuery,
+    currentPage,
+    totalPages,
+    pageSize,
+    isLoadingMore,
     saveCategoryLoader,
     updateCategoryLoader,
     deleteCategoryLoader,
@@ -275,6 +355,10 @@ abstract class _CategoriesState implements CategoriesState {
     final CategoryResponse? response,
     final String? errorMessage,
     final String searchQuery,
+    final int currentPage,
+    final int totalPages,
+    final int pageSize,
+    final bool isLoadingMore,
     final bool saveCategoryLoader,
     final bool updateCategoryLoader,
     final bool deleteCategoryLoader,
@@ -288,6 +372,14 @@ abstract class _CategoriesState implements CategoriesState {
   String? get errorMessage;
   @override
   String get searchQuery;
+  @override
+  int get currentPage;
+  @override
+  int get totalPages;
+  @override
+  int get pageSize;
+  @override
+  bool get isLoadingMore;
   @override
   bool get saveCategoryLoader;
   @override

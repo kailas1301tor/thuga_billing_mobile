@@ -4,13 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tuple/tuple.dart';
 import 'package:vyapapp/res/constants/string_constants.dart';
-import 'package:vyapapp/res/enums/enums.dart';
 import 'package:vyapapp/res/styles/color_palette.dart';
 import 'package:vyapapp/utils/common_widgets/common_app_bar.dart';
 import 'package:vyapapp/utils/common_widgets/common_bottom_sheet.dart';
 import 'package:vyapapp/utils/common_widgets/common_cached_network_image.dart';
 import 'package:vyapapp/utils/common_widgets/common_dialog_box.dart';
-import 'package:vyapapp/utils/common_widgets/common_empty_state.dart';
 import 'package:vyapapp/utils/common_widgets/common_nav_bar_button.dart';
 import 'package:vyapapp/utils/common_widgets/common_scaffold.dart';
 import 'package:vyapapp/utils/common_widgets/common_switch_state.dart';
@@ -21,7 +19,6 @@ import 'package:vyapapp/utils/common_widgets/primary_button.dart';
 import 'widget/customer_card_widget.dart';
 import '../model/customer_model.dart';
 import '../notifier/customers_notifier.dart';
-import '../state/customers_state.dart';
 
 class CustomerCrudScreen extends ConsumerWidget {
   const CustomerCrudScreen({super.key});
@@ -29,7 +26,15 @@ class CustomerCrudScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
-    final state = ref.watch(customersNotifierProvider);
+    final loaderState = ref.watch(
+      customersNotifierProvider.select((s) => s.loaderState),
+    );
+    final customerList = ref.watch(
+      customersNotifierProvider.select((s) => s.response?.results.data),
+    );
+    final isLoadingMore = ref.watch(
+      customersNotifierProvider.select((s) => s.isLoadingMore),
+    );
     final notifier = ref.read(customersNotifierProvider.notifier);
 
     return CommonScaffold(
@@ -38,7 +43,11 @@ class CustomerCrudScreen extends ConsumerWidget {
         title: Strings.customersTitle,
         actions: [
           CommonNavBarButton(
-            icon: Icon(Icons.add_rounded, size: 24.r, color: colors.primaryText),
+            icon: Icon(
+              Icons.add_rounded,
+              size: 24.r,
+              color: colors.primaryText,
+            ),
             onTap: () {
               notifier.clearForm();
               _showCustomerSheet(context, ref, notifier, null);
@@ -46,74 +55,77 @@ class CustomerCrudScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: CommonSwitchState(
-        loaderState: state.loaderState,
-        reload: () => notifier.fetchCustomers(),
-        child: _buildBody(context, colors, state, notifier),
+      body: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 8.h),
+            child: CommonSearchBar(
+              controller: notifier.searchController,
+              focusNode: notifier.searchFocusNode,
+              hintText: 'Search customers...',
+              onClear: notifier.clearSearch,
+            ),
+          ),
+          Expanded(
+            child: CommonSwitchState(
+              loaderState: loaderState,
+              reload: () => notifier.fetchCustomers(),
+              customButtonFunction: () =>
+                  _showCustomerSheet(context, ref, notifier, null),
+              emptyScreenTitle: Strings.noDataTitle,
+              emptyScreenDescription: Strings.noDataMessage,
+              buttonText: Strings.addCustomer,
+              child: CommonRefreshIndicator(
+                onRefresh: () => notifier.fetchCustomers(),
+                child: ListView.builder(
+                  controller: notifier.scrollController,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 8.h,
+                  ),
+                  itemCount:
+                      (customerList ?? []).length + (isLoadingMore ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (index == (customerList ?? []).length) {
+                      return Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16.h),
+                        child: Center(
+                          child: SizedBox(
+                            width: 24.r,
+                            height: 24.r,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.w,
+                              color: colors.primary,
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+                    final customer = (customerList ?? [])[index];
+                    return CustomerCardWidget(
+                      customer: customer,
+                      onEdit: () =>
+                          _showCustomerSheet(context, ref, notifier, customer),
+                      onDelete: () =>
+                          _showDeleteDialog(context, notifier, customer),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildBody(BuildContext context, AppColors colors, CustomersState state, CustomersNotifier notifier) {
-    if (state.loaderState == LoaderState.noData || state.response?.results.data == null) {
-      return Center(
-        child: CommonEmptyState(
-          title: Strings.noDataTitle,
-          message: Strings.noDataMessage,
-          buttonText: Strings.addCustomer,
-          onPressed: () => _showCustomerSheet(context, null, notifier, null),
-        ),
-      );
-    }
-
-    final customers = state.response!.results.data;
-    final query = state.searchQuery.toLowerCase();
-    final filteredCustomers = query.isEmpty 
-        ? customers 
-        : customers.where((e) => e.name.toLowerCase().contains(query) || e.phoneNumber.contains(query)).toList();
-
-    return Column(
-      children: [
-        Padding(
-          padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 8.h),
-          child: CommonSearchBar(
-            controller: notifier.searchController,
-            focusNode: notifier.searchFocusNode,
-            hintText: 'Search customers...',
-            onClear: notifier.clearSearch,
-          ),
-        ),
-        Expanded(
-          child: filteredCustomers.isEmpty
-              ? Center(
-                  child: CommonEmptyState(
-                    title: 'No Matches',
-                    message: 'No customers matched your search.',
-                    buttonText: 'Clear Search',
-                    onPressed: notifier.clearSearch,
-                  ),
-                )
-              : CommonRefreshIndicator(
-                  onRefresh: () => notifier.fetchCustomers(),
-                  child: ListView.builder(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-                    itemCount: filteredCustomers.length,
-                    itemBuilder: (context, index) {
-                      final customer = filteredCustomers[index];
-                      return CustomerCardWidget(
-                        customer: customer,
-                        onEdit: () => _showCustomerSheet(context, null, notifier, customer),
-                        onDelete: () => _showDeleteDialog(context, notifier, customer),
-                      );
-                    },
-                  ),
-                ),
-        ),
-      ],
-    );
-  }
-
-  void _showCustomerSheet(BuildContext context, WidgetRef? ref, CustomersNotifier notifier, CustomerModel? customer) {
+  void _showCustomerSheet(
+    BuildContext context,
+    WidgetRef ref,
+    CustomersNotifier notifier,
+    CustomerModel? customer,
+  ) {
     final isEditing = customer != null;
     if (isEditing) {
       notifier.nameController.text = customer.name;
@@ -132,7 +144,9 @@ class CustomerCrudScreen extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              if (isEditing && customer.image != null && customer.image!.isNotEmpty) ...[
+              if (isEditing &&
+                  customer.image != null &&
+                  customer.image!.isNotEmpty) ...[
                 Align(
                   alignment: Alignment.center,
                   child: CommonCachedNetworkImage(
@@ -164,7 +178,8 @@ class CustomerCrudScreen extends ConsumerWidget {
                 builder: (context, ref, _) {
                   final loaders = ref.watch(
                     customersNotifierProvider.select(
-                      (s) => Tuple2(s.saveCustomerLoader, s.updateCustomerLoader),
+                      (s) =>
+                          Tuple2(s.saveCustomerLoader, s.updateCustomerLoader),
                     ),
                   );
                   final isLoading = isEditing ? loaders.item2 : loaders.item1;
@@ -175,8 +190,9 @@ class CustomerCrudScreen extends ConsumerWidget {
                       notifier.phoneController,
                     ]),
                     builder: (context, _) {
-                      final isValid =
-                          notifier.nameController.text.trim().isNotEmpty;
+                      final isValid = notifier.nameController.text
+                          .trim()
+                          .isNotEmpty;
 
                       return PrimaryButton(
                         text: Strings.save,
@@ -205,7 +221,11 @@ class CustomerCrudScreen extends ConsumerWidget {
     );
   }
 
-  void _showDeleteDialog(BuildContext context, CustomersNotifier notifier, CustomerModel customer) {
+  void _showDeleteDialog(
+    BuildContext context,
+    CustomersNotifier notifier,
+    CustomerModel customer,
+  ) {
     showDialog(
       context: context,
       builder: (_) => Consumer(

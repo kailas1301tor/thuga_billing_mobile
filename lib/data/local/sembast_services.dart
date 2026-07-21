@@ -23,6 +23,8 @@ class SembastServices extends LocalBaseServices {
   final _completeProfileFromHome = StoreRef<String, bool>(
     'complete_profile_from_home',
   );
+  final _calculationBillsStore =
+      StoreRef<String, Map<String, dynamic>>('calculation_bills');
 
   late Database db;
 
@@ -47,7 +49,9 @@ class SembastServices extends LocalBaseServices {
     required String refreshToken,
   }) async {
     try {
-      debugPrint('🔍 SEMBAST SAVE: access="$accessToken", refresh="$refreshToken"');
+      debugPrint(
+        '🔍 SEMBAST SAVE: access="$accessToken", refresh="$refreshToken"',
+      );
       await _tokenStore.record('tokens').put(db, {
         'accessToken': accessToken,
         'refreshToken': refreshToken,
@@ -184,6 +188,45 @@ class SembastServices extends LocalBaseServices {
     } catch (e) {
       debugPrint('getCompleteProfileFromHome error: $e');
       return false;
+    }
+  }
+
+  Future<void> saveCalculationBill(Map<String, dynamic> billJson) async {
+    try {
+      final id = billJson['id']?.toString();
+      if (id == null || id.isEmpty) return;
+      await _calculationBillsStore.record(id).put(db, billJson);
+      debugPrint('🟢 SEMBAST: calculation bill saved id=$id');
+    } catch (e) {
+      debugPrint('🔴 SEMBAST saveCalculationBill error: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>?> getCalculationBill(String id) async {
+    try {
+      return await _calculationBillsStore.record(id).get(db);
+    } catch (e) {
+      debugPrint('🔴 SEMBAST getCalculationBill error: $e');
+      return null;
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getAllCalculationBills() async {
+    try {
+      final records = await _calculationBillsStore.find(db);
+      return records.map((record) => record.value).toList();
+    } catch (e) {
+      debugPrint('🔴 SEMBAST getAllCalculationBills error: $e');
+      return [];
+    }
+  }
+
+  Future<void> deleteCalculationBill(String id) async {
+    try {
+      await _calculationBillsStore.record(id).delete(db);
+      debugPrint('🟢 SEMBAST: calculation bill deleted id=$id');
+    } catch (e) {
+      debugPrint('🔴 SEMBAST deleteCalculationBill error: $e');
     }
   }
 }

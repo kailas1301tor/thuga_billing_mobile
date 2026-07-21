@@ -4,11 +4,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vyapapp/data/remote/network_base_services.dart';
 import 'package:vyapapp/data/remote/network_services.dart';
 import 'package:vyapapp/res/constants/app_constants.dart';
-import 'package:vyapapp/res/constants/string_constants.dart';
 import 'package:vyapapp/utils/helpers/safe_converters.dart';
+import 'package:vyapapp/src/bills/model/bill_model.dart';
 
 import '../model/home_dashboard_model.dart';
-import '../model/home_recent_bill_model.dart';
 import '../model/home_top_product_model.dart';
 
 abstract class HomeRepo {
@@ -23,10 +22,10 @@ class HomeRepoImpl implements HomeRepo {
   @override
   Future<Either<ResponseError, HomeDashboardModel>> getDashboard() async {
     // 1. Fetch store name from local settings
-    String shopName = 'Tortilon Bakery';
+    String shopName = 'Thuka';
     try {
       final prefs = await SharedPreferences.getInstance();
-      shopName = prefs.getString('pref_store_name') ?? 'Tortilon Bakery';
+      shopName = prefs.getString('pref_store_name') ?? 'Thuka';
     } catch (_) {}
 
     // 2. Call API
@@ -51,12 +50,9 @@ class HomeRepoImpl implements HomeRepo {
 
           // Fetch recent bills list
           final recentBillsList = convertToList(data['recent_bills']);
-          final recentBills = recentBillsList.map((b) {
-            final billMap = convertToMap(b);
-            final customerId = billMap['customer'] != null ? convertToInt(billMap['customer']) : null;
-            final customerName = customerId != null ? 'Customer #$customerId' : Strings.walkInCustomer;
-            return HomeRecentBillModel.fromJson(billMap, customerName);
-          }).toList();
+          final recentBills = recentBillsList
+              .map((b) => BillModel.fromJson(convertToMap(b)))
+              .toList();
 
           return HomeDashboardModel.fromJson(
             data,

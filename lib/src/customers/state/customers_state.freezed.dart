@@ -21,6 +21,10 @@ mixin _$CustomersState {
   CustomerResponse? get response => throw _privateConstructorUsedError;
   String? get errorMessage => throw _privateConstructorUsedError;
   String get searchQuery => throw _privateConstructorUsedError;
+  int get currentPage => throw _privateConstructorUsedError;
+  int get totalPages => throw _privateConstructorUsedError;
+  int get pageSize => throw _privateConstructorUsedError;
+  bool get isLoadingMore => throw _privateConstructorUsedError;
   bool get saveCustomerLoader => throw _privateConstructorUsedError;
   bool get updateCustomerLoader => throw _privateConstructorUsedError;
   bool get deleteCustomerLoader => throw _privateConstructorUsedError;
@@ -44,6 +48,10 @@ abstract class $CustomersStateCopyWith<$Res> {
     CustomerResponse? response,
     String? errorMessage,
     String searchQuery,
+    int currentPage,
+    int totalPages,
+    int pageSize,
+    bool isLoadingMore,
     bool saveCustomerLoader,
     bool updateCustomerLoader,
     bool deleteCustomerLoader,
@@ -69,6 +77,10 @@ class _$CustomersStateCopyWithImpl<$Res, $Val extends CustomersState>
     Object? response = freezed,
     Object? errorMessage = freezed,
     Object? searchQuery = null,
+    Object? currentPage = null,
+    Object? totalPages = null,
+    Object? pageSize = null,
+    Object? isLoadingMore = null,
     Object? saveCustomerLoader = null,
     Object? updateCustomerLoader = null,
     Object? deleteCustomerLoader = null,
@@ -91,6 +103,22 @@ class _$CustomersStateCopyWithImpl<$Res, $Val extends CustomersState>
                 ? _value.searchQuery
                 : searchQuery // ignore: cast_nullable_to_non_nullable
                       as String,
+            currentPage: null == currentPage
+                ? _value.currentPage
+                : currentPage // ignore: cast_nullable_to_non_nullable
+                      as int,
+            totalPages: null == totalPages
+                ? _value.totalPages
+                : totalPages // ignore: cast_nullable_to_non_nullable
+                      as int,
+            pageSize: null == pageSize
+                ? _value.pageSize
+                : pageSize // ignore: cast_nullable_to_non_nullable
+                      as int,
+            isLoadingMore: null == isLoadingMore
+                ? _value.isLoadingMore
+                : isLoadingMore // ignore: cast_nullable_to_non_nullable
+                      as bool,
             saveCustomerLoader: null == saveCustomerLoader
                 ? _value.saveCustomerLoader
                 : saveCustomerLoader // ignore: cast_nullable_to_non_nullable
@@ -123,6 +151,10 @@ abstract class _$$CustomersStateImplCopyWith<$Res>
     CustomerResponse? response,
     String? errorMessage,
     String searchQuery,
+    int currentPage,
+    int totalPages,
+    int pageSize,
+    bool isLoadingMore,
     bool saveCustomerLoader,
     bool updateCustomerLoader,
     bool deleteCustomerLoader,
@@ -147,6 +179,10 @@ class __$$CustomersStateImplCopyWithImpl<$Res>
     Object? response = freezed,
     Object? errorMessage = freezed,
     Object? searchQuery = null,
+    Object? currentPage = null,
+    Object? totalPages = null,
+    Object? pageSize = null,
+    Object? isLoadingMore = null,
     Object? saveCustomerLoader = null,
     Object? updateCustomerLoader = null,
     Object? deleteCustomerLoader = null,
@@ -169,6 +205,22 @@ class __$$CustomersStateImplCopyWithImpl<$Res>
             ? _value.searchQuery
             : searchQuery // ignore: cast_nullable_to_non_nullable
                   as String,
+        currentPage: null == currentPage
+            ? _value.currentPage
+            : currentPage // ignore: cast_nullable_to_non_nullable
+                  as int,
+        totalPages: null == totalPages
+            ? _value.totalPages
+            : totalPages // ignore: cast_nullable_to_non_nullable
+                  as int,
+        pageSize: null == pageSize
+            ? _value.pageSize
+            : pageSize // ignore: cast_nullable_to_non_nullable
+                  as int,
+        isLoadingMore: null == isLoadingMore
+            ? _value.isLoadingMore
+            : isLoadingMore // ignore: cast_nullable_to_non_nullable
+                  as bool,
         saveCustomerLoader: null == saveCustomerLoader
             ? _value.saveCustomerLoader
             : saveCustomerLoader // ignore: cast_nullable_to_non_nullable
@@ -194,6 +246,10 @@ class _$CustomersStateImpl implements _CustomersState {
     this.response,
     this.errorMessage,
     this.searchQuery = '',
+    this.currentPage = 1,
+    this.totalPages = 1,
+    this.pageSize = 10,
+    this.isLoadingMore = false,
     this.saveCustomerLoader = false,
     this.updateCustomerLoader = false,
     this.deleteCustomerLoader = false,
@@ -211,6 +267,18 @@ class _$CustomersStateImpl implements _CustomersState {
   final String searchQuery;
   @override
   @JsonKey()
+  final int currentPage;
+  @override
+  @JsonKey()
+  final int totalPages;
+  @override
+  @JsonKey()
+  final int pageSize;
+  @override
+  @JsonKey()
+  final bool isLoadingMore;
+  @override
+  @JsonKey()
   final bool saveCustomerLoader;
   @override
   @JsonKey()
@@ -221,7 +289,7 @@ class _$CustomersStateImpl implements _CustomersState {
 
   @override
   String toString() {
-    return 'CustomersState(loaderState: $loaderState, response: $response, errorMessage: $errorMessage, searchQuery: $searchQuery, saveCustomerLoader: $saveCustomerLoader, updateCustomerLoader: $updateCustomerLoader, deleteCustomerLoader: $deleteCustomerLoader)';
+    return 'CustomersState(loaderState: $loaderState, response: $response, errorMessage: $errorMessage, searchQuery: $searchQuery, currentPage: $currentPage, totalPages: $totalPages, pageSize: $pageSize, isLoadingMore: $isLoadingMore, saveCustomerLoader: $saveCustomerLoader, updateCustomerLoader: $updateCustomerLoader, deleteCustomerLoader: $deleteCustomerLoader)';
   }
 
   @override
@@ -237,6 +305,14 @@ class _$CustomersStateImpl implements _CustomersState {
                 other.errorMessage == errorMessage) &&
             (identical(other.searchQuery, searchQuery) ||
                 other.searchQuery == searchQuery) &&
+            (identical(other.currentPage, currentPage) ||
+                other.currentPage == currentPage) &&
+            (identical(other.totalPages, totalPages) ||
+                other.totalPages == totalPages) &&
+            (identical(other.pageSize, pageSize) ||
+                other.pageSize == pageSize) &&
+            (identical(other.isLoadingMore, isLoadingMore) ||
+                other.isLoadingMore == isLoadingMore) &&
             (identical(other.saveCustomerLoader, saveCustomerLoader) ||
                 other.saveCustomerLoader == saveCustomerLoader) &&
             (identical(other.updateCustomerLoader, updateCustomerLoader) ||
@@ -252,6 +328,10 @@ class _$CustomersStateImpl implements _CustomersState {
     response,
     errorMessage,
     searchQuery,
+    currentPage,
+    totalPages,
+    pageSize,
+    isLoadingMore,
     saveCustomerLoader,
     updateCustomerLoader,
     deleteCustomerLoader,
@@ -275,6 +355,10 @@ abstract class _CustomersState implements CustomersState {
     final CustomerResponse? response,
     final String? errorMessage,
     final String searchQuery,
+    final int currentPage,
+    final int totalPages,
+    final int pageSize,
+    final bool isLoadingMore,
     final bool saveCustomerLoader,
     final bool updateCustomerLoader,
     final bool deleteCustomerLoader,
@@ -288,6 +372,14 @@ abstract class _CustomersState implements CustomersState {
   String? get errorMessage;
   @override
   String get searchQuery;
+  @override
+  int get currentPage;
+  @override
+  int get totalPages;
+  @override
+  int get pageSize;
+  @override
+  bool get isLoadingMore;
   @override
   bool get saveCustomerLoader;
   @override

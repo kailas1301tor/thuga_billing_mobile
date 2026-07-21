@@ -13,8 +13,7 @@ class Validators {
   /// Validate password.
   static String? validatePassword(String? value) {
     if (value.isNullOrEmpty) return Strings.passwordRequired;
-    if (value!.length < 8) return Strings.passwordTooShort;
-    if (!value.isValidPassword) return Strings.passwordTooWeak;
+    if (!value!.isValidPassword) return Strings.passwordTooShort;
     return null;
   }
 

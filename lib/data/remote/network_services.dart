@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:vyapapp/utils/routes/app_navigator.dart';
 import '../../res/constants/app_constants.dart';
+import '../../utils/helpers/api_error_message_helper.dart';
 import '../../utils/helpers/common_functions.dart';
 import '../../utils/routes/route_constants.dart';
 import 'network_base_services.dart';
@@ -489,49 +490,70 @@ class NetworkServices extends NetWorkBaseServices {
       401 || 403 => Left(
         ResponseError(
           key: ApiErrorTypes.unAuthorized,
-          message: "UnAuthorized",
+          message: extractApiErrorMessage(
+            response.data,
+            fallback: 'UnAuthorized',
+          ),
           response: response.data,
         ),
       ),
       404 => Left(
         ResponseError(
           key: ApiErrorTypes.notFound,
-          message: "Not Found",
+          message: extractApiErrorMessage(
+            response.data,
+            fallback: 'Not Found',
+          ),
           response: response.data,
         ),
       ),
       422 => Left(
         ResponseError(
           key: ApiErrorTypes.badRequest,
-          message: "Validation Error",
+          message: extractApiErrorMessage(
+            response.data,
+            fallback: 'Validation Error',
+          ),
           response: response.data,
         ),
       ),
       429 => Left(
         ResponseError(
           key: ApiErrorTypes.serviceUnavailable,
-          message: "Too Many Requests",
+          message: extractApiErrorMessage(
+            response.data,
+            fallback: 'Too Many Requests',
+          ),
           response: response.data,
         ),
       ),
       500 => Left(
         ResponseError(
           key: ApiErrorTypes.internalServerError,
-          message: "Internal Server Error",
+          message: extractApiErrorMessage(
+            response.data,
+            fallback: 'Internal Server Error',
+          ),
           response: response.data,
         ),
       ),
       502 || 503 || 504 => Left(
         ResponseError(
           key: ApiErrorTypes.serviceUnavailable,
-          message: "Service Unavailable",
+          message: extractApiErrorMessage(
+            response.data,
+            fallback: 'Service Unavailable',
+          ),
           response: response.data,
         ),
       ),
       _ => Left(
         ResponseError(
           key: ApiErrorTypes.unknown,
-          message: "Unknown",
+          message: extractApiErrorMessage(
+            response.data,
+            fallback: 'Unknown',
+          ),
           response: response.data,
         ),
       ),

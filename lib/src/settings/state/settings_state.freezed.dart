@@ -20,6 +20,8 @@ mixin _$SettingsState {
   LoaderState get loaderState => throw _privateConstructorUsedError;
   SettingsModel get settings => throw _privateConstructorUsedError;
   CompanyDetailsModel? get companyDetails => throw _privateConstructorUsedError;
+  TimeOfDay get startWorkingTime => throw _privateConstructorUsedError;
+  TimeOfDay get endWorkingTime => throw _privateConstructorUsedError;
   String? get errorMessage => throw _privateConstructorUsedError;
 
   /// Create a copy of SettingsState
@@ -40,6 +42,8 @@ abstract class $SettingsStateCopyWith<$Res> {
     LoaderState loaderState,
     SettingsModel settings,
     CompanyDetailsModel? companyDetails,
+    TimeOfDay startWorkingTime,
+    TimeOfDay endWorkingTime,
     String? errorMessage,
   });
 }
@@ -62,6 +66,8 @@ class _$SettingsStateCopyWithImpl<$Res, $Val extends SettingsState>
     Object? loaderState = null,
     Object? settings = null,
     Object? companyDetails = freezed,
+    Object? startWorkingTime = null,
+    Object? endWorkingTime = null,
     Object? errorMessage = freezed,
   }) {
     return _then(
@@ -78,6 +84,14 @@ class _$SettingsStateCopyWithImpl<$Res, $Val extends SettingsState>
                 ? _value.companyDetails
                 : companyDetails // ignore: cast_nullable_to_non_nullable
                       as CompanyDetailsModel?,
+            startWorkingTime: null == startWorkingTime
+                ? _value.startWorkingTime
+                : startWorkingTime // ignore: cast_nullable_to_non_nullable
+                      as TimeOfDay,
+            endWorkingTime: null == endWorkingTime
+                ? _value.endWorkingTime
+                : endWorkingTime // ignore: cast_nullable_to_non_nullable
+                      as TimeOfDay,
             errorMessage: freezed == errorMessage
                 ? _value.errorMessage
                 : errorMessage // ignore: cast_nullable_to_non_nullable
@@ -101,6 +115,8 @@ abstract class _$$SettingsStateImplCopyWith<$Res>
     LoaderState loaderState,
     SettingsModel settings,
     CompanyDetailsModel? companyDetails,
+    TimeOfDay startWorkingTime,
+    TimeOfDay endWorkingTime,
     String? errorMessage,
   });
 }
@@ -122,6 +138,8 @@ class __$$SettingsStateImplCopyWithImpl<$Res>
     Object? loaderState = null,
     Object? settings = null,
     Object? companyDetails = freezed,
+    Object? startWorkingTime = null,
+    Object? endWorkingTime = null,
     Object? errorMessage = freezed,
   }) {
     return _then(
@@ -138,6 +156,14 @@ class __$$SettingsStateImplCopyWithImpl<$Res>
             ? _value.companyDetails
             : companyDetails // ignore: cast_nullable_to_non_nullable
                   as CompanyDetailsModel?,
+        startWorkingTime: null == startWorkingTime
+            ? _value.startWorkingTime
+            : startWorkingTime // ignore: cast_nullable_to_non_nullable
+                  as TimeOfDay,
+        endWorkingTime: null == endWorkingTime
+            ? _value.endWorkingTime
+            : endWorkingTime // ignore: cast_nullable_to_non_nullable
+                  as TimeOfDay,
         errorMessage: freezed == errorMessage
             ? _value.errorMessage
             : errorMessage // ignore: cast_nullable_to_non_nullable
@@ -154,6 +180,8 @@ class _$SettingsStateImpl implements _SettingsState {
     this.loaderState = LoaderState.loaded,
     required this.settings,
     this.companyDetails,
+    this.startWorkingTime = defaultStartWorkingTime,
+    this.endWorkingTime = defaultEndWorkingTime,
     this.errorMessage,
   });
 
@@ -165,11 +193,17 @@ class _$SettingsStateImpl implements _SettingsState {
   @override
   final CompanyDetailsModel? companyDetails;
   @override
+  @JsonKey()
+  final TimeOfDay startWorkingTime;
+  @override
+  @JsonKey()
+  final TimeOfDay endWorkingTime;
+  @override
   final String? errorMessage;
 
   @override
   String toString() {
-    return 'SettingsState(loaderState: $loaderState, settings: $settings, companyDetails: $companyDetails, errorMessage: $errorMessage)';
+    return 'SettingsState(loaderState: $loaderState, settings: $settings, companyDetails: $companyDetails, startWorkingTime: $startWorkingTime, endWorkingTime: $endWorkingTime, errorMessage: $errorMessage)';
   }
 
   @override
@@ -183,6 +217,10 @@ class _$SettingsStateImpl implements _SettingsState {
                 other.settings == settings) &&
             (identical(other.companyDetails, companyDetails) ||
                 other.companyDetails == companyDetails) &&
+            (identical(other.startWorkingTime, startWorkingTime) ||
+                other.startWorkingTime == startWorkingTime) &&
+            (identical(other.endWorkingTime, endWorkingTime) ||
+                other.endWorkingTime == endWorkingTime) &&
             (identical(other.errorMessage, errorMessage) ||
                 other.errorMessage == errorMessage));
   }
@@ -193,6 +231,8 @@ class _$SettingsStateImpl implements _SettingsState {
     loaderState,
     settings,
     companyDetails,
+    startWorkingTime,
+    endWorkingTime,
     errorMessage,
   );
 
@@ -210,6 +250,8 @@ abstract class _SettingsState implements SettingsState {
     final LoaderState loaderState,
     required final SettingsModel settings,
     final CompanyDetailsModel? companyDetails,
+    final TimeOfDay startWorkingTime,
+    final TimeOfDay endWorkingTime,
     final String? errorMessage,
   }) = _$SettingsStateImpl;
 
@@ -219,6 +261,10 @@ abstract class _SettingsState implements SettingsState {
   SettingsModel get settings;
   @override
   CompanyDetailsModel? get companyDetails;
+  @override
+  TimeOfDay get startWorkingTime;
+  @override
+  TimeOfDay get endWorkingTime;
   @override
   String? get errorMessage;
 

@@ -7,12 +7,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:vyapapp/res/constants/string_constants.dart';
 import 'package:vyapapp/res/styles/color_palette.dart';
 import 'package:vyapapp/res/styles/font_palette.dart';
 import 'package:vyapapp/src/new_bill/model/new_bill_model.dart';
+import 'package:vyapapp/src/printer/notifier/printer_notifier.dart';
 import 'package:vyapapp/src/settings/notifier/settings_notifier.dart';
 import 'package:vyapapp/utils/common_widgets/primary_button.dart';
 import 'package:vyapapp/utils/helpers/extensions.dart';
+import 'package:vyapapp/utils/helpers/receipt_print_helper.dart';
 import 'package:vyapapp/utils/helpers/toast_helper.dart';
 
 class BillPreviewSheet extends ConsumerStatefulWidget {
@@ -21,22 +24,30 @@ class BillPreviewSheet extends ConsumerStatefulWidget {
     required this.orderNumber,
     required this.dateString,
     required this.paymentMethod,
+    required this.paymentStatus,
     required this.customerName,
     required this.cartItems,
     required this.subtotal,
     required this.itemDiscountAmount,
     required this.billDiscountAmount,
+    required this.sgstTotal,
+    required this.cgstTotal,
+    required this.grandTotal,
     required this.balance,
   });
 
   final String orderNumber;
   final String dateString;
   final String paymentMethod;
+  final String paymentStatus;
   final String customerName;
   final List<CartItemModel> cartItems;
   final double subtotal;
   final double itemDiscountAmount;
   final double billDiscountAmount;
+  final double sgstTotal;
+  final double cgstTotal;
+  final double grandTotal;
   final double balance;
 
   @override
@@ -45,6 +56,43 @@ class BillPreviewSheet extends ConsumerStatefulWidget {
 
 class _BillPreviewSheetState extends ConsumerState<BillPreviewSheet> {
   final GlobalKey _repaintKey = GlobalKey();
+
+  ReceiptPrintData _buildReceiptData(String storeName) {
+    final amountPaid =
+        (widget.grandTotal - widget.balance).clamp(0.0, widget.grandTotal);
+
+    return ReceiptPrintData(
+      storeName: storeName,
+      orderNumber: widget.orderNumber,
+      dateString: widget.dateString,
+      customerName: widget.customerName,
+      paymentMethod: widget.paymentMethod,
+      paymentStatus: widget.paymentStatus,
+      subtotalText: widget.subtotal.toCurrency(),
+      grandTotalText: widget.grandTotal.toCurrency(),
+      balanceText: widget.balance.toCurrency(),
+      amountPaidText: amountPaid.toCurrency(),
+      itemDiscountText: widget.itemDiscountAmount > 0
+          ? widget.itemDiscountAmount.toCurrency()
+          : null,
+      billDiscountText: widget.billDiscountAmount > 0
+          ? widget.billDiscountAmount.toCurrency()
+          : null,
+      sgstTotalText: widget.sgstTotal > 0 ? widget.sgstTotal.toCurrency() : null,
+      cgstTotalText: widget.cgstTotal > 0 ? widget.cgstTotal.toCurrency() : null,
+      items: widget.cartItems
+          .map(
+            (item) => ReceiptPrintLineItem(
+              name: item.name,
+              unitPriceText: item.price.toCurrency(),
+              quantityText: item.quantity.toString(),
+              lineTotalText: item.totalPrice.toCurrency(),
+              discountLabel: item.hasDiscount ? item.discountLabel : null,
+            ),
+          )
+          .toList(),
+    );
+  }
 
   Future<void> _shareImage() async {
     try {
@@ -80,44 +128,10 @@ class _BillPreviewSheetState extends ConsumerState<BillPreviewSheet> {
   }
 
   void _shareText(String displayName) {
-    final receiptBuffer = StringBuffer();
-    receiptBuffer.writeln('----------------------------------');
-    receiptBuffer.writeln(displayName);
-    receiptBuffer.writeln('             RECEIPT');
-    receiptBuffer.writeln('----------------------------------');
-    receiptBuffer.writeln('Invoice No: ${widget.orderNumber}');
-    receiptBuffer.writeln('Date: ${widget.dateString}');
-    receiptBuffer.writeln('Customer: ${widget.customerName}');
-    receiptBuffer.writeln('Payment: ${widget.paymentMethod}');
-    receiptBuffer.writeln('----------------------------------');
-    for (final item in widget.cartItems) {
-      receiptBuffer.writeln(
-        '${item.name} x${item.quantity}    ${(item.price * item.quantity).toCurrency()}',
-      );
-    }
-    receiptBuffer.writeln('----------------------------------');
-    receiptBuffer.writeln('Subtotal:           ${widget.subtotal.toCurrency()}');
-    if (widget.itemDiscountAmount > 0) {
-      receiptBuffer.writeln('Item Discounts:     -${widget.itemDiscountAmount.toCurrency()}');
-    }
-    if (widget.billDiscountAmount > 0) {
-      receiptBuffer.writeln('Bill Discount:      -${widget.billDiscountAmount.toCurrency()}');
-    }
-    final totalDiscount = widget.itemDiscountAmount + widget.billDiscountAmount;
-    final grandTotal = (widget.subtotal - totalDiscount).clamp(0.0, double.infinity);
-    receiptBuffer.writeln('Grand Total:        ${grandTotal.toCurrency()}');
-    if (widget.balance > 0) {
-      final paidAmount = (grandTotal - widget.balance).clamp(0.0, double.infinity);
-      receiptBuffer.writeln('Amount Paid:        ${paidAmount.toCurrency()}');
-      receiptBuffer.writeln('Remaining Balance:  ${widget.balance.toCurrency()}');
-    }
-    receiptBuffer.writeln('----------------------------------');
-    receiptBuffer.writeln('Thank you for shopping with us!');
-    receiptBuffer.writeln('Billed via Thuga App');
-
+    final receiptBuffer = buildReceiptShareText(_buildReceiptData(displayName));
     SharePlus.instance.share(
       ShareParams(
-        text: receiptBuffer.toString(),
+        text: receiptBuffer,
         subject: 'Invoice ${widget.orderNumber}',
       ),
     );
@@ -173,7 +187,10 @@ class _BillPreviewSheetState extends ConsumerState<BillPreviewSheet> {
     final storeName = ref.watch(
       settingsNotifierProvider.select((s) => s.settings.storeName),
     );
-    final displayName = storeName.isNotEmpty ? storeName.toUpperCase() : 'THUKA';
+    final displayName = normalizeReceiptStoreName(storeName);
+    final isPrinterConnected = ref.watch(
+      printerNotifierProvider.select((value) => value.isConnected),
+    );
 
     final orderNumber = widget.orderNumber;
     final dateString = widget.dateString;
@@ -183,7 +200,9 @@ class _BillPreviewSheetState extends ConsumerState<BillPreviewSheet> {
     final subtotal = widget.subtotal;
     final itemDiscountAmount = widget.itemDiscountAmount;
     final billDiscountAmount = widget.billDiscountAmount;
-    final totalDiscount = itemDiscountAmount + billDiscountAmount;
+    final sgstTotal = widget.sgstTotal;
+    final cgstTotal = widget.cgstTotal;
+    final grandTotal = widget.grandTotal;
 
     return SingleChildScrollView(
       child: Column(
@@ -242,7 +261,10 @@ class _BillPreviewSheetState extends ConsumerState<BillPreviewSheet> {
                           _buildMetaValue(context, dateString),
                           12.verticalSpace,
                           _buildMetaLabel(context, 'Payment Method'),
-                          _buildMetaValue(context, '$paymentMethod (Paid)'),
+                          _buildMetaValue(
+                            context,
+                            '$paymentMethod (${widget.paymentStatus})',
+                          ),
                         ],
                       ),
                     ),
@@ -412,6 +434,44 @@ class _BillPreviewSheetState extends ConsumerState<BillPreviewSheet> {
                     ],
                   ),
                 ],
+                if (sgstTotal > 0) ...[
+                  6.verticalSpace,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        Strings.sgstTotal,
+                        style: FontPalette.base500(
+                          13,
+                          color: colors.secondaryText,
+                        ),
+                      ),
+                      Text(
+                        sgstTotal.toCurrency(),
+                        style: FontPalette.base600(13, color: colors.primaryText),
+                      ),
+                    ],
+                  ),
+                ],
+                if (cgstTotal > 0) ...[
+                  6.verticalSpace,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        Strings.cgstTotal,
+                        style: FontPalette.base500(
+                          13,
+                          color: colors.secondaryText,
+                        ),
+                      ),
+                      Text(
+                        cgstTotal.toCurrency(),
+                        style: FontPalette.base600(13, color: colors.primaryText),
+                      ),
+                    ],
+                  ),
+                ],
                 10.verticalSpace,
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -421,9 +481,7 @@ class _BillPreviewSheetState extends ConsumerState<BillPreviewSheet> {
                       style: FontPalette.base700(15, color: colors.primaryText),
                     ),
                     Text(
-                      (subtotal - totalDiscount)
-                          .clamp(0.0, double.infinity)
-                          .toCurrency(),
+                      grandTotal.toCurrency(),
                       style: FontPalette.base700(16, color: colors.primary),
                     ),
                   ],
@@ -441,7 +499,7 @@ class _BillPreviewSheetState extends ConsumerState<BillPreviewSheet> {
                         ),
                       ),
                       Text(
-                        ((subtotal - totalDiscount) - widget.balance)
+                        (grandTotal - widget.balance)
                             .clamp(0.0, double.infinity)
                             .toCurrency(),
                         style: FontPalette.base600(13, color: colors.primaryText),
@@ -482,7 +540,7 @@ class _BillPreviewSheetState extends ConsumerState<BillPreviewSheet> {
                       style: FontPalette.base400(10, color: colors.secondaryText),
                     ),
                     Text(
-                      'Thuga App',
+                            'Thuka App',
                       style: FontPalette.base700(10, color: colors.primary),
                     ),
                   ],
@@ -521,16 +579,37 @@ class _BillPreviewSheetState extends ConsumerState<BillPreviewSheet> {
               Expanded(
                 flex: 2,
                 child: PrimaryButton(
-                  text: 'Print Invoice',
+                  text: Strings.printInvoice,
                   radius: 12,
                   prefixIcon: Icon(
                     Icons.print_rounded,
                     size: 20.r,
                     color: Colors.white,
                   ),
-                  onPressed: () {
-                    showCustomToast(message: 'Sending invoice to printer...');
-                    Navigator.of(context).pop();
+                  onPressed: isPrinterConnected
+                      ? () async {
+                          final navigator = Navigator.of(context);
+                          final success = await ref
+                              .read(printerNotifierProvider.notifier)
+                              .printReceiptData(_buildReceiptData(storeName));
+                          if (!mounted) return;
+                          if (success) {
+                            showCustomToast(
+                              message: Strings.printerSavedSuccess,
+                            );
+                            navigator.pop();
+                          } else {
+                            showCustomErrorToast(
+                              message:
+                                  ref.read(printerNotifierProvider).errorMessage ??
+                                  Strings.printerFallbackPreview,
+                            );
+                          }
+                        }
+                      : () {
+                          showCustomErrorToast(
+                            message: Strings.noPrinterConnected,
+                          );
                   },
                 ),
               ),

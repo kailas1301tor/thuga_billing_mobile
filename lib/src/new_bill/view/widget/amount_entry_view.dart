@@ -6,6 +6,7 @@ import 'package:vyapapp/res/styles/color_palette.dart';
 import 'package:vyapapp/res/styles/font_palette.dart';
 import 'package:vyapapp/utils/common_widgets/common_text_form_field.dart';
 import 'package:vyapapp/utils/common_widgets/primary_button.dart';
+import 'package:vyapapp/utils/helpers/extensions.dart';
 import '../../model/new_bill_model.dart';
 
 class AmountEntryView extends StatelessWidget {
@@ -120,7 +121,7 @@ class AmountEntryView extends StatelessWidget {
 
                               // Price
                               Text(
-                                '₹${item.lineTotal.toStringAsFixed(2)}',
+                                item.lineTotal.toCurrency(),
                                 style: FontPalette.base700(
                                   14,
                                   color: colors.primaryText,

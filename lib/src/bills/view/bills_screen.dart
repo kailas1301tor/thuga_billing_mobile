@@ -5,50 +5,48 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:vyapapp/res/constants/string_constants.dart';
 import 'package:vyapapp/res/styles/color_palette.dart';
 import 'package:vyapapp/res/styles/font_palette.dart';
-import 'package:vyapapp/src/main/notifier/dropdowns_notifier.dart';
 import 'package:vyapapp/utils/common_widgets/common_app_bar.dart';
 import 'package:vyapapp/utils/common_widgets/common_refresh_indicator.dart';
 import 'package:vyapapp/utils/common_widgets/common_scaffold.dart';
 import 'package:vyapapp/utils/common_widgets/common_search_bar.dart';
 import 'package:vyapapp/utils/common_widgets/common_switch_state.dart';
 
+import '../model/bill_model.dart';
 import '../notifier/bills_notifier.dart';
 import 'bill_detail_screen.dart';
 import 'widget/bill_item_card.dart';
 import 'widget/bills_filter_row.dart';
 
-class BillsScreen extends ConsumerStatefulWidget {
+class BillsScreen extends ConsumerWidget {
   const BillsScreen({super.key});
 
   @override
-  ConsumerState<BillsScreen> createState() => _BillsScreenState();
-}
-
-class _BillsScreenState extends ConsumerState<BillsScreen> {
-  @override
-  void initState() {
-    super.initState();
-    // Fetch dashboard/bills list on screen initialization
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(billsNotifierProvider.notifier).fetchBills();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
-    final state = ref.watch(billsNotifierProvider);
+    final loaderState = ref.watch(
+      billsNotifierProvider.select((s) => s.loaderState),
+    );
+    final dateRangeFilter = ref.watch(
+      billsNotifierProvider.select((s) => s.dateRangeFilter),
+    );
+    final totalCount = ref.watch(
+      billsNotifierProvider.select((s) => s.data?.results.totalCount),
+    );
+    final isLoadingMore = ref.watch(
+      billsNotifierProvider.select((s) => s.isLoadingMore),
+    );
+    final bills = ref.watch(
+      billsNotifierProvider.select((s) {
+        final list = List<BillModel>.from(s.data?.results.data ?? []);
+        if (s.isNewestFirst) {
+          list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        } else {
+          list.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+        }
+        return list;
+      }),
+    );
     final notifier = ref.read(billsNotifierProvider.notifier);
-
-    // Watch customers from dropdowns notifier to map customer names
-    final customers = ref.watch(
-      dropdownsNotifierProvider.select((s) => s.data.customers),
-    );
-
-    // Watch filtered list of bills
-    final filteredBills = ref.watch(
-      billsNotifierProvider.select((_) => notifier.getFilteredBills(customers)),
-    );
 
     return CommonScaffold(
       backgroundColor: colors.background,
@@ -63,61 +61,89 @@ class _BillsScreenState extends ConsumerState<BillsScreen> {
             child: CommonSearchBar(
               controller: notifier.searchController,
               hintText: 'Search by Bill No, Customer or Amount',
+              onClear: notifier.clearSearch,
             ),
           ),
-
-          // 2. Filter Row
           BillsFilterRow(
-            selectedDate: state.dateRangeFilter,
-            onDateChanged: (val) => notifier.setDateRangeFilter(val),
+            selectedDate: dateRangeFilter,
+            onDateChanged: notifier.setDateRangeFilter,
           ),
           Expanded(
             child: CommonSwitchState(
-              loaderState: state.loaderState,
+              loaderState: loaderState,
               reload: () => notifier.fetchBills(),
-              child: CommonRefreshIndicator(
-                onRefresh: () => notifier.fetchBills(),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // 1. Search Bar
-                    20.verticalSpace,
-
-                    // 3. Bills Count Row
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20.w),
-                      child: Text(
-                        '${filteredBills.length} Bills',
-                        style: FontPalette.base700(15, color: colors.primaryText),
-                      ),
-                    ),
-                    12.verticalSpace,
-
-                    // 5. Scrollable Bills List
-                    Expanded(
-                      child: ListView.builder(
-                        padding: EdgeInsets.symmetric(horizontal: 20.w),
-                        itemCount: filteredBills.length,
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          final bill = filteredBills[index];
-                          return BillItemCard(
-                            bill: bill,
-                            onTap: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      BillDetailScreen(billId: bill.id),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
+              child: _buildBody(
+                context,
+                colors,
+                bills,
+                totalCount ?? bills.length,
+                isLoadingMore,
+                notifier,
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBody(
+    BuildContext context,
+    AppColors colors,
+    List<BillModel> bills,
+    int billCount,
+    bool isLoadingMore,
+    BillsNotifier notifier,
+  ) {
+    return CommonRefreshIndicator(
+      onRefresh: () => notifier.fetchBills(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          20.verticalSpace,
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.w),
+            child: Text(
+              '$billCount Bills',
+              style: FontPalette.base700(15, color: colors.primaryText),
+            ),
+          ),
+          12.verticalSpace,
+          Expanded(
+            child: ListView.builder(
+              controller: notifier.scrollController,
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
+              itemCount: bills.length + (isLoadingMore ? 1 : 0),
+              physics: const AlwaysScrollableScrollPhysics(),
+              itemBuilder: (context, index) {
+                if (index == bills.length) {
+                  return Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16.h),
+                    child: Center(
+                      child: SizedBox(
+                        width: 24.r,
+                        height: 24.r,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.w,
+                          color: colors.primary,
+                        ),
+                      ),
+                    ),
+                  );
+                }
+                final bill = bills[index];
+                return BillItemCard(
+                  bill: bill,
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            BillDetailScreen(billId: bill.id),
+                      ),
+                    );
+                  },
+                );
+              },
             ),
           ),
         ],

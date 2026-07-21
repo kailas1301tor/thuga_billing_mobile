@@ -6,12 +6,12 @@ part of 'dropdowns_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$dropdownsNotifierHash() => r'f7b65022d84c4d50822193a2d48fc3f52b805b92';
+String _$dropdownsNotifierHash() => r'd64ea4a08c2f033d63e5ba585223e7fe18cba021';
 
 /// See also [DropdownsNotifier].
 @ProviderFor(DropdownsNotifier)
 final dropdownsNotifierProvider =
-    AutoDisposeNotifierProvider<DropdownsNotifier, DropdownsState>.internal(
+    NotifierProvider<DropdownsNotifier, DropdownsState>.internal(
       DropdownsNotifier.new,
       name: r'dropdownsNotifierProvider',
       debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -21,6 +21,6 @@ final dropdownsNotifierProvider =
       allTransitiveDependencies: null,
     );
 
-typedef _$DropdownsNotifier = AutoDisposeNotifier<DropdownsState>;
+typedef _$DropdownsNotifier = Notifier<DropdownsState>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

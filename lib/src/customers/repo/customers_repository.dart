@@ -7,7 +7,11 @@ import 'package:vyapapp/utils/helpers/safe_converters.dart';
 import '../model/customer_model.dart';
 
 abstract class CustomersRepo {
-  Future<Either<ResponseError, CustomerResponse>> getCustomers();
+  Future<Either<ResponseError, CustomerResponse>> getCustomers({
+    required String search,
+    required int page,
+    required int pageSize,
+  });
   Future<Either<ResponseError, CustomerAddResponse>> createCustomer(Map<String, dynamic> body);
   Future<Either<ResponseError, CustomerAddResponse>> updateCustomer(int id, Map<String, dynamic> body);
   Future<Either<ResponseError, CustomerDeleteResponse>> deleteCustomer(int id);
@@ -18,9 +22,22 @@ class CustomersRepoImpl implements CustomersRepo {
   CustomersRepoImpl(this._services);
 
   @override
-  Future<Either<ResponseError, CustomerResponse>> getCustomers() async {
+  Future<Either<ResponseError, CustomerResponse>> getCustomers({
+    required String search,
+    required int page,
+    required int pageSize,
+  }) async {
+    final queryParameters = <String, dynamic>{
+      'search': search,
+      'page': page,
+      'page_size': pageSize,
+    };
+
     return await _services
-        .safe(_services.getRequest(endPoint: AppConstants.customers))
+        .safe(_services.getRequest(
+          endPoint: AppConstants.customers,
+          queryParameters: queryParameters,
+        ))
         .thenRight(_services.checkHttpStatus)
         .thenRight(_services.parseJson)
         .mapRight((right) => CustomerResponse.fromJson(convertToMap(right)));

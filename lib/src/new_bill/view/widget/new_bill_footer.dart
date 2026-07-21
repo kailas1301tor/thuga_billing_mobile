@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:vyapapp/res/constants/string_constants.dart';
 import 'package:vyapapp/res/styles/color_palette.dart';
 import 'package:vyapapp/res/styles/font_palette.dart';
 import 'package:vyapapp/utils/common_widgets/bottomsheet_content.dart';
 import 'package:vyapapp/utils/common_widgets/common_text_form_field.dart';
 import 'package:vyapapp/utils/common_widgets/primary_button.dart';
+import 'package:vyapapp/utils/helpers/extensions.dart';
 import '../../../main/model/dropdown_model.dart';
 import '../../../main/notifier/dropdowns_notifier.dart';
 
@@ -15,6 +17,7 @@ class NewBillFooter extends ConsumerWidget {
   const NewBillFooter({
     super.key,
     required this.totalAmount,
+    required this.isPrinterConnected,
     required this.paymentMethod,
     required this.selectedCustomer,
     required this.paymentStatus,
@@ -22,10 +25,11 @@ class NewBillFooter extends ConsumerWidget {
     required this.receivedAmountController,
     required this.onPaymentMethodChanged,
     required this.onPaymentStatusChanged,
-    required this.onPrintPressed,
+    required this.onSubmitPressed,
   });
 
   final double totalAmount;
+  final bool isPrinterConnected;
   final String paymentMethod;
   final DropdownCustomerModel? selectedCustomer;
   final String paymentStatus;
@@ -33,7 +37,7 @@ class NewBillFooter extends ConsumerWidget {
   final TextEditingController receivedAmountController;
   final ValueChanged<String> onPaymentMethodChanged;
   final ValueChanged<String> onPaymentStatusChanged;
-  final VoidCallback onPrintPressed;
+  final VoidCallback onSubmitPressed;
 
   IconData _getPaymentIcon(String method) {
     final lower = method.toLowerCase();
@@ -104,84 +108,83 @@ class NewBillFooter extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Credit / Payment Status Section (Only visible for selected customers)
-            if (selectedCustomer != null) ...[
-              Row(
-                children: [
-                  Text(
-                    'Payment Status:',
-                    style: FontPalette.base700(12, color: colors.secondaryText),
-                  ),
-                  12.horizontalSpace,
-                  _buildChoiceChip(
-                    context: context,
-                    label: 'Fully Paid',
-                    isSelected: paymentStatus == 'Paid',
-                    onTap: () => onPaymentStatusChanged('Paid'),
-                  ),
-                  8.horizontalSpace,
-                  _buildChoiceChip(
-                    context: context,
-                    label: 'Credit',
-                    isSelected: paymentStatus == 'Unpaid',
-                    onTap: () => onPaymentStatusChanged('Unpaid'),
-                  ),
-                  8.horizontalSpace,
-                  _buildChoiceChip(
-                    context: context,
-                    label: 'Partial',
-                    isSelected: paymentStatus == 'Partial',
-                    onTap: () => onPaymentStatusChanged('Partial'),
-                  ),
-                ],
-              ),
-              if (paymentStatus == 'Partial')
-                Padding(
-                  padding: EdgeInsets.only(top: 12.h),
-                  child: CommonTextFormField(
-                    controller: receivedAmountController,
-                    title: 'Amount Received',
-                    hintText: 'Enter amount paid by customer',
-                    inputType: const TextInputType.numberWithOptions(decimal: true),
-                    suffix: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 12.w),
-                      child: Text(
-                        'Balance: ₹${(totalAmount - receivedAmount).clamp(0.0, totalAmount).toStringAsFixed(2)}',
-                        style: FontPalette.base700(
-                          12,
-                          color: (totalAmount - receivedAmount) > 0
-                              ? colors.errorText
-                              : Colors.green.shade700,
-                        ),
+            Row(
+              children: [
+                Text(
+                  'Payment Status:',
+                  style: FontPalette.base700(12, color: colors.secondaryText),
+                ),
+                12.horizontalSpace,
+                _buildChoiceChip(
+                  context: context,
+                  label: 'Paid',
+                  isSelected: paymentStatus == 'Paid',
+                  onTap: () => onPaymentStatusChanged('Paid'),
+                ),
+                8.horizontalSpace,
+                _buildChoiceChip(
+                  context: context,
+                  label: 'Credit',
+                  isSelected: paymentStatus == 'Credit',
+                  onTap: () => onPaymentStatusChanged('Credit'),
+                ),
+                8.horizontalSpace,
+                _buildChoiceChip(
+                  context: context,
+                  label: 'Partially Paid',
+                  isSelected: paymentStatus == 'Partially Paid',
+                  onTap: () => onPaymentStatusChanged('Partially Paid'),
+                ),
+              ],
+            ),
+            if (paymentStatus == 'Partially Paid')
+              Padding(
+                padding: EdgeInsets.only(top: 12.h),
+                child: CommonTextFormField(
+                  controller: receivedAmountController,
+                  title: 'Amount Received',
+                  hintText: 'Enter amount paid by customer',
+                  inputType: const TextInputType.numberWithOptions(decimal: true),
+                  suffix: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12.w),
+                    child: Text(
+                      'Balance: ${(totalAmount - receivedAmount).clamp(0.0, totalAmount).toCurrency()}',
+                      style: FontPalette.base700(
+                        12,
+                        color: (totalAmount - receivedAmount) > 0
+                            ? colors.errorText
+                            : Colors.green.shade700,
                       ),
                     ),
                   ),
                 ),
-              if (paymentStatus == 'Unpaid')
-                Padding(
-                  padding: EdgeInsets.only(top: 8.h),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.info_outline_rounded,
-                        size: 14.r,
-                        color: colors.errorText,
-                      ),
-                      6.horizontalSpace,
-                      Expanded(
-                        child: Text(
-                          '₹${totalAmount.toStringAsFixed(2)} will be added to ${selectedCustomer?.name}\'s credit balance',
-                          style: FontPalette.base500(
-                            11,
-                            color: colors.errorText,
-                          ),
+              ),
+            if (paymentStatus == 'Credit')
+              Padding(
+                padding: EdgeInsets.only(top: 8.h),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.info_outline_rounded,
+                      size: 14.r,
+                      color: colors.errorText,
+                    ),
+                    6.horizontalSpace,
+                    Expanded(
+                      child: Text(
+                        selectedCustomer != null
+                            ? '${totalAmount.toCurrency()} will be added to ${selectedCustomer!.name}\'s credit balance'
+                            : '${totalAmount.toCurrency()} ${Strings.walkInCreditBalanceMessage}',
+                        style: FontPalette.base500(
+                          11,
+                          color: colors.errorText,
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              12.verticalSpace,
-            ],
+              ),
+            12.verticalSpace,
 
             // Main Checkout Buttons row
             Row(
@@ -248,17 +251,20 @@ class NewBillFooter extends ConsumerWidget {
                 ),
                 12.horizontalSpace,
 
-                // Right: PRINT BILL Button (Takes all remaining width)
+                // Right: Save/Print Button (Takes all remaining width)
                 Expanded(
                   child: PrimaryButton(
-                    onPressed: totalAmount > 0 ? onPrintPressed : null,
+                    onPressed: totalAmount > 0 ? onSubmitPressed : null,
                     radius: 12,
                     prefixIcon: Icon(
-                      Icons.print_rounded,
+                      isPrinterConnected
+                          ? Icons.print_rounded
+                          : Icons.save_rounded,
                       size: 20.r,
                       color: Colors.white,
                     ),
-                    text: 'PRINT BILL  ·  ₹${totalAmount.toStringAsFixed(0)}',
+                    text:
+                        '${isPrinterConnected ? Strings.printBill.toUpperCase() : Strings.saveBillLabel.toUpperCase()}  ·  ${totalAmount.toCurrency()}',
                     fontStyle: FontPalette.base700(14, color: Colors.white),
                     height: 52,
                   ),

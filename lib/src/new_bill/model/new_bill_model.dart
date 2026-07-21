@@ -76,8 +76,11 @@ class ProductModel {
   final int categoryId;
   final String categoryName;
   final String name;
-  final double quantity;
+  final double? quantity;
   final double price;
+  final String? barcode;
+  final double sgst;
+  final double cgst;
   final String? image;
   final String? imageUrl;
   final bool isQuickProduct;
@@ -89,8 +92,11 @@ class ProductModel {
     required this.categoryId,
     required this.categoryName,
     required this.name,
-    required this.quantity,
+    this.quantity,
     required this.price,
+    this.barcode,
+    this.sgst = 0.0,
+    this.cgst = 0.0,
     this.image,
     this.imageUrl,
     required this.isQuickProduct,
@@ -103,8 +109,11 @@ class ProductModel {
         categoryId: convertToInt(json['category']),
         categoryName: convertToString(json['category_name']),
         name: convertToString(json['name']),
-        quantity: convertToDouble(json['qty']),
+        quantity: json['qty'] == null ? null : convertToDouble(json['qty']),
         price: convertToDouble(json['price']),
+        barcode: json['barcode'] != null ? convertToString(json['barcode']) : null,
+        sgst: convertToDouble(json['sgst']),
+        cgst: convertToDouble(json['cgst']),
         image: json['image'] != null ? convertToString(json['image']) : null,
         imageUrl: json['image_url'] != null ? convertToString(json['image_url']) : null,
         isQuickProduct: convertToBool(json['is_quick_product']),
@@ -121,6 +130,9 @@ class ProductModel {
         'name': name,
         'qty': quantity,
         'price': price.toString(),
+        'barcode': barcode,
+        'sgst': sgst.toStringAsFixed(2),
+        'cgst': cgst.toStringAsFixed(2),
         'image': image,
         'image_url': imageUrl,
         'is_quick_product': isQuickProduct,
@@ -191,6 +203,8 @@ class CartItemModel {
     this.discountValue = 0.0,
     this.bogoBuyQty,
     this.bogoGetQty,
+    this.sgst = 0.0,
+    this.cgst = 0.0,
   });
 
   final int? productId;
@@ -204,6 +218,8 @@ class CartItemModel {
   final double discountValue;
   final int? bogoBuyQty;
   final int? bogoGetQty;
+  final double sgst;
+  final double cgst;
 
   /// Raw line total without any discount applied.
   double get lineTotal => price * quantity;
@@ -271,6 +287,8 @@ class CartItemModel {
     double? discountValue,
     int? Function()? bogoBuyQty,
     int? Function()? bogoGetQty,
+    double? sgst,
+    double? cgst,
   }) {
     return CartItemModel(
       productId: productId ?? this.productId,
@@ -284,6 +302,8 @@ class CartItemModel {
       discountValue: discountValue ?? this.discountValue,
       bogoBuyQty: bogoBuyQty != null ? bogoBuyQty() : this.bogoBuyQty,
       bogoGetQty: bogoGetQty != null ? bogoGetQty() : this.bogoGetQty,
+      sgst: sgst ?? this.sgst,
+      cgst: cgst ?? this.cgst,
     );
   }
 
@@ -305,6 +325,8 @@ class CartItemModel {
         bogoGetQty: json['bogo_get_qty'] != null
             ? convertToInt(json['bogo_get_qty'])
             : null,
+        sgst: convertToDouble(json['sgst']),
+        cgst: convertToDouble(json['cgst']),
       );
 
   Map<String, dynamic> toJson() => {
@@ -319,5 +341,7 @@ class CartItemModel {
         'discount_value': discountValue,
         'bogo_buy_qty': bogoBuyQty,
         'bogo_get_qty': bogoGetQty,
+        'sgst': sgst,
+        'cgst': cgst,
       };
 }

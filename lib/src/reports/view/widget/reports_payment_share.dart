@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:vyapapp/res/styles/color_palette.dart';
 import 'package:vyapapp/res/styles/font_palette.dart';
 import 'package:vyapapp/utils/common_widgets/common_container.dart';
+import 'package:vyapapp/utils/helpers/extensions.dart';
 import '../../model/reports_model.dart';
 
 class ReportsPaymentShare extends StatelessWidget {
@@ -105,7 +106,7 @@ class ReportsPaymentShare extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          '₹${share.amount.toStringAsFixed(0)}',
+                          share.amount.toCurrency(),
                           style: FontPalette.base600(
                             13,
                             color: colors.primaryText,

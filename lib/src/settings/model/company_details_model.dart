@@ -9,6 +9,8 @@ class CompanyDetailsModel {
   final String phoneNumber;
   final bool isActive;
   final String email;
+  final String? startWorkingHour;
+  final String? endWorkingHour;
 
   CompanyDetailsModel({
     required this.id,
@@ -18,10 +20,14 @@ class CompanyDetailsModel {
     required this.phoneNumber,
     required this.isActive,
     required this.email,
+    this.startWorkingHour,
+    this.endWorkingHour,
   });
 
   factory CompanyDetailsModel.fromJson(Map<String, dynamic> json) {
     final userMap = convertToMap(json['user']);
+    final startRaw = json['start_working_hour'];
+    final endRaw = json['end_working_hour'];
     return CompanyDetailsModel(
       id: convertToInt(json['id']),
       companyName: convertToString(json['company_name']),
@@ -29,7 +35,11 @@ class CompanyDetailsModel {
       address: convertToString(json['address']),
       phoneNumber: convertToString(json['phone_number']),
       isActive: convertToBool(json['is_active']),
-      email: convertToString(userMap['email']),
+      email: convertToString(userMap['email']).isNotEmpty
+          ? convertToString(userMap['email'])
+          : convertToString(json['email']),
+      startWorkingHour: startRaw == null ? null : convertToString(startRaw),
+      endWorkingHour: endRaw == null ? null : convertToString(endRaw),
     );
   }
 }

@@ -5,6 +5,7 @@ import 'package:vyapapp/res/enums/enums.dart';
 import 'package:vyapapp/services/repo_di.dart';
 import 'package:vyapapp/services/token_service.dart';
 import 'package:vyapapp/utils/helpers/toast_helper.dart';
+import 'package:vyapapp/utils/helpers/working_hour_helper.dart';
 import '../model/settings_model.dart';
 import '../model/company_details_model.dart';
 import '../state/settings_state.dart';
@@ -51,6 +52,14 @@ class SettingsNotifier extends _$SettingsNotifier {
     );
   }
 
+  void setStartWorkingTime(TimeOfDay time) {
+    state = state.copyWith(startWorkingTime: time);
+  }
+
+  void setEndWorkingTime(TimeOfDay time) {
+    state = state.copyWith(endWorkingTime: time);
+  }
+
   Future<void> fetchSettings() async {
     state = state.copyWith(loaderState: LoaderState.loading);
 
@@ -82,6 +91,15 @@ class SettingsNotifier extends _$SettingsNotifier {
             passwordController.text = '';
             taxController.text = localSettings.taxRate.toStringAsFixed(0);
 
+            final startTime = resolveWorkingTime(
+              companyDetails.startWorkingHour,
+              defaultStartWorkingTime,
+            );
+            final endTime = resolveWorkingTime(
+              companyDetails.endWorkingHour,
+              defaultEndWorkingTime,
+            );
+
             state = state.copyWith(
               loaderState: LoaderState.loaded,
               settings: localSettings.copyWith(
@@ -89,6 +107,8 @@ class SettingsNotifier extends _$SettingsNotifier {
                 email: companyDetails.email,
               ),
               companyDetails: companyDetails,
+              startWorkingTime: startTime,
+              endWorkingTime: endTime,
             );
           },
         );
@@ -103,6 +123,8 @@ class SettingsNotifier extends _$SettingsNotifier {
     final phone = phoneController.text.trim();
     final password = passwordController.text;
     final tax = double.tryParse(taxController.text.trim()) ?? 0.0;
+    final startWorkingHour = formatWorkingHour24(state.startWorkingTime);
+    final endWorkingHour = formatWorkingHour24(state.endWorkingTime);
 
     if (name.isEmpty) {
       showCustomErrorToast(message: 'Store name cannot be empty');
@@ -134,6 +156,8 @@ class SettingsNotifier extends _$SettingsNotifier {
       companyName: name,
       address: address,
       phoneNumber: phone,
+      startWorkingHour: startWorkingHour,
+      endWorkingHour: endWorkingHour,
     );
 
     updateResult.fold(
@@ -161,6 +185,8 @@ class SettingsNotifier extends _$SettingsNotifier {
             phoneNumber: phone,
             isActive: state.companyDetails?.isActive ?? true,
             email: email,
+            startWorkingHour: startWorkingHour,
+            endWorkingHour: endWorkingHour,
           ),
         );
         showCustomToast(message: 'Company details and settings saved successfully!');
@@ -182,8 +208,8 @@ class SettingsNotifier extends _$SettingsNotifier {
 
   Future<void> resetToDefaults() async {
     final defaults = const SettingsModel(
-      storeName: 'Tortilon Bakery',
-      email: 'contact@tortilon.com',
+      storeName: 'Thuka',
+      email: 'contact@thuka.com',
       autoPrint: false,
       defaultPaymentMethod: 'Cash',
       taxRate: 5.0,
@@ -210,6 +236,8 @@ class SettingsNotifier extends _$SettingsNotifier {
         state = state.copyWith(
           loaderState: LoaderState.loaded,
           settings: right,
+          startWorkingTime: defaultStartWorkingTime,
+          endWorkingTime: defaultEndWorkingTime,
           companyDetails: CompanyDetailsModel(
             id: state.companyDetails?.id ?? 1,
             companyName: right.storeName,
@@ -218,6 +246,8 @@ class SettingsNotifier extends _$SettingsNotifier {
             phoneNumber: '9987654656',
             isActive: true,
             email: right.email,
+            startWorkingHour: formatWorkingHour24(defaultStartWorkingTime),
+            endWorkingHour: formatWorkingHour24(defaultEndWorkingTime),
           ),
         );
         showCustomToast(message: 'Settings reset to defaults');

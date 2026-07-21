@@ -19,17 +19,17 @@ class LoginFooterWidget extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // Text(
-        //   Strings.dontHaveAccount,
-        //   style: FontPalette.base400(14, color: colors.secondaryText),
-        // ),
-        // GestureDetector(
-        //   onTap: () => _onSignUpTap(context),
-        //   child: Text(
-        //     Strings.signUp,
-        //     style: FontPalette.base700(14, color: colors.primary),
-        //   ),
-        // ),
+        Text(
+          Strings.dontHaveAccount,
+          style: FontPalette.base400(14, color: colors.secondaryText),
+        ),
+        GestureDetector(
+          onTap: () => _onSignUpTap(context),
+          child: Text(
+            Strings.signUp,
+            style: FontPalette.base700(14, color: colors.primary),
+          ),
+        ),
       ],
     );
   }
