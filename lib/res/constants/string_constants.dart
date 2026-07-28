@@ -125,6 +125,8 @@ class Strings {
   // Screen titles
   static const String homeTitle = "Home";
   static const String billsTitle = "Bills";
+  static const String searchBillsHint =
+      "Search by Bill No, Customer or Amount";
   static const String newBillTitle = "New Bill";
   static const String reportsTitle = "Reports";
   static const String settingsTitle = "Settings";
@@ -139,6 +141,19 @@ class Strings {
       "Only $count units available";
   static String productAvailableStock(int count) => "Available: $count";
   static const String outOfStock = "Out of stock";
+  static const String searchProductsHint = "Search products...";
+  static const String selectCustomer = "Select Customer";
+  static const String noProductsFound = "No products found";
+  static const String orderSummary = "Order Summary";
+  static const String clearAll = "Clear All";
+  static const String totalLabel = "Total";
+  static const String selectPaymentMethod = "Select Payment Method";
+  static const String amountReceived = "Amount Received";
+  static const String enterAmountReceived = "Enter amount paid by customer";
+  static const String balanceLabel = "Balance";
+  static const String applyDiscount = "Apply Discount";
+  static const String enterDiscountAmount = "Enter discount amount (₹)";
+  static const String apply = "Apply";
 
   // Home dashboard
   static const String goodMorning = "Good Morning";
@@ -147,6 +162,7 @@ class Strings {
   static const String todaysSales = "Today's Sales";
   static const String vsYesterday = "vs Yesterday";
   static const String bills = "Bills";
+  static const String pendingBills = "Pending Bills";
   static const String avgBillValue = "Avg. Bill Value";
   static const String bestSeller = "Best Seller";
   static const String sold = "Sold";
@@ -189,6 +205,7 @@ class Strings {
   static const String ofSales = "of sales";
   static const String homeMenu = "Menu";
   static const String appMenuTitle = "Thuka Menu";
+  static const String appMenuSubtitle = "Manage business inventory";
   static const String billedViaApp = "Billed via Thuka App";
   static const String appBrandFooter = "Thuka App";
   static const String notifications = "Notifications";

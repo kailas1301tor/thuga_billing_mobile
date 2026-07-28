@@ -1,24 +1,33 @@
 import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 
 class ConnectivityService {
   final Connectivity _connectivity = Connectivity();
   final StreamController<bool> _controller = StreamController<bool>.broadcast();
-  late final StreamSubscription<List<ConnectivityResult>> _subscription;
+  StreamSubscription<List<ConnectivityResult>>? _subscription;
 
   Timer? _debounce;
   bool _isConnected = true;
 
   Stream<bool> get connectionStream => _controller.stream;
-  bool get isConnected => _isConnected;
+  bool get isConnected => kIsWeb ? true : _isConnected;
 
   ConnectivityService() {
     initialize();
   }
 
   void initialize() {
+    if (kIsWeb) {
+      _isConnected = true;
+      if (!_controller.isClosed) {
+        _controller.add(true);
+      }
+      return;
+    }
+
     checkConnection();
 
     _subscription = _connectivity.onConnectivityChanged.listen((results) {
@@ -32,11 +41,14 @@ class ConnectivityService {
   }
 
   Future<void> checkConnection() async {
+    if (kIsWeb) return;
+
     final initialStatus = await _verifyConnection();
     _updateStatus(initialStatus);
   }
 
   Future<bool> _verifyConnection({int retry = 2}) async {
+    if (kIsWeb) return true;
     while (retry > 0) {
       try {
         final response = await http
@@ -63,7 +75,7 @@ class ConnectivityService {
   }
 
   void dispose() {
-    _subscription.cancel();
+    _subscription?.cancel();
     _debounce?.cancel();
     _controller.close();
   }

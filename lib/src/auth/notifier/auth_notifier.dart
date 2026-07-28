@@ -12,6 +12,7 @@ import 'package:thuga/utils/routes/route_constants.dart';
 import '../../../utils/helpers/validators.dart';
 import '../state/auth_state.dart';
 import '../repo/auth_repo.dart';
+import '../model/auth_model.dart';
 
 part 'auth_notifier.g.dart';
 
@@ -53,70 +54,82 @@ class AuthNotifier extends _$AuthNotifier {
     }
 
     state = state.copyWith(loaderState: LoaderState.loading);
-    return await authRepo
-        .login(
-          email: emailController.text.trim(),
-          password: passwordController.text,
-        )
-        .fold(
-          (error) {
-            final loaderState = handleResponseError(error.key);
-            debugPrint("🔴 LOGIN ERROR: ${error.message}");
-            state = state.copyWith(loaderState: loaderState);
-            showCustomToast(
-              message: error.message ?? "Login failed",
-              isSuccess: false,
-            );
-            return false;
-          },
-          (authModel) async {
-            debugPrint('🔍 AUTH MODEL TOKENS:');
-            debugPrint('  accessToken: "${authModel.accessToken}"');
-            debugPrint('  refreshToken: "${authModel.refreshToken}"');
-            debugPrint('  id: ${authModel.id}');
-            debugPrint('  email: "${authModel.email}"');
 
-            final accessVal = authModel.accessToken ?? '';
-            final refreshVal = authModel.refreshToken ?? '';
-            debugPrint(
-              '🔍 SAVING TO SEMBAST → access="$accessVal", refresh="$refreshVal"',
-            );
+    final result = await authRepo.login(
+      email: emailController.text.trim(),
+      password: passwordController.text,
+    );
 
-            await ref
-                .read(tokenServiceProvider)
-                .saveTokens(accessToken: accessVal, refreshToken: refreshVal);
-            await ref
-                .read(tokenServiceProvider)
-                .saveUserId(authModel.id.toString());
-            await safeCrashlyticsSetUserIdentifier(authModel.id.toString());
-
-            // Verify round-trip
-            final readBack = await ref
-                .read(tokenServiceProvider)
-                .getAccessToken();
-            debugPrint('🔍 READ-BACK FROM SEMBAST → "$readBack"');
-            debugPrint(
-              '🔍 isEmpty=${readBack?.isEmpty}, isNull=${readBack == null}',
-            );
-
-            debugPrint("🟢 LOGIN SUCCESS: ${authModel.email}");
-            state = state.copyWith(
-              loaderState: LoaderState.loaded,
-              authModel: authModel,
-            );
-            navigateAndClearStack(RouteConstants.routeHomeScreen);
-            return true;
-          },
-        )
-        .catchError((error) {
-          debugPrint("🔴 UNEXPECTED LOGIN ERROR: $error");
-          state = state.copyWith(loaderState: LoaderState.error);
+    try {
+      return await result.fold(
+        (error) async {
+          final loaderState = handleResponseError(error.key);
+          debugPrint("🔴 LOGIN ERROR: ${error.message}");
+          state = state.copyWith(loaderState: loaderState);
           showCustomToast(
-            message: "An unexpected error occurred",
+            message: error.message ?? "Login failed",
             isSuccess: false,
           );
           return false;
-        });
+        },
+        (authModel) => _completeLogin(authModel),
+      );
+    } catch (error) {
+      debugPrint("🔴 UNEXPECTED LOGIN ERROR: $error");
+      state = state.copyWith(loaderState: LoaderState.error);
+      showCustomToast(
+        message: "An unexpected error occurred",
+        isSuccess: false,
+      );
+      return false;
+    }
+  }
+
+  Future<bool> _completeLogin(AuthModel authModel) async {
+    debugPrint('🔍 AUTH MODEL TOKENS:');
+    debugPrint('  accessToken: "${authModel.accessToken}"');
+    debugPrint('  refreshToken: "${authModel.refreshToken}"');
+    debugPrint('  id: ${authModel.id}');
+    debugPrint('  email: "${authModel.email}"');
+
+    final accessVal = authModel.accessToken ?? '';
+    final refreshVal = authModel.refreshToken ?? '';
+
+    if (accessVal.isEmpty) {
+      debugPrint('🔴 LOGIN ERROR: empty access token in response');
+      state = state.copyWith(loaderState: LoaderState.error);
+      showCustomToast(
+        message: 'Login failed: missing access token',
+        isSuccess: false,
+      );
+      return false;
+    }
+
+    debugPrint(
+      '🔍 SAVING TO SEMBAST → access="$accessVal", refresh="$refreshVal"',
+    );
+
+    final tokenService = ref.read(tokenServiceProvider);
+    await tokenService.saveTokens(
+      accessToken: accessVal,
+      refreshToken: refreshVal,
+    );
+    await tokenService.saveUserId(authModel.id.toString());
+    await safeCrashlyticsSetUserIdentifier(authModel.id.toString());
+
+    final readBack = await tokenService.getAccessToken();
+    debugPrint('🔍 READ-BACK FROM SEMBAST → "$readBack"');
+    debugPrint(
+      '🔍 isEmpty=${readBack?.isEmpty}, isNull=${readBack == null}',
+    );
+
+    debugPrint("🟢 LOGIN SUCCESS: ${authModel.email}");
+    state = state.copyWith(
+      loaderState: LoaderState.loaded,
+      authModel: authModel,
+    );
+    navigateAndClearStack(RouteConstants.routeHomeScreen);
+    return true;
   }
 
   /// Register a new company profile.
@@ -247,17 +260,17 @@ class AuthNotifier extends _$AuthNotifier {
     state = state.copyWith(emailErrorText: null);
   }
 
-  /// Log out the user, clear local Sembast DB tokens, and redirect to the login screen.
+  /// Log out the user, clear local tokens, and redirect to the login screen.
   Future<void> logout() async {
-    state = state.copyWith(loaderState: LoaderState.loading);
+    if (ref.mounted) {
+      state = state.copyWith(loaderState: LoaderState.loading);
+    }
 
-    // Clear local storage and tokens
-    await ref.read(tokenServiceProvider).clearTokens();
-    await safeCrashlyticsSetUserIdentifier('');
-
-    state = state.copyWith(loaderState: LoaderState.loaded);
-
-    // Redirect to login screen
-    navigateAndClearStack(RouteConstants.routeLoginScreen);
+    try {
+      await ref.read(tokenServiceProvider).clearTokens();
+      await safeCrashlyticsSetUserIdentifier('');
+    } finally {
+      navigateAndClearStack(RouteConstants.routeLoginScreen);
+    }
   }
 }

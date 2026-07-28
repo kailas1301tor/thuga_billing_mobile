@@ -14,9 +14,16 @@ import 'reports_payment_share.dart';
 import 'reports_sales_chart.dart';
 
 class ReportsContentWidget extends ConsumerWidget {
-  const ReportsContentWidget({super.key, this.data});
+  const ReportsContentWidget({
+    super.key,
+    this.data,
+    this.embeddedInParentScroll = false,
+  });
 
   final ReportsDataModel? data;
+
+  /// When true, defers scrolling to a parent [CustomScrollView] (e.g. web layout).
+  final bool embeddedInParentScroll;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -28,11 +35,9 @@ class ReportsContentWidget extends ConsumerWidget {
 
     final ranges = ['Today', 'Yesterday', 'Last 7 Days', 'This Month'];
 
-    return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
+    final content = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
           // 1. Date Range Filter Chips
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -83,7 +88,15 @@ class ReportsContentWidget extends ConsumerWidget {
           _buildTopProductsCard(context, data?.topProducts),
           20.verticalSpace,
         ],
-      ),
+    );
+
+    if (embeddedInParentScroll) {
+      return content;
+    }
+
+    return SingleChildScrollView(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      child: content,
     );
   }
 

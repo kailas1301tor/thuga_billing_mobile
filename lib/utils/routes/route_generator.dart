@@ -2,13 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../../src/auth/view/login_screen.dart';
 import '../../src/auth/view/register_screen.dart';
-import '../../src/main/view/main_screen.dart';
 import '../../src/splash/view/splash_screen.dart';
 import 'route_constants.dart';
 
-/// Route generator for named navigation.
-///
-/// Add new routes here as you create new screens.
+/// Legacy route generator — superseded by [appRouter].
+/// Kept for reference; [ThugaApp] uses `MaterialApp.router` with go_router.
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -31,8 +29,11 @@ class RouteGenerator {
         );
 
       case RouteConstants.routeHomeScreen:
+      case RouteConstants.routeHome:
         return MaterialPageRoute(
-          builder: (_) => const MainScreen(),
+          builder: (_) => const Scaffold(
+            body: Center(child: Text('Use go_router shell routes')),
+          ),
           settings: settings,
         );
 

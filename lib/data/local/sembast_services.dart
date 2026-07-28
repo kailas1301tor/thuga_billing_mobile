@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:sembast/sembast_io.dart';
+import 'package:sembast/sembast.dart';
 import 'package:thuga/data/local/local_base_services.dart';
+import 'package:thuga/data/local/sembast_database_opener.dart';
 
 part 'sembast_services.g.dart';
 
@@ -26,7 +26,20 @@ class SembastServices extends LocalBaseServices {
   final _calculationBillsStore =
       StoreRef<String, Map<String, dynamic>>('calculation_bills');
 
-  late Database db;
+  Database? _db;
+  Future<void>? _opening;
+
+  Future<Database> _ensureDb() async {
+    if (_db != null) return _db!;
+    _opening ??= _openDatabase();
+    await _opening;
+    return _db!;
+  }
+
+  Future<void> _openDatabase() async {
+    _db = await openSembastDatabase(dbPath);
+    debugPrint('🟢 SEMBAST: database opened');
+  }
 
   @override
   Future<void> deleteUserData() async {}
@@ -36,8 +49,7 @@ class SembastServices extends LocalBaseServices {
 
   @override
   Future<void> initialize() async {
-    final appDir = await getApplicationDocumentsDirectory();
-    db = await databaseFactoryIo.openDatabase('${appDir.path}/$dbPath');
+    await _ensureDb();
   }
 
   @override
@@ -49,10 +61,11 @@ class SembastServices extends LocalBaseServices {
     required String refreshToken,
   }) async {
     try {
+      final database = await _ensureDb();
       debugPrint(
         '🔍 SEMBAST SAVE: access="$accessToken", refresh="$refreshToken"',
       );
-      await _tokenStore.record('tokens').put(db, {
+      await _tokenStore.record('tokens').put(database, {
         'accessToken': accessToken,
         'refreshToken': refreshToken,
       });
@@ -65,7 +78,8 @@ class SembastServices extends LocalBaseServices {
   @override
   Future<void> saveUser({required bool isNewUser}) async {
     try {
-      await _userStatus.record('isNewUser').put(db, isNewUser.toString());
+      final database = await _ensureDb();
+      await _userStatus.record('isNewUser').put(database, isNewUser.toString());
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -73,14 +87,16 @@ class SembastServices extends LocalBaseServices {
 
   @override
   Future<bool> isNewUser() async {
-    final status = await _userStatus.record('isNewUser').get(db);
+    final database = await _ensureDb();
+    final status = await _userStatus.record('isNewUser').get(database);
     return status == 'true';
   }
 
   @override
   Future<String?> getAccessToken() async {
     try {
-      final token = await _tokenStore.record('tokens').get(db);
+      final database = await _ensureDb();
+      final token = await _tokenStore.record('tokens').get(database);
       debugPrint('🔍 SEMBAST READ: raw record=$token');
       final result = token?['accessToken'];
       debugPrint('🔍 SEMBAST READ: accessToken="$result"');
@@ -94,7 +110,8 @@ class SembastServices extends LocalBaseServices {
   @override
   Future<String?> getRefreshToken() async {
     try {
-      final token = await _tokenStore.record('tokens').get(db);
+      final database = await _ensureDb();
+      final token = await _tokenStore.record('tokens').get(database);
       return token?['refreshToken'];
     } catch (e) {
       return null;
@@ -103,7 +120,8 @@ class SembastServices extends LocalBaseServices {
 
   Future<void> saveUserId(String userId) async {
     try {
-      await _tokenStore.record('userId').put(db, {'userId': userId});
+      final database = await _ensureDb();
+      await _tokenStore.record('userId').put(database, {'userId': userId});
     } catch (e) {
       debugPrint('saveUserId error: $e');
     }
@@ -111,7 +129,8 @@ class SembastServices extends LocalBaseServices {
 
   Future<String?> getUserId() async {
     try {
-      final record = await _tokenStore.record('userId').get(db);
+      final database = await _ensureDb();
+      final record = await _tokenStore.record('userId').get(database);
       return record?['userId'];
     } catch (e) {
       return null;
@@ -121,10 +140,11 @@ class SembastServices extends LocalBaseServices {
   @override
   Future<bool> clearLocalDb() async {
     try {
-      await _userStatus.delete(db);
-      await _tokenStore.delete(db);
-      await _reminderStore.delete(db);
-      await _completeProfileFromHome.delete(db);
+      final database = await _ensureDb();
+      await _userStatus.delete(database);
+      await _tokenStore.delete(database);
+      await _reminderStore.delete(database);
+      await _completeProfileFromHome.delete(database);
       return true;
     } catch (e) {
       return false;
@@ -133,7 +153,8 @@ class SembastServices extends LocalBaseServices {
 
   Future<void> updateOnboardedStatus(bool value) async {
     try {
-      await _onboardedStatus.record('onboarded_status').put(db, value);
+      final database = await _ensureDb();
+      await _onboardedStatus.record('onboarded_status').put(database, value);
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -141,9 +162,10 @@ class SembastServices extends LocalBaseServices {
 
   Future<bool> getOnboardedStatus() async {
     try {
+      final database = await _ensureDb();
       final onboardedStatus = await _onboardedStatus
           .record('onboarded_status')
-          .get(db);
+          .get(database);
       return onboardedStatus ?? false;
     } catch (e) {
       return false;
@@ -152,7 +174,8 @@ class SembastServices extends LocalBaseServices {
 
   Future<void> setLastReminderShown(String mealLabel, DateTime time) async {
     try {
-      await _reminderStore.record(mealLabel).put(db, time.toIso8601String());
+      final database = await _ensureDb();
+      await _reminderStore.record(mealLabel).put(database, time.toIso8601String());
     } catch (e) {
       debugPrint('setLastReminderShown error: $e');
     }
@@ -160,7 +183,8 @@ class SembastServices extends LocalBaseServices {
 
   Future<DateTime?> getLastReminderShown(String mealLabel) async {
     try {
-      final iso = await _reminderStore.record(mealLabel).get(db);
+      final database = await _ensureDb();
+      final iso = await _reminderStore.record(mealLabel).get(database);
       if (iso == null) return null;
       return DateTime.tryParse(iso);
     } catch (e) {
@@ -171,9 +195,10 @@ class SembastServices extends LocalBaseServices {
 
   Future<void> removeCompleteProfileFromHome(bool value) async {
     try {
+      final database = await _ensureDb();
       await _completeProfileFromHome
           .record('remove_complete_profile_from_home')
-          .put(db, value);
+          .put(database, value);
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -181,9 +206,10 @@ class SembastServices extends LocalBaseServices {
 
   Future<bool> getCompleteProfileFromHome() async {
     try {
+      final database = await _ensureDb();
       final onboardedStatus = await _completeProfileFromHome
           .record('remove_complete_profile_from_home')
-          .get(db);
+          .get(database);
       return onboardedStatus ?? false;
     } catch (e) {
       debugPrint('getCompleteProfileFromHome error: $e');
@@ -195,7 +221,8 @@ class SembastServices extends LocalBaseServices {
     try {
       final id = billJson['id']?.toString();
       if (id == null || id.isEmpty) return;
-      await _calculationBillsStore.record(id).put(db, billJson);
+      final database = await _ensureDb();
+      await _calculationBillsStore.record(id).put(database, billJson);
       debugPrint('🟢 SEMBAST: calculation bill saved id=$id');
     } catch (e) {
       debugPrint('🔴 SEMBAST saveCalculationBill error: $e');
@@ -204,7 +231,8 @@ class SembastServices extends LocalBaseServices {
 
   Future<Map<String, dynamic>?> getCalculationBill(String id) async {
     try {
-      return await _calculationBillsStore.record(id).get(db);
+      final database = await _ensureDb();
+      return await _calculationBillsStore.record(id).get(database);
     } catch (e) {
       debugPrint('🔴 SEMBAST getCalculationBill error: $e');
       return null;
@@ -213,7 +241,8 @@ class SembastServices extends LocalBaseServices {
 
   Future<List<Map<String, dynamic>>> getAllCalculationBills() async {
     try {
-      final records = await _calculationBillsStore.find(db);
+      final database = await _ensureDb();
+      final records = await _calculationBillsStore.find(database);
       return records.map((record) => record.value).toList();
     } catch (e) {
       debugPrint('🔴 SEMBAST getAllCalculationBills error: $e');
@@ -223,7 +252,8 @@ class SembastServices extends LocalBaseServices {
 
   Future<void> deleteCalculationBill(String id) async {
     try {
-      await _calculationBillsStore.record(id).delete(db);
+      final database = await _ensureDb();
+      await _calculationBillsStore.record(id).delete(database);
       debugPrint('🟢 SEMBAST: calculation bill deleted id=$id');
     } catch (e) {
       debugPrint('🔴 SEMBAST deleteCalculationBill error: $e');

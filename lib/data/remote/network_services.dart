@@ -11,7 +11,10 @@ import 'package:thuga/utils/routes/app_navigator.dart';
 import '../../res/constants/app_constants.dart';
 import '../../utils/helpers/api_error_message_helper.dart';
 import '../../utils/helpers/common_functions.dart';
+import '../../utils/helpers/token_response_helper.dart';
 import '../../utils/routes/route_constants.dart';
+import 'dio_web_config_stub.dart'
+    if (dart.library.html) 'dio_web_config_web.dart';
 import 'network_base_services.dart';
 import '../../services/connectivity_service.dart';
 import '../../services/token_service.dart';
@@ -69,21 +72,37 @@ class NetworkServices extends NetWorkBaseServices {
         connectTimeout: kConnectTimeOut,
         receiveTimeout: kReceiveTimeOut,
         receiveDataWhenStatusError: true,
-        headers: {"Content-Type": "application/json"},
+        headers: const {Headers.acceptHeader: Headers.jsonContentType},
       ),
     );
+
+    configureWebAdapter(_dio);
 
     // ── Auth Interceptor ─────────────────────────────────────────────────
     _dio.interceptors.add(
       InterceptorsWrapper(
-        onRequest: (options, handler) {
+        onRequest: (options, handler) async {
           final isFromAuth = options.extra['isFromAuth'] ?? false;
-          final token = AppConstants.accessToken;
 
-          if (!isFromAuth && token.isNotEmpty) {
-            options.headers["Authorization"] = "Bearer $token";
+          // Avoid sending Content-Type on bodyless requests — unnecessary
+          // and adds noise to CORS preflight diagnostics on web.
+          final hasBody = options.data != null;
+          if (!hasBody) {
+            options.headers.remove(Headers.contentTypeHeader);
+          } else if (options.data is! FormData &&
+              !options.headers.containsKey(Headers.contentTypeHeader)) {
+            options.headers[Headers.contentTypeHeader] = Headers.jsonContentType;
           }
-          return handler.next(options);
+
+          if (!isFromAuth) {
+            await _hydrateAccessTokenIfNeeded();
+            final token = AppConstants.accessToken;
+            if (token.isNotEmpty) {
+              options.headers['Authorization'] = 'Bearer $token';
+            }
+          }
+
+          handler.next(options);
         },
         onError: (DioException e, handler) async {
           if (e.response?.statusCode == 401) {
@@ -209,6 +228,8 @@ class NetworkServices extends NetWorkBaseServices {
   // ── Internet Check (singleton Connectivity) ────────────────────────────
 
   Future<void> _assertInternetAvailable() async {
+    if (kIsWeb) return;
+
     final isConnected = _ref.read(connectivityServiceProvider).isConnected;
     if (!isConnected) {
       debugPrint('🔴 No internet connection (cached check)');
@@ -602,19 +623,22 @@ class NetworkServices extends NetWorkBaseServices {
 
   // ── Auth Helpers ───────────────────────────────────────────────────────
 
+  /// Loads access token from persistent storage when memory is empty.
+  Future<void> _hydrateAccessTokenIfNeeded() async {
+    if (AppConstants.accessToken.isNotEmpty) return;
+
+    try {
+      await _ref.read(tokenServiceProvider).hydrateSession();
+    } catch (e) {
+      debugPrint('🔴 TOKEN HYDRATE ERROR: $e');
+    }
+  }
+
   Future<void> _logout() async {
     debugPrint('🔴 Failed to refresh token — forcing logout');
     await _ref.read(tokenServiceProvider).clearTokens();
 
-    if (appNavigatorKey.currentState != null) {
-      executeAfterFrame(() {
-        Navigator.pushNamedAndRemoveUntil(
-          appNavigatorKey.currentState!.context,
-          RouteConstants.routeLoginScreen,
-          (_) => false,
-        );
-      });
-    }
+    navigateAndClearStack(RouteConstants.routeLoginScreen);
   }
 
   @override
@@ -637,12 +661,20 @@ class NetworkServices extends NetWorkBaseServices {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         debugPrint('🟢 Access token refreshed');
-        final newAccessToken = response.data['access'] ?? '';
-        await _ref
-            .read(tokenServiceProvider)
-            .saveTokens(
+        final tokens = parseAuthTokensFromResponse(response.data);
+        final newAccessToken = tokens.accessToken;
+        if (newAccessToken.isEmpty) {
+          debugPrint('🔴 Refresh response missing access token');
+          return false;
+        }
+
+        final newRefreshToken = tokens.refreshToken.isNotEmpty
+            ? tokens.refreshToken
+            : refreshToken;
+
+        await _ref.read(tokenServiceProvider).saveTokens(
               accessToken: newAccessToken,
-              refreshToken: refreshToken,
+              refreshToken: newRefreshToken,
             );
         return true;
       } else {

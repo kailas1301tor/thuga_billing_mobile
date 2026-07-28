@@ -9,10 +9,12 @@ class BillsFilterRow extends StatelessWidget {
     super.key,
     required this.selectedDate,
     required this.onDateChanged,
+    this.horizontalPadding,
   });
 
   final String selectedDate;
   final ValueChanged<String> onDateChanged;
+  final double? horizontalPadding;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +22,7 @@ class BillsFilterRow extends StatelessWidget {
     final options = const ['Today', 'Yesterday', 'This Week', 'All Time'];
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.w),
+      padding: EdgeInsets.symmetric(horizontal: horizontalPadding ?? 20.w),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(

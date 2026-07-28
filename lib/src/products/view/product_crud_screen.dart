@@ -1,5 +1,4 @@
 // lib/src/products/view/product_crud_screen.dart
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -17,6 +16,7 @@ import 'package:thuga/utils/common_widgets/common_search_bar.dart';
 import 'package:thuga/utils/common_widgets/common_switch_state.dart';
 import 'package:thuga/utils/common_widgets/common_text_form_field.dart';
 import 'package:thuga/utils/common_widgets/common_refresh_indicator.dart';
+import 'package:thuga/utils/common_widgets/web/responsive_list_grid.dart';
 import 'package:thuga/utils/common_widgets/primary_button.dart';
 import 'widget/product_card_widget.dart';
 import '../model/product_crud_model.dart';
@@ -27,6 +27,7 @@ import 'package:thuga/src/categories/notifier/categories_notifier.dart';
 import 'package:thuga/src/categories/model/category_model.dart';
 import 'package:thuga/utils/common_widgets/bottomsheet_content.dart';
 import 'package:thuga/utils/helpers/extensions.dart';
+import 'package:thuga/utils/helpers/platform_local_image.dart';
 
 class ProductCrudScreen extends ConsumerWidget {
   const ProductCrudScreen({super.key});
@@ -215,27 +216,27 @@ class ProductCrudScreen extends ConsumerWidget {
     final isLoadingMore = state.isLoadingMore;
     return CommonRefreshIndicator(
       onRefresh: () => notifier.fetchProducts(),
-      child: ListView.builder(
+      child: ResponsiveListGrid(
         controller: notifier.scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-        itemCount: products.length + (isLoadingMore ? 1 : 0),
-        itemBuilder: (context, index) {
-          if (index == products.length) {
-            return Padding(
-              padding: EdgeInsets.symmetric(vertical: 16.h),
-              child: Center(
-                child: SizedBox(
-                  width: 24.r,
-                  height: 24.r,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.w,
-                    color: colors.primary,
-                  ),
-                ),
+        itemCount: products.length,
+        isLoadingMore: isLoadingMore,
+        minItemWidth: 320,
+        loadingIndicator: Padding(
+          padding: EdgeInsets.symmetric(vertical: 16.h),
+          child: Center(
+            child: SizedBox(
+              width: 24.r,
+              height: 24.r,
+              child: CircularProgressIndicator(
+                strokeWidth: 2.w,
+                color: colors.primary,
               ),
-            );
-          }
+            ),
+          ),
+        ),
+        itemBuilder: (context, index) {
           final product = products[index];
           final isToggling = state.togglingProductIds.contains(product.id);
           return ProductCardWidget(
@@ -243,7 +244,9 @@ class ProductCrudScreen extends ConsumerWidget {
             isToggling: isToggling,
             onEdit: () => _showProductSheet(context, null, notifier, product),
             onDelete: () => _showDeleteDialog(context, notifier, product),
-            onToggleStatus: isToggling ? null : (value) => notifier.toggleProductStatus(product.id, value),
+            onToggleStatus: isToggling
+                ? null
+                : (value) => notifier.toggleProductStatus(product.id, value),
           );
         },
       ),
@@ -318,8 +321,8 @@ class ProductCrudScreen extends ConsumerWidget {
                             ),
                             clipBehavior: Clip.antiAlias,
                             child: selectedImagePath != null
-                                ? Image.file(
-                                    File(selectedImagePath),
+                                ? buildPlatformLocalImage(
+                                    selectedImagePath,
                                     fit: BoxFit.cover,
                                   )
                                 : (isEditing &&

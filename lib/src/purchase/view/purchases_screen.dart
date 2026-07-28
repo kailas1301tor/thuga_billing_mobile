@@ -9,6 +9,7 @@ import 'package:thuga/utils/common_widgets/common_container.dart';
 import 'package:thuga/utils/common_widgets/common_refresh_indicator.dart';
 import 'package:thuga/utils/common_widgets/common_scaffold.dart';
 import 'package:thuga/utils/common_widgets/common_switch_state.dart';
+import 'package:thuga/utils/common_widgets/web/responsive_list_grid.dart';
 import 'package:thuga/utils/helpers/common_functions.dart';
 import '../notifier/purchases_notifier.dart';
 import 'widget/purchase_item_card.dart';
@@ -108,11 +109,12 @@ class PurchasesScreen extends ConsumerWidget {
               reload: () => notifier.fetchPurchases(),
               child: CommonRefreshIndicator(
                 onRefresh: () => notifier.fetchPurchases(),
-                child: ListView.builder(
+                child: ResponsiveListGrid(
                   controller: notifier.scrollController,
                   padding: EdgeInsets.symmetric(horizontal: 20.w),
-                  itemCount: state.purchases.length,
                   physics: const AlwaysScrollableScrollPhysics(),
+                  itemCount: state.purchases.length,
+                  minItemWidth: 300,
                   itemBuilder: (context, index) {
                     final purchase = state.purchases[index];
                     return PurchaseItemCard(purchase: purchase);

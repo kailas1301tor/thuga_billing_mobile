@@ -9,6 +9,7 @@ import 'package:thuga/utils/common_widgets/common_dialog_box.dart';
 import 'package:thuga/utils/common_widgets/common_empty_state.dart';
 import 'package:thuga/utils/common_widgets/common_scaffold.dart';
 import 'package:thuga/utils/common_widgets/common_switch_state.dart';
+import 'package:thuga/utils/common_widgets/web/responsive_list_grid.dart';
 
 import '../notifier/calculation_list_notifier.dart';
 import 'calculation_detail_screen.dart';
@@ -66,9 +67,10 @@ class CalculationScreen extends ConsumerWidget {
                   ).then((_) => notifier.refresh());
                 },
               )
-            : ListView.builder(
+            : ResponsiveListGrid(
                 padding: EdgeInsets.all(20.w),
                 itemCount: bills.length,
+                minItemWidth: 320,
                 itemBuilder: (context, index) {
                   final summary = bills[index];
                   return CalculationBillCard(

@@ -9,6 +9,11 @@ import 'package:thuga/firebase_options.dart';
 bool isFirebaseInitialized = false;
 
 Future<void> initializeFirebase() async {
+  if (kIsWeb) {
+    debugPrint('🟡 FIREBASE: skipped on web (not configured)');
+    return;
+  }
+
   try {
     if (Firebase.apps.isNotEmpty) {
       isFirebaseInitialized = true;

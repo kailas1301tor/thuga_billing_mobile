@@ -1,4 +1,5 @@
-// /Users/wac/Documents/wac projects/tsuite/lib/utils/common_widgets/common_dialog_box.dart
+// lib/utils/common_widgets/common_dialog_box.dart
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:thuga/res/constants/string_constants.dart';
@@ -14,7 +15,7 @@ class CommonDialogBox extends StatelessWidget {
     required this.primaryLabel,
     required this.onPrimary,
     this.secondaryLabel,
-    this.onSecondary, 
+    this.onSecondary,
     this.isLoadingPrimary = false,
     this.autoPop = true,
   });
@@ -27,6 +28,8 @@ class CommonDialogBox extends StatelessWidget {
   final VoidCallback? onSecondary;
   final bool isLoadingPrimary;
   final bool autoPop;
+
+  static const double _maxDialogWidth = 400;
 
   static Future<T?> show<T>({
     required BuildContext context,
@@ -55,52 +58,69 @@ class CommonDialogBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final horizontalInset = kIsWeb ? 24.0 : 24.w;
+    final contentPadding = kIsWeb ? 24.0 : 24.r;
+    final buttonWidth = kIsWeb ? 120.0 : 128.w;
+    final buttonHeight = kIsWeb ? 44.0 : 48.h;
 
     return Dialog(
-      insetPadding: EdgeInsets.symmetric(horizontal: 24.w),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.r)),
-      child: Padding(
-        padding: EdgeInsets.all(24.r),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: FontPalette.base700(20, color: colors.primaryText),
-            ),
-            12.verticalSpace,
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: FontPalette.base400(14, color: colors.secondaryText),
-            ),
-            24.verticalSpace,
-            SizedBox(
-              width: double.maxFinite,
-              child: PrimaryButton(
-                text: primaryLabel,
-                isLoading: isLoadingPrimary,
-                onPressed: () {
-                  if (autoPop) Navigator.of(context).pop();
-                  onPrimary();
-                },
+      insetPadding: EdgeInsets.symmetric(horizontal: horizontalInset),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(kIsWeb ? 16 : 24.r),
+      ),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: _maxDialogWidth),
+        child: Padding(
+          padding: EdgeInsets.all(contentPadding),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                title,
+                textAlign: TextAlign.start,
+                style: FontPalette.base700(20, color: colors.primaryText),
               ),
-            ),
-            if (secondaryLabel != null) ...[
-              8.verticalSpace,
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  onSecondary?.call();
-                },
-                child: Text(
-                  secondaryLabel ?? Strings.cancel,
-                  style: FontPalette.base600(14, color: colors.secondaryText),
-                ),
+              SizedBox(height: kIsWeb ? 12 : 12.h),
+              Text(
+                message,
+                textAlign: TextAlign.start,
+                style: FontPalette.base400(14, color: colors.secondaryText),
+              ),
+              SizedBox(height: kIsWeb ? 24 : 24.h),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  if (secondaryLabel != null) ...[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        onSecondary?.call();
+                      },
+                      child: Text(
+                        secondaryLabel ?? Strings.cancel,
+                        style: FontPalette.base600(
+                          14,
+                          color: colors.secondaryText,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: kIsWeb ? 8 : 8.w),
+                  ],
+                  PrimaryButton(
+                    width: buttonWidth,
+                    height: buttonHeight,
+                    text: primaryLabel,
+                    isLoading: isLoadingPrimary,
+                    onPressed: () {
+                      if (autoPop) Navigator.of(context).pop();
+                      onPrimary();
+                    },
+                  ),
+                ],
               ),
             ],
-          ],
+          ),
         ),
       ),
     );

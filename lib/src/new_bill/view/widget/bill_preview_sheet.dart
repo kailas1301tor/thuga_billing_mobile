@@ -1,11 +1,9 @@
 // lib/src/new_bill/view/widget/bill_preview_sheet.dart
-import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:thuga/res/constants/string_constants.dart';
 import 'package:thuga/res/styles/color_palette.dart';
@@ -16,6 +14,7 @@ import 'package:thuga/src/settings/notifier/settings_notifier.dart';
 import 'package:thuga/utils/common_widgets/primary_button.dart';
 import 'package:thuga/utils/helpers/extensions.dart';
 import 'package:thuga/utils/helpers/receipt_print_helper.dart';
+import 'package:thuga/utils/helpers/share_image_helper.dart';
 import 'package:thuga/utils/helpers/toast_helper.dart';
 
 class BillPreviewSheet extends ConsumerStatefulWidget {
@@ -111,15 +110,10 @@ class _BillPreviewSheetState extends ConsumerState<BillPreviewSheet> {
 
       final pngBytes = byteData.buffer.asUint8List();
 
-      final tempDir = await getTemporaryDirectory();
-      final tempFile = File('${tempDir.path}/invoice_${widget.orderNumber}.png');
-      await tempFile.writeAsBytes(pngBytes);
-
-      await SharePlus.instance.share(
-        ShareParams(
-          files: [XFile(tempFile.path)],
-          text: 'Invoice ${widget.orderNumber}',
-        ),
+      await sharePngBytes(
+        bytes: pngBytes,
+        fileName: 'invoice_${widget.orderNumber}.png',
+        shareText: 'Invoice ${widget.orderNumber}',
       );
     } catch (e) {
       debugPrint("🔴 SHARE IMAGE ERROR: $e");

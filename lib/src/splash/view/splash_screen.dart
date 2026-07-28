@@ -1,10 +1,10 @@
 // lib/src/splash/view/splash_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:thuga/res/constants/string_constants.dart';
 import 'package:thuga/res/styles/color_palette.dart';
 import 'package:thuga/res/styles/font_palette.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:thuga/utils/common_widgets/common_scaffold.dart';
 
 import '../notifier/splash_notifier.dart';
@@ -61,7 +61,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       splashProvider.select((state) => state.pendingRoute),
       (previous, next) {
         if (next == null || !context.mounted) return;
-        Navigator.pushNamedAndRemoveUntil(context, next, (_) => false);
+        context.go(next);
       },
     );
 
@@ -85,7 +85,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                   Strings.appName,
                   style: FontPalette.base700(36, color: colors.primary),
                 ),
-                8.verticalSpace,
+                const SizedBox(height: 8),
                 Text(
                   'Your Store Partner',
                   style: FontPalette.base400(14, color: colors.secondaryText),

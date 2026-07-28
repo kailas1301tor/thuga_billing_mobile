@@ -14,6 +14,7 @@ import 'package:thuga/utils/common_widgets/common_switch_state.dart';
 import 'package:thuga/utils/common_widgets/common_text_form_field.dart';
 import 'package:thuga/utils/common_widgets/common_search_bar.dart';
 import 'package:thuga/utils/common_widgets/common_refresh_indicator.dart';
+import 'package:thuga/utils/common_widgets/web/responsive_list_grid.dart';
 import 'package:thuga/utils/common_widgets/primary_button.dart';
 import 'widget/category_card_widget.dart';
 import '../model/category_model.dart';
@@ -78,31 +79,29 @@ class CategoryCrudScreen extends ConsumerWidget {
               buttonText: Strings.addCategory,
               child: CommonRefreshIndicator(
                 onRefresh: () => notifier.fetchCategories(),
-                child: ListView.builder(
+                child: ResponsiveListGrid(
                   controller: notifier.scrollController,
                   physics: const AlwaysScrollableScrollPhysics(),
                   padding: EdgeInsets.symmetric(
                     horizontal: 16.w,
                     vertical: 8.h,
                   ),
-                  itemCount:
-                      (categoryList ?? []).length + (isLoadingMore ? 1 : 0),
-                  itemBuilder: (context, index) {
-                    if (index == (categoryList ?? []).length) {
-                      return Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16.h),
-                        child: Center(
-                          child: SizedBox(
-                            width: 24.r,
-                            height: 24.r,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2.w,
-                              color: colors.primary,
-                            ),
-                          ),
+                  itemCount: (categoryList ?? []).length,
+                  isLoadingMore: isLoadingMore,
+                  loadingIndicator: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16.h),
+                    child: Center(
+                      child: SizedBox(
+                        width: 24.r,
+                        height: 24.r,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.w,
+                          color: colors.primary,
                         ),
-                      );
-                    }
+                      ),
+                    ),
+                  ),
+                  itemBuilder: (context, index) {
                     final category = (categoryList ?? [])[index];
                     return CategoryCardWidget(
                       category: category,

@@ -19,9 +19,16 @@ import '../../notifier/settings_notifier.dart';
 import '../../model/settings_model.dart';
 
 class SettingsContentWidget extends ConsumerWidget {
-  const SettingsContentWidget({super.key, required this.settings});
+  const SettingsContentWidget({
+    super.key,
+    required this.settings,
+    this.embeddedInParentScroll = false,
+  });
 
   final SettingsModel settings;
+
+  /// When true, defers scrolling to a parent [CustomScrollView] (e.g. web layout).
+  final bool embeddedInParentScroll;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -33,11 +40,9 @@ class SettingsContentWidget extends ConsumerWidget {
         ? settings.storeName.trim()[0].toUpperCase()
         : 'S';
 
-    return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
+    final content = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
           // 1. Store Profile Section (Avatar + Company Details)
           _buildSectionHeader(context, 'Store Profile'),
           12.verticalSpace,
@@ -170,7 +175,15 @@ class SettingsContentWidget extends ConsumerWidget {
           ),
           20.verticalSpace,
         ],
-      ),
+    );
+
+    if (embeddedInParentScroll) {
+      return content;
+    }
+
+    return SingleChildScrollView(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      child: content,
     );
   }
 

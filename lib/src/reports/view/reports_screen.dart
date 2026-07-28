@@ -1,39 +1,17 @@
 // lib/src/reports/view/reports_screen.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:thuga/res/constants/string_constants.dart';
-import 'package:thuga/res/styles/color_palette.dart';
-import 'package:thuga/utils/common_widgets/common_app_bar.dart';
-import 'package:thuga/utils/common_widgets/common_refresh_indicator.dart';
-import 'package:thuga/utils/common_widgets/common_scaffold.dart';
-import 'package:thuga/utils/common_widgets/common_switch_state.dart';
-import '../notifier/reports_notifier.dart';
-import 'widget/reports_content_widget.dart';
+import 'package:thuga/src/reports/view/mobile/reports_mobile_screen.dart';
+import 'package:thuga/src/reports/view/web/reports_web_screen.dart';
+import 'package:thuga/utils/common_widgets/platform_screen.dart';
 
-class ReportsScreen extends ConsumerWidget {
+class ReportsScreen extends StatelessWidget {
   const ReportsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final colors = context.appColors;
-    final loaderState = ref.watch(
-      reportsProvider.select((s) => s.loaderState),
-    );
-    final data = ref.watch(reportsProvider.select((s) => s.data));
-
-    return CommonScaffold(
-      backgroundColor: colors.background,
-      appBar: CommonAppBar(title: Strings.reportsTitle, showBackButton: false),
-      body: CommonRefreshIndicator(
-        onRefresh: () =>
-            ref.read(reportsProvider.notifier).fetchReportsData(),
-        child: CommonSwitchState(
-          loaderState: loaderState,
-          reload: () =>
-              ref.read(reportsProvider.notifier).fetchReportsData(),
-          child: ReportsContentWidget(data: data),
-        ),
-      ),
+  Widget build(BuildContext context) {
+    return PlatformScreen(
+      mobile: (context) => const ReportsMobileScreen(),
+      web: (context) => const ReportsWebScreen(),
     );
   }
 }

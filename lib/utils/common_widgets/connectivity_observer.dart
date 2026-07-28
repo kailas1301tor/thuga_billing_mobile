@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:thuga/services/connectivity_service.dart';
@@ -26,6 +27,8 @@ class _ConnectivityObserverState extends ConsumerState<ConnectivityObserver> {
 
   @override
   Widget build(BuildContext context) {
+    if (kIsWeb) return widget.child;
+
     ref.listen<AsyncValue<bool>>(connectivityStatusProvider, (previous, next) {
       final isOnline = next.value ?? true;
 

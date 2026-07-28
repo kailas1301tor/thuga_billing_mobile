@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:thuga/res/constants/string_constants.dart';
 import 'package:thuga/res/styles/color_palette.dart';
 import 'package:thuga/res/styles/font_palette.dart';
+import 'package:go_router/go_router.dart';
 import 'package:thuga/utils/routes/route_constants.dart';
 
 class LoginFooterWidget extends StatelessWidget {
   const LoginFooterWidget({super.key});
 
   void _onSignUpTap(BuildContext context) {
-    Navigator.pushNamed(context, RouteConstants.routeRegisterScreen);
+    context.push(RouteConstants.routeRegisterScreen);
   }
 
   @override

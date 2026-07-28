@@ -7,7 +7,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:thuga/data/local/sembast_services.dart';
 import 'package:thuga/services/token_service.dart';
 import 'package:thuga/utils/routes/route_constants.dart';
-import 'package:thuga/res/constants/app_constants.dart';
 
 import '../state/splash_state.dart';
 
@@ -45,6 +44,7 @@ class SplashNotifier extends _$SplashNotifier {
 
       String? accessToken;
       try {
+        await tokenService.hydrateSession();
         accessToken = await tokenService
             .getAccessToken()
             .timeout(const Duration(seconds: 2));
@@ -60,7 +60,6 @@ class SplashNotifier extends _$SplashNotifier {
 
       final hasSession = accessToken != null && accessToken.isNotEmpty;
       if (hasSession) {
-        AppConstants.accessToken = accessToken;
         final userId = await tokenService.getUserId();
         if (!ref.mounted) return;
         if (userId != null && userId.isNotEmpty) {
