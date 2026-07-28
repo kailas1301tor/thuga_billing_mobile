@@ -1,6 +1,6 @@
 // lib/src/bills/notifier/bill_detail_notifier.dart
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:vyapapp/services/repo_di.dart';
+import 'package:thuga/services/repo_di.dart';
 import '../model/bill_detail_model.dart';
 
 part 'bill_detail_notifier.g.dart';

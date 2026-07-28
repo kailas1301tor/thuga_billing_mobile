@@ -6,21 +6,57 @@ part of 'products_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$productsNotifierHash() => r'e446780bbfccf186b87e3fe92dabafb3e8750ba9';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [ProductsNotifier].
 @ProviderFor(ProductsNotifier)
-final productsNotifierProvider =
-    AutoDisposeNotifierProvider<ProductsNotifier, ProductsState>.internal(
-      ProductsNotifier.new,
-      name: r'productsNotifierProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$productsNotifierHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+final productsProvider = ProductsNotifierProvider._();
 
-typedef _$ProductsNotifier = AutoDisposeNotifier<ProductsState>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class ProductsNotifierProvider
+    extends $NotifierProvider<ProductsNotifier, ProductsState> {
+  ProductsNotifierProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'productsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$productsNotifierHash();
+
+  @$internal
+  @override
+  ProductsNotifier create() => ProductsNotifier();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(ProductsState value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<ProductsState>(value),
+    );
+  }
+}
+
+String _$productsNotifierHash() => r'e05ae7fe0952ff612e11eb4e32a5a405c9408d90';
+
+abstract class _$ProductsNotifier extends $Notifier<ProductsState> {
+  ProductsState build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<ProductsState, ProductsState>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<ProductsState, ProductsState>,
+              ProductsState,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}

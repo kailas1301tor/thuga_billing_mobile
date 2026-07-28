@@ -1,5 +1,5 @@
 // lib/src/bills/model/bill_detail_model.dart
-import 'package:vyapapp/utils/helpers/safe_converters.dart';
+import 'package:thuga/utils/helpers/safe_converters.dart';
 
 class BillDetailItemModel {
   const BillDetailItemModel({

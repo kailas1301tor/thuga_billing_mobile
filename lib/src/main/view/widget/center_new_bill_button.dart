@@ -1,7 +1,7 @@
 // lib/src/main/view/widget/center_new_bill_button.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/color_palette.dart';
 
 class CenterNewBillButton extends StatelessWidget {
   const CenterNewBillButton({

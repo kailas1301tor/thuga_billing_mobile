@@ -2,11 +2,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/res/styles/font_palette.dart';
-import 'package:vyapapp/utils/common_widgets/common_container.dart';
-import 'package:vyapapp/utils/common_widgets/common_cached_network_image.dart';
-import 'package:vyapapp/utils/helpers/extensions.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/font_palette.dart';
+import 'package:thuga/utils/common_widgets/common_container.dart';
+import 'package:thuga/utils/common_widgets/common_cached_network_image.dart';
+import 'package:thuga/utils/helpers/extensions.dart';
 import '../../notifier/reports_notifier.dart';
 import '../../model/reports_model.dart';
 import 'reports_metrics_grid.dart';
@@ -22,9 +22,9 @@ class ReportsContentWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final selectedRange = ref.watch(
-      reportsNotifierProvider.select((s) => s.selectedRange),
+      reportsProvider.select((s) => s.selectedRange),
     );
-    final notifier = ref.read(reportsNotifierProvider.notifier);
+    final notifier = ref.read(reportsProvider.notifier);
 
     final ranges = ['Today', 'Yesterday', 'Last 7 Days', 'This Month'];
 

@@ -1,10 +1,10 @@
 // lib/src/calculation/repo/calculation_repository.dart
 import 'package:either_dart/either.dart';
-import 'package:vyapapp/data/local/sembast_services.dart';
-import 'package:vyapapp/data/remote/network_base_services.dart';
-import 'package:vyapapp/data/remote/network_services.dart';
-import 'package:vyapapp/res/constants/app_constants.dart';
-import 'package:vyapapp/utils/helpers/safe_converters.dart';
+import 'package:thuga/data/local/sembast_services.dart';
+import 'package:thuga/data/remote/network_base_services.dart';
+import 'package:thuga/data/remote/network_services.dart';
+import 'package:thuga/res/constants/app_constants.dart';
+import 'package:thuga/utils/helpers/safe_converters.dart';
 
 import '../model/calculation_bill_model.dart';
 import '../model/calculation_catalog_model.dart';

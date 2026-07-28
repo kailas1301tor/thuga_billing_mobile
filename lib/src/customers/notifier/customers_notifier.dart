@@ -2,12 +2,12 @@
 import 'package:flutter/material.dart';
 import 'package:either_dart/either.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:vyapapp/res/enums/enums.dart';
-import 'package:vyapapp/services/repo_di.dart';
-import 'package:vyapapp/utils/helpers/api_error_handler.dart';
-import 'package:vyapapp/utils/helpers/toast_helper.dart';
-import 'package:vyapapp/utils/helpers/debounce_helper.dart';
-import 'package:vyapapp/src/main/notifier/dropdowns_notifier.dart';
+import 'package:thuga/res/enums/enums.dart';
+import 'package:thuga/services/repo_di.dart';
+import 'package:thuga/utils/helpers/api_error_handler.dart';
+import 'package:thuga/utils/helpers/toast_helper.dart';
+import 'package:thuga/utils/helpers/debounce_helper.dart';
+import 'package:thuga/src/main/notifier/dropdowns_notifier.dart';
 import '../model/customer_model.dart';
 import '../state/customers_state.dart';
 
@@ -180,7 +180,7 @@ class CustomersNotifier extends _$CustomersNotifier {
         clearForm();
         showCustomToast(message: right.message);
         fetchCustomers(showLoader: false);
-        ref.read(dropdownsNotifierProvider.notifier).refreshDropdowns();
+        ref.read(dropdownsProvider.notifier).refreshDropdowns();
         state = state.copyWith(saveCustomerLoader: false);
         return true;
       },
@@ -215,7 +215,7 @@ class CustomersNotifier extends _$CustomersNotifier {
         clearForm();
         showCustomToast(message: right.message);
         fetchCustomers(showLoader: false);
-        ref.read(dropdownsNotifierProvider.notifier).refreshDropdowns();
+        ref.read(dropdownsProvider.notifier).refreshDropdowns();
         state = state.copyWith(updateCustomerLoader: false);
         return true;
       },
@@ -235,7 +235,7 @@ class CustomersNotifier extends _$CustomersNotifier {
         debugPrint("🟢 API SUCCESS: ${right.message}");
         showCustomToast(message: right.message);
         fetchCustomers(showLoader: false);
-        ref.read(dropdownsNotifierProvider.notifier).refreshDropdowns();
+        ref.read(dropdownsProvider.notifier).refreshDropdowns();
         state = state.copyWith(deleteCustomerLoader: false);
         return true;
       },

@@ -1,5 +1,5 @@
 // lib/utils/helpers/bill_tax_helper.dart
-import 'package:vyapapp/src/new_bill/model/new_bill_model.dart';
+import 'package:thuga/src/new_bill/model/new_bill_model.dart';
 
 class BillTotals {
   const BillTotals({

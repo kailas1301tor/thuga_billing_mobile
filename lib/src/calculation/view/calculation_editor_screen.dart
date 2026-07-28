@@ -3,21 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tuple/tuple.dart';
-import 'package:vyapapp/res/constants/string_constants.dart';
-import 'package:vyapapp/res/enums/enums.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/res/styles/font_palette.dart';
-import 'package:vyapapp/src/main/model/dropdown_model.dart';
-import 'package:vyapapp/src/main/notifier/dropdowns_notifier.dart';
-import 'package:vyapapp/utils/common_widgets/bottomsheet_content.dart';
-import 'package:vyapapp/utils/common_widgets/common_app_bar.dart';
-import 'package:vyapapp/utils/common_widgets/common_dialog_box.dart';
-import 'package:vyapapp/utils/common_widgets/common_loader.dart';
-import 'package:vyapapp/utils/common_widgets/common_scaffold.dart';
-import 'package:vyapapp/utils/common_widgets/common_text_form_field.dart';
-import 'package:vyapapp/utils/common_widgets/primary_button.dart';
-import 'package:vyapapp/utils/helpers/calculation_total_helper.dart';
-import 'package:vyapapp/utils/helpers/extensions.dart';
+import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/res/enums/enums.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/font_palette.dart';
+import 'package:thuga/src/main/model/dropdown_model.dart';
+import 'package:thuga/src/main/notifier/dropdowns_notifier.dart';
+import 'package:thuga/utils/common_widgets/bottomsheet_content.dart';
+import 'package:thuga/utils/common_widgets/common_app_bar.dart';
+import 'package:thuga/utils/common_widgets/common_dialog_box.dart';
+import 'package:thuga/utils/common_widgets/common_loader.dart';
+import 'package:thuga/utils/common_widgets/common_scaffold.dart';
+import 'package:thuga/utils/common_widgets/common_text_form_field.dart';
+import 'package:thuga/utils/common_widgets/primary_button.dart';
+import 'package:thuga/utils/helpers/calculation_total_helper.dart';
+import 'package:thuga/utils/helpers/extensions.dart';
 
 import '../notifier/calculation_editor_notifier.dart';
 import 'calculation_detail_screen.dart';
@@ -34,7 +34,7 @@ class CalculationEditorScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
-    final provider = calculationEditorNotifierProvider(billId);
+    final provider = calculationEditorProvider(billId);
     final notifier = ref.read(provider.notifier);
     final isEditing = billId != null && billId!.isNotEmpty;
 
@@ -69,10 +69,10 @@ class CalculationEditorScreen extends ConsumerWidget {
     final products = editorData.item4;
 
     final customers = ref.watch(
-      dropdownsNotifierProvider.select((s) => s.data.customers),
+      dropdownsProvider.select((s) => s.data.customers),
     );
     final customersLoader = ref.watch(
-      dropdownsNotifierProvider.select((s) => s.loaderState),
+      dropdownsProvider.select((s) => s.loaderState),
     );
 
     final addedIds = sections.map((s) => s.customerId).toSet();

@@ -2,11 +2,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/res/styles/font_palette.dart';
-import 'package:vyapapp/utils/common_widgets/common_text_form_field.dart';
-import 'package:vyapapp/utils/common_widgets/primary_button.dart';
-import 'package:vyapapp/utils/helpers/extensions.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/font_palette.dart';
+import 'package:thuga/utils/common_widgets/common_text_form_field.dart';
+import 'package:thuga/utils/common_widgets/primary_button.dart';
+import 'package:thuga/utils/helpers/extensions.dart';
 import '../../model/new_bill_model.dart';
 
 class AmountEntryView extends StatelessWidget {

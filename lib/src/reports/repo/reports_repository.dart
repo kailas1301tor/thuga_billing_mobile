@@ -1,9 +1,9 @@
 // lib/src/reports/repo/reports_repository.dart
 import 'package:either_dart/either.dart';
-import 'package:vyapapp/data/remote/network_base_services.dart';
-import 'package:vyapapp/data/remote/network_services.dart';
-import 'package:vyapapp/res/constants/app_constants.dart';
-import 'package:vyapapp/utils/helpers/safe_converters.dart';
+import 'package:thuga/data/remote/network_base_services.dart';
+import 'package:thuga/data/remote/network_services.dart';
+import 'package:thuga/res/constants/app_constants.dart';
+import 'package:thuga/utils/helpers/safe_converters.dart';
 import '../model/reports_model.dart';
 
 abstract class ReportsRepo {

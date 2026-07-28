@@ -2,16 +2,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/res/constants/string_constants.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/res/styles/font_palette.dart';
-import 'package:vyapapp/utils/common_widgets/common_app_bar.dart';
-import 'package:vyapapp/utils/common_widgets/common_container.dart';
-import 'package:vyapapp/utils/common_widgets/common_nav_bar_button.dart';
-import 'package:vyapapp/utils/common_widgets/common_scaffold.dart';
-import 'package:vyapapp/utils/common_widgets/common_switch_state.dart';
-import 'package:vyapapp/utils/helpers/calculation_total_helper.dart';
-import 'package:vyapapp/utils/helpers/extensions.dart';
+import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/font_palette.dart';
+import 'package:thuga/utils/common_widgets/common_app_bar.dart';
+import 'package:thuga/utils/common_widgets/common_container.dart';
+import 'package:thuga/utils/common_widgets/common_nav_bar_button.dart';
+import 'package:thuga/utils/common_widgets/common_scaffold.dart';
+import 'package:thuga/utils/common_widgets/common_switch_state.dart';
+import 'package:thuga/utils/helpers/calculation_total_helper.dart';
+import 'package:thuga/utils/helpers/extensions.dart';
 
 import '../notifier/calculation_detail_notifier.dart';
 import 'calculation_editor_screen.dart';
@@ -25,8 +25,8 @@ class CalculationDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
-    final state = ref.watch(calculationDetailNotifierProvider(billId));
-    final notifier = ref.read(calculationDetailNotifierProvider(billId).notifier);
+    final state = ref.watch(calculationDetailProvider(billId));
+    final notifier = ref.read(calculationDetailProvider(billId).notifier);
     final bill = state.bill;
     final prices = buildCalculationPriceMap(state.categories);
 

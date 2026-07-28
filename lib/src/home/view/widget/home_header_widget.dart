@@ -1,11 +1,11 @@
 // lib/src/home/view/widget/home_header_widget.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/res/constants/string_constants.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/res/styles/font_palette.dart';
-import 'package:vyapapp/utils/common_widgets/common_container.dart';
-import 'package:vyapapp/utils/common_widgets/common_nav_bar_button.dart';
+import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/font_palette.dart';
+import 'package:thuga/utils/common_widgets/common_container.dart';
+import 'package:thuga/utils/common_widgets/common_nav_bar_button.dart';
 
 class HomeHeaderWidget extends StatelessWidget {
   const HomeHeaderWidget({

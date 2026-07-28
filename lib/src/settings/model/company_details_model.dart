@@ -1,5 +1,5 @@
 // lib/src/settings/model/company_details_model.dart
-import 'package:vyapapp/utils/helpers/safe_converters.dart';
+import 'package:thuga/utils/helpers/safe_converters.dart';
 
 class CompanyDetailsModel {
   final int id;

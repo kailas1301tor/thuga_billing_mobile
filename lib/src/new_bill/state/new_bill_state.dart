@@ -1,6 +1,6 @@
 // lib/src/new_bill/state/new_bill_state.dart
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:vyapapp/res/enums/enums.dart';
+import 'package:thuga/res/enums/enums.dart';
 import '../../main/model/dropdown_model.dart';
 import '../model/new_bill_model.dart';
 

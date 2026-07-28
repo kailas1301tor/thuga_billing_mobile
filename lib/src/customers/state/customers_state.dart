@@ -1,6 +1,6 @@
 // lib/src/customers/state/customers_state.dart
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:vyapapp/res/enums/enums.dart';
+import 'package:thuga/res/enums/enums.dart';
 import '../model/customer_model.dart';
 
 part 'customers_state.freezed.dart';

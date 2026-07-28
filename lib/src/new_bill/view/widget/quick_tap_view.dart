@@ -2,17 +2,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/res/constants/string_constants.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/res/styles/font_palette.dart';
-import 'package:vyapapp/utils/common_widgets/common_bottom_sheet.dart';
-import 'package:vyapapp/utils/common_widgets/common_search_bar.dart';
-import 'package:vyapapp/utils/common_widgets/common_text_form_field.dart';
-import 'package:vyapapp/utils/common_widgets/primary_button.dart';
-import 'package:vyapapp/utils/helpers/extensions.dart';
-import 'package:vyapapp/utils/helpers/product_stock_helper.dart';
-import 'package:vyapapp/utils/helpers/toast_helper.dart';
-import 'package:vyapapp/utils/common_widgets/bottomsheet_content.dart';
+import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/font_palette.dart';
+import 'package:thuga/utils/common_widgets/common_bottom_sheet.dart';
+import 'package:thuga/utils/common_widgets/common_search_bar.dart';
+import 'package:thuga/utils/common_widgets/common_text_form_field.dart';
+import 'package:thuga/utils/common_widgets/primary_button.dart';
+import 'package:thuga/utils/helpers/extensions.dart';
+import 'package:thuga/utils/helpers/product_stock_helper.dart';
+import 'package:thuga/utils/helpers/toast_helper.dart';
+import 'package:thuga/utils/common_widgets/bottomsheet_content.dart';
 import '../../../main/model/dropdown_model.dart';
 import '../../../main/notifier/dropdowns_notifier.dart';
 import '../../model/new_bill_model.dart';
@@ -30,29 +30,29 @@ class QuickTapView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
-    final notifier = ref.read(newBillNotifierProvider.notifier);
+    final notifier = ref.read(newBillProvider.notifier);
 
     // Watched state fields for granular rebuilds
     final selectedCategory = ref.watch(
-      newBillNotifierProvider.select((s) => s.selectedCategory),
+      newBillProvider.select((s) => s.selectedCategory),
     );
     final isCartExpanded = ref.watch(
-      newBillNotifierProvider.select((s) => s.isCartExpanded),
+      newBillProvider.select((s) => s.isCartExpanded),
     );
     final products = ref.watch(
-      newBillNotifierProvider.select((s) => s.products),
+      newBillProvider.select((s) => s.products),
     );
     final isLoadingMore = ref.watch(
-      newBillNotifierProvider.select((s) => s.isLoadingMore),
+      newBillProvider.select((s) => s.isLoadingMore),
     );
-    final cartItems = ref.watch(newBillNotifierProvider.select((s) => s.cart));
+    final cartItems = ref.watch(newBillProvider.select((s) => s.cart));
     final discountAmount = ref.watch(
-      newBillNotifierProvider.select((s) => s.discountAmount),
+      newBillProvider.select((s) => s.discountAmount),
     );
     final selectedCustomer = ref.watch(
-      newBillNotifierProvider.select((s) => s.selectedCustomer),
+      newBillProvider.select((s) => s.selectedCustomer),
     );
-    final dropdownsState = ref.watch(dropdownsNotifierProvider);
+    final dropdownsState = ref.watch(dropdownsProvider);
     final customerList = dropdownsState.data.customers;
     final customersLoader = dropdownsState.loaderState;
 
@@ -545,7 +545,7 @@ class QuickTapView extends ConsumerWidget {
     WidgetRef ref,
     CartItemModel item,
   ) {
-    final notifier = ref.read(newBillNotifierProvider.notifier);
+    final notifier = ref.read(newBillProvider.notifier);
     CommonBottomSheet.show(
       context: context,
       title: 'Item Discount',
@@ -573,8 +573,8 @@ class QuickTapView extends ConsumerWidget {
 
   void _showDiscountDialog(BuildContext context, WidgetRef ref, double subtotal) {
     final colors = context.appColors;
-    final notifier = ref.read(newBillNotifierProvider.notifier);
-    final currentDiscount = ref.read(newBillNotifierProvider.select((s) => s.discountAmount));
+    final notifier = ref.read(newBillProvider.notifier);
+    final currentDiscount = ref.read(newBillProvider.select((s) => s.discountAmount));
     final controller = TextEditingController(text: currentDiscount > 0 ? currentDiscount.toStringAsFixed(2) : '');
 
     showDialog(

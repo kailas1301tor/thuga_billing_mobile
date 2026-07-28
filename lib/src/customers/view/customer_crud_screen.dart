@@ -3,19 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tuple/tuple.dart';
-import 'package:vyapapp/res/constants/string_constants.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/utils/common_widgets/common_app_bar.dart';
-import 'package:vyapapp/utils/common_widgets/common_bottom_sheet.dart';
-import 'package:vyapapp/utils/common_widgets/common_cached_network_image.dart';
-import 'package:vyapapp/utils/common_widgets/common_dialog_box.dart';
-import 'package:vyapapp/utils/common_widgets/common_nav_bar_button.dart';
-import 'package:vyapapp/utils/common_widgets/common_scaffold.dart';
-import 'package:vyapapp/utils/common_widgets/common_switch_state.dart';
-import 'package:vyapapp/utils/common_widgets/common_text_form_field.dart';
-import 'package:vyapapp/utils/common_widgets/common_search_bar.dart';
-import 'package:vyapapp/utils/common_widgets/common_refresh_indicator.dart';
-import 'package:vyapapp/utils/common_widgets/primary_button.dart';
+import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/utils/common_widgets/common_app_bar.dart';
+import 'package:thuga/utils/common_widgets/common_bottom_sheet.dart';
+import 'package:thuga/utils/common_widgets/common_cached_network_image.dart';
+import 'package:thuga/utils/common_widgets/common_dialog_box.dart';
+import 'package:thuga/utils/common_widgets/common_nav_bar_button.dart';
+import 'package:thuga/utils/common_widgets/common_scaffold.dart';
+import 'package:thuga/utils/common_widgets/common_switch_state.dart';
+import 'package:thuga/utils/common_widgets/common_text_form_field.dart';
+import 'package:thuga/utils/common_widgets/common_search_bar.dart';
+import 'package:thuga/utils/common_widgets/common_refresh_indicator.dart';
+import 'package:thuga/utils/common_widgets/primary_button.dart';
 import 'widget/customer_card_widget.dart';
 import '../model/customer_model.dart';
 import '../notifier/customers_notifier.dart';
@@ -27,15 +27,15 @@ class CustomerCrudScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final loaderState = ref.watch(
-      customersNotifierProvider.select((s) => s.loaderState),
+      customersProvider.select((s) => s.loaderState),
     );
     final customerList = ref.watch(
-      customersNotifierProvider.select((s) => s.response?.results.data),
+      customersProvider.select((s) => s.response?.results.data),
     );
     final isLoadingMore = ref.watch(
-      customersNotifierProvider.select((s) => s.isLoadingMore),
+      customersProvider.select((s) => s.isLoadingMore),
     );
-    final notifier = ref.read(customersNotifierProvider.notifier);
+    final notifier = ref.read(customersProvider.notifier);
 
     return CommonScaffold(
       backgroundColor: colors.background,
@@ -177,7 +177,7 @@ class CustomerCrudScreen extends ConsumerWidget {
               Consumer(
                 builder: (context, ref, _) {
                   final loaders = ref.watch(
-                    customersNotifierProvider.select(
+                    customersProvider.select(
                       (s) =>
                           Tuple2(s.saveCustomerLoader, s.updateCustomerLoader),
                     ),
@@ -231,7 +231,7 @@ class CustomerCrudScreen extends ConsumerWidget {
       builder: (_) => Consumer(
         builder: (context, ref, _) {
           final isDeleting = ref.watch(
-            customersNotifierProvider.select(
+            customersProvider.select(
               (value) => value.deleteCustomerLoader,
             ),
           );

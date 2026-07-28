@@ -1,5 +1,5 @@
 // lib/src/products/model/product_crud_model.dart
-import 'package:vyapapp/utils/helpers/safe_converters.dart';
+import 'package:thuga/utils/helpers/safe_converters.dart';
 
 /// GET /api/products
 class ProductResponse {

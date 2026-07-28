@@ -1,6 +1,6 @@
 // lib/src/calculation/state/calculation_detail_state.dart
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:vyapapp/res/enums/enums.dart';
+import 'package:thuga/res/enums/enums.dart';
 
 import '../model/calculation_bill_model.dart';
 import '../model/calculation_catalog_model.dart';

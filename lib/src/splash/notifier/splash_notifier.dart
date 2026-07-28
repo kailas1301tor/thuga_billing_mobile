@@ -1,45 +1,51 @@
 // lib/src/splash/notifier/splash_notifier.dart
 import 'dart:async';
 
+import 'package:thuga/services/firebase_service.dart';
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:vyapapp/data/local/sembast_services.dart';
-import 'package:vyapapp/services/token_service.dart';
-import 'package:vyapapp/utils/routes/route_constants.dart';
-import 'package:vyapapp/res/constants/app_constants.dart';
+import 'package:thuga/data/local/sembast_services.dart';
+import 'package:thuga/services/token_service.dart';
+import 'package:thuga/utils/routes/route_constants.dart';
+import 'package:thuga/res/constants/app_constants.dart';
 
 import '../state/splash_state.dart';
 
 part 'splash_notifier.g.dart';
 
-@Riverpod(keepAlive: false)
+@Riverpod(keepAlive: true)
 class SplashNotifier extends _$SplashNotifier {
   @override
   SplashState build() => const SplashState();
 
-  Future<void> initialize(BuildContext context) async {
+  Future<void> initialize() async {
+    if (!ref.mounted) return;
     if (state.status != SplashStatus.idle) return;
 
     state = state.copyWith(status: SplashStatus.checking);
     debugPrint('🔵 ACTION: splash initialize called');
 
-    // Initialize Sembast Database
+    final sembast = ref.read(sembastServicesProvider);
+    final tokenService = ref.read(tokenServiceProvider);
+
     try {
-      await ref.read(sembastServicesProvider).initialize();
+      await sembast.initialize();
       debugPrint('🟢 Sembast database initialized successfully');
     } catch (e) {
       debugPrint('🔴 Sembast initialization error: $e');
     }
 
+    if (!ref.mounted) return;
+
     var route = RouteConstants.routeLoginScreen;
 
     try {
       await Future<void>.delayed(const Duration(milliseconds: 1500));
+      if (!ref.mounted) return;
 
       String? accessToken;
       try {
-        accessToken = await ref
-            .read(tokenServiceProvider)
+        accessToken = await tokenService
             .getAccessToken()
             .timeout(const Duration(seconds: 2));
       } on TimeoutException catch (e) {
@@ -50,9 +56,16 @@ class SplashNotifier extends _$SplashNotifier {
         accessToken = null;
       }
 
+      if (!ref.mounted) return;
+
       final hasSession = accessToken != null && accessToken.isNotEmpty;
       if (hasSession) {
         AppConstants.accessToken = accessToken;
+        final userId = await tokenService.getUserId();
+        if (!ref.mounted) return;
+        if (userId != null && userId.isNotEmpty) {
+          await safeCrashlyticsSetUserIdentifier(userId);
+        }
       }
 
       debugPrint('🔍 SPLASH TOKEN READ: value="$accessToken"');
@@ -72,11 +85,10 @@ class SplashNotifier extends _$SplashNotifier {
     } catch (e) {
       debugPrint('🔴 SPLASH ERROR: initialize failed: $e');
       route = RouteConstants.routeLoginScreen;
-    } finally {
-      state = state.copyWith(status: SplashStatus.done, pendingRoute: route);
-      if (context.mounted) {
-        Navigator.pushNamedAndRemoveUntil(context, route, (route) => false);
-      }
     }
+
+    if (!ref.mounted) return;
+
+    state = state.copyWith(status: SplashStatus.done, pendingRoute: route);
   }
 }

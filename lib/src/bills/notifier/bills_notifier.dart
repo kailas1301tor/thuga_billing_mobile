@@ -2,12 +2,12 @@
 import 'package:either_dart/either.dart';
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:vyapapp/res/constants/string_constants.dart';
-import 'package:vyapapp/res/enums/enums.dart';
-import 'package:vyapapp/services/repo_di.dart';
-import 'package:vyapapp/utils/helpers/api_error_handler.dart';
-import 'package:vyapapp/utils/helpers/debounce_helper.dart';
-import 'package:vyapapp/utils/helpers/toast_helper.dart';
+import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/res/enums/enums.dart';
+import 'package:thuga/services/repo_di.dart';
+import 'package:thuga/utils/helpers/api_error_handler.dart';
+import 'package:thuga/utils/helpers/debounce_helper.dart';
+import 'package:thuga/utils/helpers/toast_helper.dart';
 import '../model/bill_model.dart';
 import '../notifier/bill_detail_notifier.dart';
 import '../repo/bills_repository.dart';
@@ -181,7 +181,7 @@ class BillsNotifier extends _$BillsNotifier {
           (right) async {
             debugPrint("🟢 API SUCCESS: ${right.message}");
             showCustomToast(message: Strings.paymentStatusUpdated);
-            ref.invalidate(billDetailNotifierProvider(billId));
+            ref.invalidate(billDetailProvider(billId));
             await fetchBills(page: 1, showLoader: false);
             state = state.copyWith(updatingBillId: null);
             return true;

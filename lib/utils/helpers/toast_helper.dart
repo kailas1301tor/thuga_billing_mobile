@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vyapapp/utils/common_widgets/custom_toast.dart' as ct;
+import 'package:thuga/utils/common_widgets/custom_toast.dart' as ct;
 
 /// Show a standard toast message.
 void showCustomToast({required String message}) {

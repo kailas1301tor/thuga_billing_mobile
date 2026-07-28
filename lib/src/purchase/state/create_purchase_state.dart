@@ -1,6 +1,6 @@
 // lib/src/purchase/state/create_purchase_state.dart
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:vyapapp/src/main/model/dropdown_model.dart';
+import 'package:thuga/src/main/model/dropdown_model.dart';
 
 part 'create_purchase_state.freezed.dart';
 

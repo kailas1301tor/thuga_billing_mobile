@@ -1,11 +1,12 @@
 // lib/src/home/repo/home_repository.dart
 import 'package:either_dart/either.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:vyapapp/data/remote/network_base_services.dart';
-import 'package:vyapapp/data/remote/network_services.dart';
-import 'package:vyapapp/res/constants/app_constants.dart';
-import 'package:vyapapp/utils/helpers/safe_converters.dart';
-import 'package:vyapapp/src/bills/model/bill_model.dart';
+import 'package:thuga/data/remote/network_base_services.dart';
+import 'package:thuga/data/remote/network_services.dart';
+import 'package:thuga/res/constants/app_constants.dart';
+import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/utils/helpers/safe_converters.dart';
+import 'package:thuga/src/bills/model/bill_model.dart';
 
 import '../model/home_dashboard_model.dart';
 import '../model/home_top_product_model.dart';
@@ -22,10 +23,10 @@ class HomeRepoImpl implements HomeRepo {
   @override
   Future<Either<ResponseError, HomeDashboardModel>> getDashboard() async {
     // 1. Fetch store name from local settings
-    String shopName = 'Thuka';
+    String shopName = Strings.appName;
     try {
       final prefs = await SharedPreferences.getInstance();
-      shopName = prefs.getString('pref_store_name') ?? 'Thuka';
+      shopName = prefs.getString('pref_store_name') ?? Strings.appName;
     } catch (_) {}
 
     // 2. Call API

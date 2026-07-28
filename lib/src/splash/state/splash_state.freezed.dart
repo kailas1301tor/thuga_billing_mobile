@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,159 +9,260 @@ part of 'splash_state.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
-
 /// @nodoc
 mixin _$SplashState {
-  SplashStatus get status => throw _privateConstructorUsedError;
-  String? get pendingRoute => throw _privateConstructorUsedError;
 
-  /// Create a copy of SplashState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $SplashStateCopyWith<SplashState> get copyWith =>
-      throw _privateConstructorUsedError;
+ SplashStatus get status; String? get pendingRoute;
+/// Create a copy of SplashState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$SplashStateCopyWith<SplashState> get copyWith => _$SplashStateCopyWithImpl<SplashState>(this as SplashState, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SplashState&&(identical(other.status, status) || other.status == status)&&(identical(other.pendingRoute, pendingRoute) || other.pendingRoute == pendingRoute));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,status,pendingRoute);
+
+@override
+String toString() {
+  return 'SplashState(status: $status, pendingRoute: $pendingRoute)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $SplashStateCopyWith<$Res> {
-  factory $SplashStateCopyWith(
-    SplashState value,
-    $Res Function(SplashState) then,
-  ) = _$SplashStateCopyWithImpl<$Res, SplashState>;
-  @useResult
-  $Res call({SplashStatus status, String? pendingRoute});
-}
+abstract mixin class $SplashStateCopyWith<$Res>  {
+  factory $SplashStateCopyWith(SplashState value, $Res Function(SplashState) _then) = _$SplashStateCopyWithImpl;
+@useResult
+$Res call({
+ SplashStatus status, String? pendingRoute
+});
 
+
+
+
+}
 /// @nodoc
-class _$SplashStateCopyWithImpl<$Res, $Val extends SplashState>
+class _$SplashStateCopyWithImpl<$Res>
     implements $SplashStateCopyWith<$Res> {
-  _$SplashStateCopyWithImpl(this._value, this._then);
+  _$SplashStateCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final SplashState _self;
+  final $Res Function(SplashState) _then;
 
-  /// Create a copy of SplashState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({Object? status = null, Object? pendingRoute = freezed}) {
-    return _then(
-      _value.copyWith(
-            status: null == status
-                ? _value.status
-                : status // ignore: cast_nullable_to_non_nullable
-                      as SplashStatus,
-            pendingRoute: freezed == pendingRoute
-                ? _value.pendingRoute
-                : pendingRoute // ignore: cast_nullable_to_non_nullable
-                      as String?,
-          )
-          as $Val,
-    );
-  }
+/// Create a copy of SplashState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? pendingRoute = freezed,}) {
+  return _then(_self.copyWith(
+status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as SplashStatus,pendingRoute: freezed == pendingRoute ? _self.pendingRoute : pendingRoute // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [SplashState].
+extension SplashStatePatterns on SplashState {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _SplashState value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _SplashState() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _SplashState value)  $default,){
+final _that = this;
+switch (_that) {
+case _SplashState():
+return $default(_that);}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _SplashState value)?  $default,){
+final _that = this;
+switch (_that) {
+case _SplashState() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( SplashStatus status,  String? pendingRoute)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _SplashState() when $default != null:
+return $default(_that.status,_that.pendingRoute);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( SplashStatus status,  String? pendingRoute)  $default,) {final _that = this;
+switch (_that) {
+case _SplashState():
+return $default(_that.status,_that.pendingRoute);}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( SplashStatus status,  String? pendingRoute)?  $default,) {final _that = this;
+switch (_that) {
+case _SplashState() when $default != null:
+return $default(_that.status,_that.pendingRoute);case _:
+  return null;
+
+}
+}
+
 }
 
 /// @nodoc
-abstract class _$$SplashStateImplCopyWith<$Res>
-    implements $SplashStateCopyWith<$Res> {
-  factory _$$SplashStateImplCopyWith(
-    _$SplashStateImpl value,
-    $Res Function(_$SplashStateImpl) then,
-  ) = __$$SplashStateImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({SplashStatus status, String? pendingRoute});
+
+
+class _SplashState implements SplashState {
+  const _SplashState({this.status = SplashStatus.idle, this.pendingRoute});
+  
+
+@override@JsonKey() final  SplashStatus status;
+@override final  String? pendingRoute;
+
+/// Create a copy of SplashState
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$SplashStateCopyWith<_SplashState> get copyWith => __$SplashStateCopyWithImpl<_SplashState>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SplashState&&(identical(other.status, status) || other.status == status)&&(identical(other.pendingRoute, pendingRoute) || other.pendingRoute == pendingRoute));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,status,pendingRoute);
+
+@override
+String toString() {
+  return 'SplashState(status: $status, pendingRoute: $pendingRoute)';
+}
+
+
 }
 
 /// @nodoc
-class __$$SplashStateImplCopyWithImpl<$Res>
-    extends _$SplashStateCopyWithImpl<$Res, _$SplashStateImpl>
-    implements _$$SplashStateImplCopyWith<$Res> {
-  __$$SplashStateImplCopyWithImpl(
-    _$SplashStateImpl _value,
-    $Res Function(_$SplashStateImpl) _then,
-  ) : super(_value, _then);
+abstract mixin class _$SplashStateCopyWith<$Res> implements $SplashStateCopyWith<$Res> {
+  factory _$SplashStateCopyWith(_SplashState value, $Res Function(_SplashState) _then) = __$SplashStateCopyWithImpl;
+@override @useResult
+$Res call({
+ SplashStatus status, String? pendingRoute
+});
 
-  /// Create a copy of SplashState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({Object? status = null, Object? pendingRoute = freezed}) {
-    return _then(
-      _$SplashStateImpl(
-        status: null == status
-            ? _value.status
-            : status // ignore: cast_nullable_to_non_nullable
-                  as SplashStatus,
-        pendingRoute: freezed == pendingRoute
-            ? _value.pendingRoute
-            : pendingRoute // ignore: cast_nullable_to_non_nullable
-                  as String?,
-      ),
-    );
-  }
+
+
+
 }
-
 /// @nodoc
+class __$SplashStateCopyWithImpl<$Res>
+    implements _$SplashStateCopyWith<$Res> {
+  __$SplashStateCopyWithImpl(this._self, this._then);
 
-class _$SplashStateImpl implements _SplashState {
-  const _$SplashStateImpl({this.status = SplashStatus.idle, this.pendingRoute});
+  final _SplashState _self;
+  final $Res Function(_SplashState) _then;
 
-  @override
-  @JsonKey()
-  final SplashStatus status;
-  @override
-  final String? pendingRoute;
-
-  @override
-  String toString() {
-    return 'SplashState(status: $status, pendingRoute: $pendingRoute)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$SplashStateImpl &&
-            (identical(other.status, status) || other.status == status) &&
-            (identical(other.pendingRoute, pendingRoute) ||
-                other.pendingRoute == pendingRoute));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, status, pendingRoute);
-
-  /// Create a copy of SplashState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$SplashStateImplCopyWith<_$SplashStateImpl> get copyWith =>
-      __$$SplashStateImplCopyWithImpl<_$SplashStateImpl>(this, _$identity);
+/// Create a copy of SplashState
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? pendingRoute = freezed,}) {
+  return _then(_SplashState(
+status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as SplashStatus,pendingRoute: freezed == pendingRoute ? _self.pendingRoute : pendingRoute // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
 }
 
-abstract class _SplashState implements SplashState {
-  const factory _SplashState({
-    final SplashStatus status,
-    final String? pendingRoute,
-  }) = _$SplashStateImpl;
 
-  @override
-  SplashStatus get status;
-  @override
-  String? get pendingRoute;
-
-  /// Create a copy of SplashState
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$SplashStateImplCopyWith<_$SplashStateImpl> get copyWith =>
-      throw _privateConstructorUsedError;
 }
+
+// dart format on

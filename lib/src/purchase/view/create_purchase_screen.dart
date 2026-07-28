@@ -3,18 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/res/styles/font_palette.dart';
-import 'package:vyapapp/src/main/notifier/dropdowns_notifier.dart';
-import 'package:vyapapp/src/main/model/dropdown_model.dart';
-import 'package:vyapapp/utils/common_widgets/bottomsheet_content.dart';
-import 'package:vyapapp/utils/common_widgets/common_app_bar.dart';
-import 'package:vyapapp/utils/common_widgets/common_container.dart';
-import 'package:vyapapp/utils/common_widgets/common_scaffold.dart';
-import 'package:vyapapp/utils/common_widgets/common_text_form_field.dart';
-import 'package:vyapapp/utils/common_widgets/primary_button.dart';
-import 'package:vyapapp/utils/helpers/common_functions.dart';
-import 'package:vyapapp/utils/helpers/extensions.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/font_palette.dart';
+import 'package:thuga/src/main/notifier/dropdowns_notifier.dart';
+import 'package:thuga/src/main/model/dropdown_model.dart';
+import 'package:thuga/utils/common_widgets/bottomsheet_content.dart';
+import 'package:thuga/utils/common_widgets/common_app_bar.dart';
+import 'package:thuga/utils/common_widgets/common_container.dart';
+import 'package:thuga/utils/common_widgets/common_scaffold.dart';
+import 'package:thuga/utils/common_widgets/common_text_form_field.dart';
+import 'package:thuga/utils/common_widgets/primary_button.dart';
+import 'package:thuga/utils/helpers/common_functions.dart';
+import 'package:thuga/utils/helpers/extensions.dart';
 import '../notifier/create_purchase_notifier.dart';
 
 class CreatePurchaseScreen extends ConsumerWidget {
@@ -23,15 +23,15 @@ class CreatePurchaseScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
-    final state = ref.watch(createPurchaseNotifierProvider);
-    final notifier = ref.read(createPurchaseNotifierProvider.notifier);
+    final state = ref.watch(createPurchaseProvider);
+    final notifier = ref.read(createPurchaseProvider.notifier);
 
     // Watch products list from dropdowns
     final products = ref.watch(
-      dropdownsNotifierProvider.select((s) => s.data.products),
+      dropdownsProvider.select((s) => s.data.products),
     );
     final dropdownsLoader = ref.watch(
-      dropdownsNotifierProvider.select((s) => s.loaderState),
+      dropdownsProvider.select((s) => s.loaderState),
     );
 
     return CommonScaffold(

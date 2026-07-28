@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,641 +9,335 @@ part of 'new_bill_state.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
-
 /// @nodoc
 mixin _$NewBillState {
-  LoaderState get loaderState => throw _privateConstructorUsedError;
-  int get billingMode =>
-      throw _privateConstructorUsedError; // 0: Quick Tap, 1: Amount Entry
-  String get selectedCategory => throw _privateConstructorUsedError;
-  int get selectedCategoryId =>
-      throw _privateConstructorUsedError; // 0 = "All Categories"
-  String get searchQuery => throw _privateConstructorUsedError;
-  bool get isSearchExpanded => throw _privateConstructorUsedError;
-  bool get isCartExpanded => throw _privateConstructorUsedError;
-  List<CategoryWithProductsModel> get categories =>
-      throw _privateConstructorUsedError;
-  List<ProductModel> get products => throw _privateConstructorUsedError;
-  List<CartItemModel> get cart => throw _privateConstructorUsedError;
-  String get paymentMethod => throw _privateConstructorUsedError;
-  int get billNumber => throw _privateConstructorUsedError;
-  bool get isSavingBill => throw _privateConstructorUsedError;
-  double get discountAmount => throw _privateConstructorUsedError;
-  int get currentPage => throw _privateConstructorUsedError;
-  int get totalPages => throw _privateConstructorUsedError;
-  bool get isLoadingMore => throw _privateConstructorUsedError;
-  String get paymentStatus => throw _privateConstructorUsedError;
-  double get receivedAmount => throw _privateConstructorUsedError;
-  DropdownCustomerModel? get selectedCustomer =>
-      throw _privateConstructorUsedError;
-  String? get errorMessage => throw _privateConstructorUsedError;
 
-  /// Create a copy of NewBillState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $NewBillStateCopyWith<NewBillState> get copyWith =>
-      throw _privateConstructorUsedError;
+ LoaderState get loaderState; int get billingMode; String get selectedCategory; int get selectedCategoryId; String get searchQuery; bool get isSearchExpanded; bool get isCartExpanded; List<CategoryWithProductsModel> get categories; List<ProductModel> get products; List<CartItemModel> get cart; String get paymentMethod; int get billNumber; bool get isSavingBill; double get discountAmount; int get currentPage; int get totalPages; bool get isLoadingMore; String get paymentStatus; double get receivedAmount; DropdownCustomerModel? get selectedCustomer; String? get errorMessage;
+/// Create a copy of NewBillState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$NewBillStateCopyWith<NewBillState> get copyWith => _$NewBillStateCopyWithImpl<NewBillState>(this as NewBillState, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is NewBillState&&(identical(other.loaderState, loaderState) || other.loaderState == loaderState)&&(identical(other.billingMode, billingMode) || other.billingMode == billingMode)&&(identical(other.selectedCategory, selectedCategory) || other.selectedCategory == selectedCategory)&&(identical(other.selectedCategoryId, selectedCategoryId) || other.selectedCategoryId == selectedCategoryId)&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery)&&(identical(other.isSearchExpanded, isSearchExpanded) || other.isSearchExpanded == isSearchExpanded)&&(identical(other.isCartExpanded, isCartExpanded) || other.isCartExpanded == isCartExpanded)&&const DeepCollectionEquality().equals(other.categories, categories)&&const DeepCollectionEquality().equals(other.products, products)&&const DeepCollectionEquality().equals(other.cart, cart)&&(identical(other.paymentMethod, paymentMethod) || other.paymentMethod == paymentMethod)&&(identical(other.billNumber, billNumber) || other.billNumber == billNumber)&&(identical(other.isSavingBill, isSavingBill) || other.isSavingBill == isSavingBill)&&(identical(other.discountAmount, discountAmount) || other.discountAmount == discountAmount)&&(identical(other.currentPage, currentPage) || other.currentPage == currentPage)&&(identical(other.totalPages, totalPages) || other.totalPages == totalPages)&&(identical(other.isLoadingMore, isLoadingMore) || other.isLoadingMore == isLoadingMore)&&(identical(other.paymentStatus, paymentStatus) || other.paymentStatus == paymentStatus)&&(identical(other.receivedAmount, receivedAmount) || other.receivedAmount == receivedAmount)&&(identical(other.selectedCustomer, selectedCustomer) || other.selectedCustomer == selectedCustomer)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+}
+
+
+@override
+int get hashCode => Object.hashAll([runtimeType,loaderState,billingMode,selectedCategory,selectedCategoryId,searchQuery,isSearchExpanded,isCartExpanded,const DeepCollectionEquality().hash(categories),const DeepCollectionEquality().hash(products),const DeepCollectionEquality().hash(cart),paymentMethod,billNumber,isSavingBill,discountAmount,currentPage,totalPages,isLoadingMore,paymentStatus,receivedAmount,selectedCustomer,errorMessage]);
+
+@override
+String toString() {
+  return 'NewBillState(loaderState: $loaderState, billingMode: $billingMode, selectedCategory: $selectedCategory, selectedCategoryId: $selectedCategoryId, searchQuery: $searchQuery, isSearchExpanded: $isSearchExpanded, isCartExpanded: $isCartExpanded, categories: $categories, products: $products, cart: $cart, paymentMethod: $paymentMethod, billNumber: $billNumber, isSavingBill: $isSavingBill, discountAmount: $discountAmount, currentPage: $currentPage, totalPages: $totalPages, isLoadingMore: $isLoadingMore, paymentStatus: $paymentStatus, receivedAmount: $receivedAmount, selectedCustomer: $selectedCustomer, errorMessage: $errorMessage)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $NewBillStateCopyWith<$Res> {
-  factory $NewBillStateCopyWith(
-    NewBillState value,
-    $Res Function(NewBillState) then,
-  ) = _$NewBillStateCopyWithImpl<$Res, NewBillState>;
-  @useResult
-  $Res call({
-    LoaderState loaderState,
-    int billingMode,
-    String selectedCategory,
-    int selectedCategoryId,
-    String searchQuery,
-    bool isSearchExpanded,
-    bool isCartExpanded,
-    List<CategoryWithProductsModel> categories,
-    List<ProductModel> products,
-    List<CartItemModel> cart,
-    String paymentMethod,
-    int billNumber,
-    bool isSavingBill,
-    double discountAmount,
-    int currentPage,
-    int totalPages,
-    bool isLoadingMore,
-    String paymentStatus,
-    double receivedAmount,
-    DropdownCustomerModel? selectedCustomer,
-    String? errorMessage,
-  });
-}
+abstract mixin class $NewBillStateCopyWith<$Res>  {
+  factory $NewBillStateCopyWith(NewBillState value, $Res Function(NewBillState) _then) = _$NewBillStateCopyWithImpl;
+@useResult
+$Res call({
+ LoaderState loaderState, int billingMode, String selectedCategory, int selectedCategoryId, String searchQuery, bool isSearchExpanded, bool isCartExpanded, List<CategoryWithProductsModel> categories, List<ProductModel> products, List<CartItemModel> cart, String paymentMethod, int billNumber, bool isSavingBill, double discountAmount, int currentPage, int totalPages, bool isLoadingMore, String paymentStatus, double receivedAmount, DropdownCustomerModel? selectedCustomer, String? errorMessage
+});
 
+
+
+
+}
 /// @nodoc
-class _$NewBillStateCopyWithImpl<$Res, $Val extends NewBillState>
+class _$NewBillStateCopyWithImpl<$Res>
     implements $NewBillStateCopyWith<$Res> {
-  _$NewBillStateCopyWithImpl(this._value, this._then);
+  _$NewBillStateCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final NewBillState _self;
+  final $Res Function(NewBillState) _then;
 
-  /// Create a copy of NewBillState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? loaderState = null,
-    Object? billingMode = null,
-    Object? selectedCategory = null,
-    Object? selectedCategoryId = null,
-    Object? searchQuery = null,
-    Object? isSearchExpanded = null,
-    Object? isCartExpanded = null,
-    Object? categories = null,
-    Object? products = null,
-    Object? cart = null,
-    Object? paymentMethod = null,
-    Object? billNumber = null,
-    Object? isSavingBill = null,
-    Object? discountAmount = null,
-    Object? currentPage = null,
-    Object? totalPages = null,
-    Object? isLoadingMore = null,
-    Object? paymentStatus = null,
-    Object? receivedAmount = null,
-    Object? selectedCustomer = freezed,
-    Object? errorMessage = freezed,
-  }) {
-    return _then(
-      _value.copyWith(
-            loaderState: null == loaderState
-                ? _value.loaderState
-                : loaderState // ignore: cast_nullable_to_non_nullable
-                      as LoaderState,
-            billingMode: null == billingMode
-                ? _value.billingMode
-                : billingMode // ignore: cast_nullable_to_non_nullable
-                      as int,
-            selectedCategory: null == selectedCategory
-                ? _value.selectedCategory
-                : selectedCategory // ignore: cast_nullable_to_non_nullable
-                      as String,
-            selectedCategoryId: null == selectedCategoryId
-                ? _value.selectedCategoryId
-                : selectedCategoryId // ignore: cast_nullable_to_non_nullable
-                      as int,
-            searchQuery: null == searchQuery
-                ? _value.searchQuery
-                : searchQuery // ignore: cast_nullable_to_non_nullable
-                      as String,
-            isSearchExpanded: null == isSearchExpanded
-                ? _value.isSearchExpanded
-                : isSearchExpanded // ignore: cast_nullable_to_non_nullable
-                      as bool,
-            isCartExpanded: null == isCartExpanded
-                ? _value.isCartExpanded
-                : isCartExpanded // ignore: cast_nullable_to_non_nullable
-                      as bool,
-            categories: null == categories
-                ? _value.categories
-                : categories // ignore: cast_nullable_to_non_nullable
-                      as List<CategoryWithProductsModel>,
-            products: null == products
-                ? _value.products
-                : products // ignore: cast_nullable_to_non_nullable
-                      as List<ProductModel>,
-            cart: null == cart
-                ? _value.cart
-                : cart // ignore: cast_nullable_to_non_nullable
-                      as List<CartItemModel>,
-            paymentMethod: null == paymentMethod
-                ? _value.paymentMethod
-                : paymentMethod // ignore: cast_nullable_to_non_nullable
-                      as String,
-            billNumber: null == billNumber
-                ? _value.billNumber
-                : billNumber // ignore: cast_nullable_to_non_nullable
-                      as int,
-            isSavingBill: null == isSavingBill
-                ? _value.isSavingBill
-                : isSavingBill // ignore: cast_nullable_to_non_nullable
-                      as bool,
-            discountAmount: null == discountAmount
-                ? _value.discountAmount
-                : discountAmount // ignore: cast_nullable_to_non_nullable
-                      as double,
-            currentPage: null == currentPage
-                ? _value.currentPage
-                : currentPage // ignore: cast_nullable_to_non_nullable
-                      as int,
-            totalPages: null == totalPages
-                ? _value.totalPages
-                : totalPages // ignore: cast_nullable_to_non_nullable
-                      as int,
-            isLoadingMore: null == isLoadingMore
-                ? _value.isLoadingMore
-                : isLoadingMore // ignore: cast_nullable_to_non_nullable
-                      as bool,
-            paymentStatus: null == paymentStatus
-                ? _value.paymentStatus
-                : paymentStatus // ignore: cast_nullable_to_non_nullable
-                      as String,
-            receivedAmount: null == receivedAmount
-                ? _value.receivedAmount
-                : receivedAmount // ignore: cast_nullable_to_non_nullable
-                      as double,
-            selectedCustomer: freezed == selectedCustomer
-                ? _value.selectedCustomer
-                : selectedCustomer // ignore: cast_nullable_to_non_nullable
-                      as DropdownCustomerModel?,
-            errorMessage: freezed == errorMessage
-                ? _value.errorMessage
-                : errorMessage // ignore: cast_nullable_to_non_nullable
-                      as String?,
-          )
-          as $Val,
-    );
-  }
+/// Create a copy of NewBillState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? loaderState = null,Object? billingMode = null,Object? selectedCategory = null,Object? selectedCategoryId = null,Object? searchQuery = null,Object? isSearchExpanded = null,Object? isCartExpanded = null,Object? categories = null,Object? products = null,Object? cart = null,Object? paymentMethod = null,Object? billNumber = null,Object? isSavingBill = null,Object? discountAmount = null,Object? currentPage = null,Object? totalPages = null,Object? isLoadingMore = null,Object? paymentStatus = null,Object? receivedAmount = null,Object? selectedCustomer = freezed,Object? errorMessage = freezed,}) {
+  return _then(_self.copyWith(
+loaderState: null == loaderState ? _self.loaderState : loaderState // ignore: cast_nullable_to_non_nullable
+as LoaderState,billingMode: null == billingMode ? _self.billingMode : billingMode // ignore: cast_nullable_to_non_nullable
+as int,selectedCategory: null == selectedCategory ? _self.selectedCategory : selectedCategory // ignore: cast_nullable_to_non_nullable
+as String,selectedCategoryId: null == selectedCategoryId ? _self.selectedCategoryId : selectedCategoryId // ignore: cast_nullable_to_non_nullable
+as int,searchQuery: null == searchQuery ? _self.searchQuery : searchQuery // ignore: cast_nullable_to_non_nullable
+as String,isSearchExpanded: null == isSearchExpanded ? _self.isSearchExpanded : isSearchExpanded // ignore: cast_nullable_to_non_nullable
+as bool,isCartExpanded: null == isCartExpanded ? _self.isCartExpanded : isCartExpanded // ignore: cast_nullable_to_non_nullable
+as bool,categories: null == categories ? _self.categories : categories // ignore: cast_nullable_to_non_nullable
+as List<CategoryWithProductsModel>,products: null == products ? _self.products : products // ignore: cast_nullable_to_non_nullable
+as List<ProductModel>,cart: null == cart ? _self.cart : cart // ignore: cast_nullable_to_non_nullable
+as List<CartItemModel>,paymentMethod: null == paymentMethod ? _self.paymentMethod : paymentMethod // ignore: cast_nullable_to_non_nullable
+as String,billNumber: null == billNumber ? _self.billNumber : billNumber // ignore: cast_nullable_to_non_nullable
+as int,isSavingBill: null == isSavingBill ? _self.isSavingBill : isSavingBill // ignore: cast_nullable_to_non_nullable
+as bool,discountAmount: null == discountAmount ? _self.discountAmount : discountAmount // ignore: cast_nullable_to_non_nullable
+as double,currentPage: null == currentPage ? _self.currentPage : currentPage // ignore: cast_nullable_to_non_nullable
+as int,totalPages: null == totalPages ? _self.totalPages : totalPages // ignore: cast_nullable_to_non_nullable
+as int,isLoadingMore: null == isLoadingMore ? _self.isLoadingMore : isLoadingMore // ignore: cast_nullable_to_non_nullable
+as bool,paymentStatus: null == paymentStatus ? _self.paymentStatus : paymentStatus // ignore: cast_nullable_to_non_nullable
+as String,receivedAmount: null == receivedAmount ? _self.receivedAmount : receivedAmount // ignore: cast_nullable_to_non_nullable
+as double,selectedCustomer: freezed == selectedCustomer ? _self.selectedCustomer : selectedCustomer // ignore: cast_nullable_to_non_nullable
+as DropdownCustomerModel?,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
 }
 
-/// @nodoc
-abstract class _$$NewBillStateImplCopyWith<$Res>
-    implements $NewBillStateCopyWith<$Res> {
-  factory _$$NewBillStateImplCopyWith(
-    _$NewBillStateImpl value,
-    $Res Function(_$NewBillStateImpl) then,
-  ) = __$$NewBillStateImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({
-    LoaderState loaderState,
-    int billingMode,
-    String selectedCategory,
-    int selectedCategoryId,
-    String searchQuery,
-    bool isSearchExpanded,
-    bool isCartExpanded,
-    List<CategoryWithProductsModel> categories,
-    List<ProductModel> products,
-    List<CartItemModel> cart,
-    String paymentMethod,
-    int billNumber,
-    bool isSavingBill,
-    double discountAmount,
-    int currentPage,
-    int totalPages,
-    bool isLoadingMore,
-    String paymentStatus,
-    double receivedAmount,
-    DropdownCustomerModel? selectedCustomer,
-    String? errorMessage,
-  });
 }
 
-/// @nodoc
-class __$$NewBillStateImplCopyWithImpl<$Res>
-    extends _$NewBillStateCopyWithImpl<$Res, _$NewBillStateImpl>
-    implements _$$NewBillStateImplCopyWith<$Res> {
-  __$$NewBillStateImplCopyWithImpl(
-    _$NewBillStateImpl _value,
-    $Res Function(_$NewBillStateImpl) _then,
-  ) : super(_value, _then);
 
-  /// Create a copy of NewBillState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? loaderState = null,
-    Object? billingMode = null,
-    Object? selectedCategory = null,
-    Object? selectedCategoryId = null,
-    Object? searchQuery = null,
-    Object? isSearchExpanded = null,
-    Object? isCartExpanded = null,
-    Object? categories = null,
-    Object? products = null,
-    Object? cart = null,
-    Object? paymentMethod = null,
-    Object? billNumber = null,
-    Object? isSavingBill = null,
-    Object? discountAmount = null,
-    Object? currentPage = null,
-    Object? totalPages = null,
-    Object? isLoadingMore = null,
-    Object? paymentStatus = null,
-    Object? receivedAmount = null,
-    Object? selectedCustomer = freezed,
-    Object? errorMessage = freezed,
-  }) {
-    return _then(
-      _$NewBillStateImpl(
-        loaderState: null == loaderState
-            ? _value.loaderState
-            : loaderState // ignore: cast_nullable_to_non_nullable
-                  as LoaderState,
-        billingMode: null == billingMode
-            ? _value.billingMode
-            : billingMode // ignore: cast_nullable_to_non_nullable
-                  as int,
-        selectedCategory: null == selectedCategory
-            ? _value.selectedCategory
-            : selectedCategory // ignore: cast_nullable_to_non_nullable
-                  as String,
-        selectedCategoryId: null == selectedCategoryId
-            ? _value.selectedCategoryId
-            : selectedCategoryId // ignore: cast_nullable_to_non_nullable
-                  as int,
-        searchQuery: null == searchQuery
-            ? _value.searchQuery
-            : searchQuery // ignore: cast_nullable_to_non_nullable
-                  as String,
-        isSearchExpanded: null == isSearchExpanded
-            ? _value.isSearchExpanded
-            : isSearchExpanded // ignore: cast_nullable_to_non_nullable
-                  as bool,
-        isCartExpanded: null == isCartExpanded
-            ? _value.isCartExpanded
-            : isCartExpanded // ignore: cast_nullable_to_non_nullable
-                  as bool,
-        categories: null == categories
-            ? _value._categories
-            : categories // ignore: cast_nullable_to_non_nullable
-                  as List<CategoryWithProductsModel>,
-        products: null == products
-            ? _value._products
-            : products // ignore: cast_nullable_to_non_nullable
-                  as List<ProductModel>,
-        cart: null == cart
-            ? _value._cart
-            : cart // ignore: cast_nullable_to_non_nullable
-                  as List<CartItemModel>,
-        paymentMethod: null == paymentMethod
-            ? _value.paymentMethod
-            : paymentMethod // ignore: cast_nullable_to_non_nullable
-                  as String,
-        billNumber: null == billNumber
-            ? _value.billNumber
-            : billNumber // ignore: cast_nullable_to_non_nullable
-                  as int,
-        isSavingBill: null == isSavingBill
-            ? _value.isSavingBill
-            : isSavingBill // ignore: cast_nullable_to_non_nullable
-                  as bool,
-        discountAmount: null == discountAmount
-            ? _value.discountAmount
-            : discountAmount // ignore: cast_nullable_to_non_nullable
-                  as double,
-        currentPage: null == currentPage
-            ? _value.currentPage
-            : currentPage // ignore: cast_nullable_to_non_nullable
-                  as int,
-        totalPages: null == totalPages
-            ? _value.totalPages
-            : totalPages // ignore: cast_nullable_to_non_nullable
-                  as int,
-        isLoadingMore: null == isLoadingMore
-            ? _value.isLoadingMore
-            : isLoadingMore // ignore: cast_nullable_to_non_nullable
-                  as bool,
-        paymentStatus: null == paymentStatus
-            ? _value.paymentStatus
-            : paymentStatus // ignore: cast_nullable_to_non_nullable
-                  as String,
-        receivedAmount: null == receivedAmount
-            ? _value.receivedAmount
-            : receivedAmount // ignore: cast_nullable_to_non_nullable
-                  as double,
-        selectedCustomer: freezed == selectedCustomer
-            ? _value.selectedCustomer
-            : selectedCustomer // ignore: cast_nullable_to_non_nullable
-                  as DropdownCustomerModel?,
-        errorMessage: freezed == errorMessage
-            ? _value.errorMessage
-            : errorMessage // ignore: cast_nullable_to_non_nullable
-                  as String?,
-      ),
-    );
-  }
+/// Adds pattern-matching-related methods to [NewBillState].
+extension NewBillStatePatterns on NewBillState {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _NewBillState value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _NewBillState() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _NewBillState value)  $default,){
+final _that = this;
+switch (_that) {
+case _NewBillState():
+return $default(_that);}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _NewBillState value)?  $default,){
+final _that = this;
+switch (_that) {
+case _NewBillState() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( LoaderState loaderState,  int billingMode,  String selectedCategory,  int selectedCategoryId,  String searchQuery,  bool isSearchExpanded,  bool isCartExpanded,  List<CategoryWithProductsModel> categories,  List<ProductModel> products,  List<CartItemModel> cart,  String paymentMethod,  int billNumber,  bool isSavingBill,  double discountAmount,  int currentPage,  int totalPages,  bool isLoadingMore,  String paymentStatus,  double receivedAmount,  DropdownCustomerModel? selectedCustomer,  String? errorMessage)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _NewBillState() when $default != null:
+return $default(_that.loaderState,_that.billingMode,_that.selectedCategory,_that.selectedCategoryId,_that.searchQuery,_that.isSearchExpanded,_that.isCartExpanded,_that.categories,_that.products,_that.cart,_that.paymentMethod,_that.billNumber,_that.isSavingBill,_that.discountAmount,_that.currentPage,_that.totalPages,_that.isLoadingMore,_that.paymentStatus,_that.receivedAmount,_that.selectedCustomer,_that.errorMessage);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( LoaderState loaderState,  int billingMode,  String selectedCategory,  int selectedCategoryId,  String searchQuery,  bool isSearchExpanded,  bool isCartExpanded,  List<CategoryWithProductsModel> categories,  List<ProductModel> products,  List<CartItemModel> cart,  String paymentMethod,  int billNumber,  bool isSavingBill,  double discountAmount,  int currentPage,  int totalPages,  bool isLoadingMore,  String paymentStatus,  double receivedAmount,  DropdownCustomerModel? selectedCustomer,  String? errorMessage)  $default,) {final _that = this;
+switch (_that) {
+case _NewBillState():
+return $default(_that.loaderState,_that.billingMode,_that.selectedCategory,_that.selectedCategoryId,_that.searchQuery,_that.isSearchExpanded,_that.isCartExpanded,_that.categories,_that.products,_that.cart,_that.paymentMethod,_that.billNumber,_that.isSavingBill,_that.discountAmount,_that.currentPage,_that.totalPages,_that.isLoadingMore,_that.paymentStatus,_that.receivedAmount,_that.selectedCustomer,_that.errorMessage);}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( LoaderState loaderState,  int billingMode,  String selectedCategory,  int selectedCategoryId,  String searchQuery,  bool isSearchExpanded,  bool isCartExpanded,  List<CategoryWithProductsModel> categories,  List<ProductModel> products,  List<CartItemModel> cart,  String paymentMethod,  int billNumber,  bool isSavingBill,  double discountAmount,  int currentPage,  int totalPages,  bool isLoadingMore,  String paymentStatus,  double receivedAmount,  DropdownCustomerModel? selectedCustomer,  String? errorMessage)?  $default,) {final _that = this;
+switch (_that) {
+case _NewBillState() when $default != null:
+return $default(_that.loaderState,_that.billingMode,_that.selectedCategory,_that.selectedCategoryId,_that.searchQuery,_that.isSearchExpanded,_that.isCartExpanded,_that.categories,_that.products,_that.cart,_that.paymentMethod,_that.billNumber,_that.isSavingBill,_that.discountAmount,_that.currentPage,_that.totalPages,_that.isLoadingMore,_that.paymentStatus,_that.receivedAmount,_that.selectedCustomer,_that.errorMessage);case _:
+  return null;
+
+}
+}
+
 }
 
 /// @nodoc
 
-class _$NewBillStateImpl implements _NewBillState {
-  const _$NewBillStateImpl({
-    this.loaderState = LoaderState.loaded,
-    this.billingMode = 0,
-    this.selectedCategory = '',
-    this.selectedCategoryId = 0,
-    this.searchQuery = '',
-    this.isSearchExpanded = false,
-    this.isCartExpanded = false,
-    final List<CategoryWithProductsModel> categories = const [],
-    final List<ProductModel> products = const [],
-    final List<CartItemModel> cart = const [],
-    this.paymentMethod = 'Cash',
-    this.billNumber = 1046,
-    this.isSavingBill = false,
-    this.discountAmount = 0.0,
-    this.currentPage = 1,
-    this.totalPages = 1,
-    this.isLoadingMore = false,
-    this.paymentStatus = 'Paid',
-    this.receivedAmount = 0.0,
-    this.selectedCustomer,
-    this.errorMessage,
-  }) : _categories = categories,
-       _products = products,
-       _cart = cart;
 
-  @override
-  @JsonKey()
-  final LoaderState loaderState;
-  @override
-  @JsonKey()
-  final int billingMode;
-  // 0: Quick Tap, 1: Amount Entry
-  @override
-  @JsonKey()
-  final String selectedCategory;
-  @override
-  @JsonKey()
-  final int selectedCategoryId;
-  // 0 = "All Categories"
-  @override
-  @JsonKey()
-  final String searchQuery;
-  @override
-  @JsonKey()
-  final bool isSearchExpanded;
-  @override
-  @JsonKey()
-  final bool isCartExpanded;
-  final List<CategoryWithProductsModel> _categories;
-  @override
-  @JsonKey()
-  List<CategoryWithProductsModel> get categories {
-    if (_categories is EqualUnmodifiableListView) return _categories;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_categories);
-  }
+class _NewBillState implements NewBillState {
+  const _NewBillState({this.loaderState = LoaderState.loaded, this.billingMode = 0, this.selectedCategory = '', this.selectedCategoryId = 0, this.searchQuery = '', this.isSearchExpanded = false, this.isCartExpanded = false, final  List<CategoryWithProductsModel> categories = const [], final  List<ProductModel> products = const [], final  List<CartItemModel> cart = const [], this.paymentMethod = 'Cash', this.billNumber = 1046, this.isSavingBill = false, this.discountAmount = 0.0, this.currentPage = 1, this.totalPages = 1, this.isLoadingMore = false, this.paymentStatus = 'Paid', this.receivedAmount = 0.0, this.selectedCustomer, this.errorMessage}): _categories = categories,_products = products,_cart = cart;
+  
 
-  final List<ProductModel> _products;
-  @override
-  @JsonKey()
-  List<ProductModel> get products {
-    if (_products is EqualUnmodifiableListView) return _products;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_products);
-  }
-
-  final List<CartItemModel> _cart;
-  @override
-  @JsonKey()
-  List<CartItemModel> get cart {
-    if (_cart is EqualUnmodifiableListView) return _cart;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_cart);
-  }
-
-  @override
-  @JsonKey()
-  final String paymentMethod;
-  @override
-  @JsonKey()
-  final int billNumber;
-  @override
-  @JsonKey()
-  final bool isSavingBill;
-  @override
-  @JsonKey()
-  final double discountAmount;
-  @override
-  @JsonKey()
-  final int currentPage;
-  @override
-  @JsonKey()
-  final int totalPages;
-  @override
-  @JsonKey()
-  final bool isLoadingMore;
-  @override
-  @JsonKey()
-  final String paymentStatus;
-  @override
-  @JsonKey()
-  final double receivedAmount;
-  @override
-  final DropdownCustomerModel? selectedCustomer;
-  @override
-  final String? errorMessage;
-
-  @override
-  String toString() {
-    return 'NewBillState(loaderState: $loaderState, billingMode: $billingMode, selectedCategory: $selectedCategory, selectedCategoryId: $selectedCategoryId, searchQuery: $searchQuery, isSearchExpanded: $isSearchExpanded, isCartExpanded: $isCartExpanded, categories: $categories, products: $products, cart: $cart, paymentMethod: $paymentMethod, billNumber: $billNumber, isSavingBill: $isSavingBill, discountAmount: $discountAmount, currentPage: $currentPage, totalPages: $totalPages, isLoadingMore: $isLoadingMore, paymentStatus: $paymentStatus, receivedAmount: $receivedAmount, selectedCustomer: $selectedCustomer, errorMessage: $errorMessage)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$NewBillStateImpl &&
-            (identical(other.loaderState, loaderState) ||
-                other.loaderState == loaderState) &&
-            (identical(other.billingMode, billingMode) ||
-                other.billingMode == billingMode) &&
-            (identical(other.selectedCategory, selectedCategory) ||
-                other.selectedCategory == selectedCategory) &&
-            (identical(other.selectedCategoryId, selectedCategoryId) ||
-                other.selectedCategoryId == selectedCategoryId) &&
-            (identical(other.searchQuery, searchQuery) ||
-                other.searchQuery == searchQuery) &&
-            (identical(other.isSearchExpanded, isSearchExpanded) ||
-                other.isSearchExpanded == isSearchExpanded) &&
-            (identical(other.isCartExpanded, isCartExpanded) ||
-                other.isCartExpanded == isCartExpanded) &&
-            const DeepCollectionEquality().equals(
-              other._categories,
-              _categories,
-            ) &&
-            const DeepCollectionEquality().equals(other._products, _products) &&
-            const DeepCollectionEquality().equals(other._cart, _cart) &&
-            (identical(other.paymentMethod, paymentMethod) ||
-                other.paymentMethod == paymentMethod) &&
-            (identical(other.billNumber, billNumber) ||
-                other.billNumber == billNumber) &&
-            (identical(other.isSavingBill, isSavingBill) ||
-                other.isSavingBill == isSavingBill) &&
-            (identical(other.discountAmount, discountAmount) ||
-                other.discountAmount == discountAmount) &&
-            (identical(other.currentPage, currentPage) ||
-                other.currentPage == currentPage) &&
-            (identical(other.totalPages, totalPages) ||
-                other.totalPages == totalPages) &&
-            (identical(other.isLoadingMore, isLoadingMore) ||
-                other.isLoadingMore == isLoadingMore) &&
-            (identical(other.paymentStatus, paymentStatus) ||
-                other.paymentStatus == paymentStatus) &&
-            (identical(other.receivedAmount, receivedAmount) ||
-                other.receivedAmount == receivedAmount) &&
-            (identical(other.selectedCustomer, selectedCustomer) ||
-                other.selectedCustomer == selectedCustomer) &&
-            (identical(other.errorMessage, errorMessage) ||
-                other.errorMessage == errorMessage));
-  }
-
-  @override
-  int get hashCode => Object.hashAll([
-    runtimeType,
-    loaderState,
-    billingMode,
-    selectedCategory,
-    selectedCategoryId,
-    searchQuery,
-    isSearchExpanded,
-    isCartExpanded,
-    const DeepCollectionEquality().hash(_categories),
-    const DeepCollectionEquality().hash(_products),
-    const DeepCollectionEquality().hash(_cart),
-    paymentMethod,
-    billNumber,
-    isSavingBill,
-    discountAmount,
-    currentPage,
-    totalPages,
-    isLoadingMore,
-    paymentStatus,
-    receivedAmount,
-    selectedCustomer,
-    errorMessage,
-  ]);
-
-  /// Create a copy of NewBillState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$NewBillStateImplCopyWith<_$NewBillStateImpl> get copyWith =>
-      __$$NewBillStateImplCopyWithImpl<_$NewBillStateImpl>(this, _$identity);
+@override@JsonKey() final  LoaderState loaderState;
+@override@JsonKey() final  int billingMode;
+@override@JsonKey() final  String selectedCategory;
+@override@JsonKey() final  int selectedCategoryId;
+@override@JsonKey() final  String searchQuery;
+@override@JsonKey() final  bool isSearchExpanded;
+@override@JsonKey() final  bool isCartExpanded;
+ final  List<CategoryWithProductsModel> _categories;
+@override@JsonKey() List<CategoryWithProductsModel> get categories {
+  if (_categories is EqualUnmodifiableListView) return _categories;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_categories);
 }
 
-abstract class _NewBillState implements NewBillState {
-  const factory _NewBillState({
-    final LoaderState loaderState,
-    final int billingMode,
-    final String selectedCategory,
-    final int selectedCategoryId,
-    final String searchQuery,
-    final bool isSearchExpanded,
-    final bool isCartExpanded,
-    final List<CategoryWithProductsModel> categories,
-    final List<ProductModel> products,
-    final List<CartItemModel> cart,
-    final String paymentMethod,
-    final int billNumber,
-    final bool isSavingBill,
-    final double discountAmount,
-    final int currentPage,
-    final int totalPages,
-    final bool isLoadingMore,
-    final String paymentStatus,
-    final double receivedAmount,
-    final DropdownCustomerModel? selectedCustomer,
-    final String? errorMessage,
-  }) = _$NewBillStateImpl;
-
-  @override
-  LoaderState get loaderState;
-  @override
-  int get billingMode; // 0: Quick Tap, 1: Amount Entry
-  @override
-  String get selectedCategory;
-  @override
-  int get selectedCategoryId; // 0 = "All Categories"
-  @override
-  String get searchQuery;
-  @override
-  bool get isSearchExpanded;
-  @override
-  bool get isCartExpanded;
-  @override
-  List<CategoryWithProductsModel> get categories;
-  @override
-  List<ProductModel> get products;
-  @override
-  List<CartItemModel> get cart;
-  @override
-  String get paymentMethod;
-  @override
-  int get billNumber;
-  @override
-  bool get isSavingBill;
-  @override
-  double get discountAmount;
-  @override
-  int get currentPage;
-  @override
-  int get totalPages;
-  @override
-  bool get isLoadingMore;
-  @override
-  String get paymentStatus;
-  @override
-  double get receivedAmount;
-  @override
-  DropdownCustomerModel? get selectedCustomer;
-  @override
-  String? get errorMessage;
-
-  /// Create a copy of NewBillState
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$NewBillStateImplCopyWith<_$NewBillStateImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+ final  List<ProductModel> _products;
+@override@JsonKey() List<ProductModel> get products {
+  if (_products is EqualUnmodifiableListView) return _products;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_products);
 }
+
+ final  List<CartItemModel> _cart;
+@override@JsonKey() List<CartItemModel> get cart {
+  if (_cart is EqualUnmodifiableListView) return _cart;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_cart);
+}
+
+@override@JsonKey() final  String paymentMethod;
+@override@JsonKey() final  int billNumber;
+@override@JsonKey() final  bool isSavingBill;
+@override@JsonKey() final  double discountAmount;
+@override@JsonKey() final  int currentPage;
+@override@JsonKey() final  int totalPages;
+@override@JsonKey() final  bool isLoadingMore;
+@override@JsonKey() final  String paymentStatus;
+@override@JsonKey() final  double receivedAmount;
+@override final  DropdownCustomerModel? selectedCustomer;
+@override final  String? errorMessage;
+
+/// Create a copy of NewBillState
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$NewBillStateCopyWith<_NewBillState> get copyWith => __$NewBillStateCopyWithImpl<_NewBillState>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _NewBillState&&(identical(other.loaderState, loaderState) || other.loaderState == loaderState)&&(identical(other.billingMode, billingMode) || other.billingMode == billingMode)&&(identical(other.selectedCategory, selectedCategory) || other.selectedCategory == selectedCategory)&&(identical(other.selectedCategoryId, selectedCategoryId) || other.selectedCategoryId == selectedCategoryId)&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery)&&(identical(other.isSearchExpanded, isSearchExpanded) || other.isSearchExpanded == isSearchExpanded)&&(identical(other.isCartExpanded, isCartExpanded) || other.isCartExpanded == isCartExpanded)&&const DeepCollectionEquality().equals(other._categories, _categories)&&const DeepCollectionEquality().equals(other._products, _products)&&const DeepCollectionEquality().equals(other._cart, _cart)&&(identical(other.paymentMethod, paymentMethod) || other.paymentMethod == paymentMethod)&&(identical(other.billNumber, billNumber) || other.billNumber == billNumber)&&(identical(other.isSavingBill, isSavingBill) || other.isSavingBill == isSavingBill)&&(identical(other.discountAmount, discountAmount) || other.discountAmount == discountAmount)&&(identical(other.currentPage, currentPage) || other.currentPage == currentPage)&&(identical(other.totalPages, totalPages) || other.totalPages == totalPages)&&(identical(other.isLoadingMore, isLoadingMore) || other.isLoadingMore == isLoadingMore)&&(identical(other.paymentStatus, paymentStatus) || other.paymentStatus == paymentStatus)&&(identical(other.receivedAmount, receivedAmount) || other.receivedAmount == receivedAmount)&&(identical(other.selectedCustomer, selectedCustomer) || other.selectedCustomer == selectedCustomer)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+}
+
+
+@override
+int get hashCode => Object.hashAll([runtimeType,loaderState,billingMode,selectedCategory,selectedCategoryId,searchQuery,isSearchExpanded,isCartExpanded,const DeepCollectionEquality().hash(_categories),const DeepCollectionEquality().hash(_products),const DeepCollectionEquality().hash(_cart),paymentMethod,billNumber,isSavingBill,discountAmount,currentPage,totalPages,isLoadingMore,paymentStatus,receivedAmount,selectedCustomer,errorMessage]);
+
+@override
+String toString() {
+  return 'NewBillState(loaderState: $loaderState, billingMode: $billingMode, selectedCategory: $selectedCategory, selectedCategoryId: $selectedCategoryId, searchQuery: $searchQuery, isSearchExpanded: $isSearchExpanded, isCartExpanded: $isCartExpanded, categories: $categories, products: $products, cart: $cart, paymentMethod: $paymentMethod, billNumber: $billNumber, isSavingBill: $isSavingBill, discountAmount: $discountAmount, currentPage: $currentPage, totalPages: $totalPages, isLoadingMore: $isLoadingMore, paymentStatus: $paymentStatus, receivedAmount: $receivedAmount, selectedCustomer: $selectedCustomer, errorMessage: $errorMessage)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$NewBillStateCopyWith<$Res> implements $NewBillStateCopyWith<$Res> {
+  factory _$NewBillStateCopyWith(_NewBillState value, $Res Function(_NewBillState) _then) = __$NewBillStateCopyWithImpl;
+@override @useResult
+$Res call({
+ LoaderState loaderState, int billingMode, String selectedCategory, int selectedCategoryId, String searchQuery, bool isSearchExpanded, bool isCartExpanded, List<CategoryWithProductsModel> categories, List<ProductModel> products, List<CartItemModel> cart, String paymentMethod, int billNumber, bool isSavingBill, double discountAmount, int currentPage, int totalPages, bool isLoadingMore, String paymentStatus, double receivedAmount, DropdownCustomerModel? selectedCustomer, String? errorMessage
+});
+
+
+
+
+}
+/// @nodoc
+class __$NewBillStateCopyWithImpl<$Res>
+    implements _$NewBillStateCopyWith<$Res> {
+  __$NewBillStateCopyWithImpl(this._self, this._then);
+
+  final _NewBillState _self;
+  final $Res Function(_NewBillState) _then;
+
+/// Create a copy of NewBillState
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? loaderState = null,Object? billingMode = null,Object? selectedCategory = null,Object? selectedCategoryId = null,Object? searchQuery = null,Object? isSearchExpanded = null,Object? isCartExpanded = null,Object? categories = null,Object? products = null,Object? cart = null,Object? paymentMethod = null,Object? billNumber = null,Object? isSavingBill = null,Object? discountAmount = null,Object? currentPage = null,Object? totalPages = null,Object? isLoadingMore = null,Object? paymentStatus = null,Object? receivedAmount = null,Object? selectedCustomer = freezed,Object? errorMessage = freezed,}) {
+  return _then(_NewBillState(
+loaderState: null == loaderState ? _self.loaderState : loaderState // ignore: cast_nullable_to_non_nullable
+as LoaderState,billingMode: null == billingMode ? _self.billingMode : billingMode // ignore: cast_nullable_to_non_nullable
+as int,selectedCategory: null == selectedCategory ? _self.selectedCategory : selectedCategory // ignore: cast_nullable_to_non_nullable
+as String,selectedCategoryId: null == selectedCategoryId ? _self.selectedCategoryId : selectedCategoryId // ignore: cast_nullable_to_non_nullable
+as int,searchQuery: null == searchQuery ? _self.searchQuery : searchQuery // ignore: cast_nullable_to_non_nullable
+as String,isSearchExpanded: null == isSearchExpanded ? _self.isSearchExpanded : isSearchExpanded // ignore: cast_nullable_to_non_nullable
+as bool,isCartExpanded: null == isCartExpanded ? _self.isCartExpanded : isCartExpanded // ignore: cast_nullable_to_non_nullable
+as bool,categories: null == categories ? _self._categories : categories // ignore: cast_nullable_to_non_nullable
+as List<CategoryWithProductsModel>,products: null == products ? _self._products : products // ignore: cast_nullable_to_non_nullable
+as List<ProductModel>,cart: null == cart ? _self._cart : cart // ignore: cast_nullable_to_non_nullable
+as List<CartItemModel>,paymentMethod: null == paymentMethod ? _self.paymentMethod : paymentMethod // ignore: cast_nullable_to_non_nullable
+as String,billNumber: null == billNumber ? _self.billNumber : billNumber // ignore: cast_nullable_to_non_nullable
+as int,isSavingBill: null == isSavingBill ? _self.isSavingBill : isSavingBill // ignore: cast_nullable_to_non_nullable
+as bool,discountAmount: null == discountAmount ? _self.discountAmount : discountAmount // ignore: cast_nullable_to_non_nullable
+as double,currentPage: null == currentPage ? _self.currentPage : currentPage // ignore: cast_nullable_to_non_nullable
+as int,totalPages: null == totalPages ? _self.totalPages : totalPages // ignore: cast_nullable_to_non_nullable
+as int,isLoadingMore: null == isLoadingMore ? _self.isLoadingMore : isLoadingMore // ignore: cast_nullable_to_non_nullable
+as bool,paymentStatus: null == paymentStatus ? _self.paymentStatus : paymentStatus // ignore: cast_nullable_to_non_nullable
+as String,receivedAmount: null == receivedAmount ? _self.receivedAmount : receivedAmount // ignore: cast_nullable_to_non_nullable
+as double,selectedCustomer: freezed == selectedCustomer ? _self.selectedCustomer : selectedCustomer // ignore: cast_nullable_to_non_nullable
+as DropdownCustomerModel?,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+
+}
+
+// dart format on

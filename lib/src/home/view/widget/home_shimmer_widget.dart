@@ -1,7 +1,7 @@
 // lib/src/home/view/widget/home_shimmer_widget.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/utils/common_widgets/common_shimmer_box.dart';
+import 'package:thuga/utils/common_widgets/common_shimmer_box.dart';
 
 class HomeShimmerWidget extends StatelessWidget {
   const HomeShimmerWidget({super.key});

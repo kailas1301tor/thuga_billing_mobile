@@ -6,21 +6,57 @@ part of 'printer_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$printerNotifierHash() => r'5e2402c4f48d59727f673a56ac8463a6cb67172f';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [PrinterNotifier].
 @ProviderFor(PrinterNotifier)
-final printerNotifierProvider =
-    NotifierProvider<PrinterNotifier, PrinterState>.internal(
-      PrinterNotifier.new,
-      name: r'printerNotifierProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$printerNotifierHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+final printerProvider = PrinterNotifierProvider._();
 
-typedef _$PrinterNotifier = Notifier<PrinterState>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class PrinterNotifierProvider
+    extends $NotifierProvider<PrinterNotifier, PrinterState> {
+  PrinterNotifierProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'printerProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$printerNotifierHash();
+
+  @$internal
+  @override
+  PrinterNotifier create() => PrinterNotifier();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(PrinterState value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<PrinterState>(value),
+    );
+  }
+}
+
+String _$printerNotifierHash() => r'498044388fc3434e36dcd85280b4a355c7dc4794';
+
+abstract class _$PrinterNotifier extends $Notifier<PrinterState> {
+  PrinterState build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<PrinterState, PrinterState>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<PrinterState, PrinterState>,
+              PrinterState,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}

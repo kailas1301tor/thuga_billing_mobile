@@ -7,20 +7,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:vyapapp/res/constants/string_constants.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/res/styles/font_palette.dart';
-import 'package:vyapapp/src/bills/model/bill_detail_model.dart';
-import 'package:vyapapp/src/bills/notifier/bills_notifier.dart';
-import 'package:vyapapp/src/bills/view/widget/bill_payment_status_action.dart';
-import 'package:vyapapp/src/main/notifier/dropdowns_notifier.dart';
-import 'package:vyapapp/src/main/model/dropdown_model.dart';
-import 'package:vyapapp/src/printer/notifier/printer_notifier.dart';
-import 'package:vyapapp/src/settings/notifier/settings_notifier.dart';
-import 'package:vyapapp/utils/common_widgets/primary_button.dart';
-import 'package:vyapapp/utils/helpers/extensions.dart';
-import 'package:vyapapp/utils/helpers/receipt_print_helper.dart';
-import 'package:vyapapp/utils/helpers/toast_helper.dart';
+import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/font_palette.dart';
+import 'package:thuga/src/bills/model/bill_detail_model.dart';
+import 'package:thuga/src/bills/notifier/bills_notifier.dart';
+import 'package:thuga/src/bills/view/widget/bill_payment_status_action.dart';
+import 'package:thuga/src/main/notifier/dropdowns_notifier.dart';
+import 'package:thuga/src/main/model/dropdown_model.dart';
+import 'package:thuga/src/printer/notifier/printer_notifier.dart';
+import 'package:thuga/src/settings/notifier/settings_notifier.dart';
+import 'package:thuga/utils/common_widgets/primary_button.dart';
+import 'package:thuga/utils/helpers/extensions.dart';
+import 'package:thuga/utils/helpers/receipt_print_helper.dart';
+import 'package:thuga/utils/helpers/toast_helper.dart';
 
 class BillDetailContent extends ConsumerStatefulWidget {
   const BillDetailContent({super.key, required this.billDetail});
@@ -182,21 +182,21 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final storeName = ref.watch(
-      settingsNotifierProvider.select((s) => s.settings.storeName),
+      settingsProvider.select((s) => s.settings.storeName),
     );
     final displayName = normalizeReceiptStoreName(storeName);
     final isPrinterConnected = ref.watch(
-      printerNotifierProvider.select((value) => value.isConnected),
+      printerProvider.select((value) => value.isConnected),
     );
     final isUpdatingPayment = ref.watch(
-      billsNotifierProvider.select(
+      billsProvider.select(
         (s) => s.updatingBillId == widget.billDetail.id,
       ),
     );
-    final billsNotifier = ref.read(billsNotifierProvider.notifier);
+    final billsNotifier = ref.read(billsProvider.notifier);
 
     final customers = ref.watch(
-      dropdownsNotifierProvider.select((s) => s.data.customers),
+      dropdownsProvider.select((s) => s.data.customers),
     );
     final customerName = _resolveCustomerName(customers);
     final customerPhone = widget.billDetail.customerPhone;
@@ -481,7 +481,7 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
                             style: FontPalette.base400(10, color: colors.secondaryText),
                           ),
                           Text(
-                            'Thuka App',
+                            Strings.appBrandFooter,
                             style: FontPalette.base700(10, color: colors.primary),
                           ),
                         ],
@@ -541,7 +541,7 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
                       return;
                     }
                     final success = await ref
-                        .read(printerNotifierProvider.notifier)
+                        .read(printerProvider.notifier)
                         .printReceiptData(
                           _buildReceiptData(
                             storeName: storeName,
@@ -556,7 +556,7 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
                     } else {
                       showCustomErrorToast(
                         message:
-                            ref.read(printerNotifierProvider).errorMessage ??
+                            ref.read(printerProvider).errorMessage ??
                             Strings.printerFallbackPreview,
                       );
                     }

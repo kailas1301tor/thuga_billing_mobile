@@ -2,16 +2,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/res/constants/string_constants.dart';
-import 'package:vyapapp/res/enums/enums.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/res/styles/font_palette.dart';
-import 'package:vyapapp/utils/common_widgets/common_app_bar.dart';
-import 'package:vyapapp/utils/common_widgets/common_field_section.dart';
-import 'package:vyapapp/utils/common_widgets/common_password_field.dart';
-import 'package:vyapapp/utils/common_widgets/common_scaffold.dart';
-import 'package:vyapapp/utils/common_widgets/common_text_form_field.dart';
-import 'package:vyapapp/utils/common_widgets/primary_button.dart';
+import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/res/enums/enums.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/font_palette.dart';
+import 'package:thuga/utils/common_widgets/common_app_bar.dart';
+import 'package:thuga/utils/common_widgets/common_field_section.dart';
+import 'package:thuga/utils/common_widgets/common_password_field.dart';
+import 'package:thuga/utils/common_widgets/common_scaffold.dart';
+import 'package:thuga/utils/common_widgets/common_text_form_field.dart';
+import 'package:thuga/utils/common_widgets/primary_button.dart';
 import '../notifier/auth_notifier.dart';
 
 class RegisterScreen extends ConsumerWidget {
@@ -19,7 +19,7 @@ class RegisterScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final notifier = ref.read(authNotifierProvider.notifier);
+    final notifier = ref.read(authProvider.notifier);
     final colors = context.appColors;
 
     return CommonScaffold(
@@ -56,7 +56,7 @@ class RegisterScreen extends ConsumerWidget {
                       Consumer(
                         builder: (context, ref, _) {
                           final errorText = ref.watch(
-                            authNotifierProvider.select((s) => s.companyNameErrorText),
+                            authProvider.select((s) => s.companyNameErrorText),
                           );
                           return CommonFieldSection(
                             title: 'Company Name',
@@ -83,7 +83,7 @@ class RegisterScreen extends ConsumerWidget {
                       Consumer(
                         builder: (context, ref, _) {
                           final errorText = ref.watch(
-                            authNotifierProvider.select((s) => s.emailErrorText),
+                            authProvider.select((s) => s.emailErrorText),
                           );
                           return CommonFieldSection(
                             title: Strings.email,
@@ -110,7 +110,7 @@ class RegisterScreen extends ConsumerWidget {
                       Consumer(
                         builder: (context, ref, _) {
                           final errorText = ref.watch(
-                            authNotifierProvider.select((s) => s.passwordErrorText),
+                            authProvider.select((s) => s.passwordErrorText),
                           );
                           return CommonFieldSection(
                             title: Strings.password,
@@ -136,7 +136,7 @@ class RegisterScreen extends ConsumerWidget {
                       Consumer(
                         builder: (context, ref, _) {
                           final errorText = ref.watch(
-                            authNotifierProvider.select((s) => s.addressErrorText),
+                            authProvider.select((s) => s.addressErrorText),
                           );
                           return CommonFieldSection(
                             title: 'Address',
@@ -163,7 +163,7 @@ class RegisterScreen extends ConsumerWidget {
                       Consumer(
                         builder: (context, ref, _) {
                           final errorText = ref.watch(
-                            authNotifierProvider.select((s) => s.phoneErrorText),
+                            authProvider.select((s) => s.phoneErrorText),
                           );
                           return CommonFieldSection(
                             title: 'Contact Phone',
@@ -194,7 +194,7 @@ class RegisterScreen extends ConsumerWidget {
                         Consumer(
                           builder: (context, ref, _) {
                             final isLoading = ref.watch(
-                              authNotifierProvider.select(
+                              authProvider.select(
                                 (s) => s.loaderState == LoaderState.loading,
                               ),
                             );

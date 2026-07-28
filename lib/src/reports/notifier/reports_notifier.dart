@@ -1,8 +1,8 @@
 // lib/src/reports/notifier/reports_notifier.dart
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:vyapapp/res/enums/enums.dart';
-import 'package:vyapapp/services/repo_di.dart';
-import 'package:vyapapp/utils/helpers/api_error_handler.dart';
+import 'package:thuga/res/enums/enums.dart';
+import 'package:thuga/services/repo_di.dart';
+import 'package:thuga/utils/helpers/api_error_handler.dart';
 import '../state/reports_state.dart';
 
 part 'reports_notifier.g.dart';

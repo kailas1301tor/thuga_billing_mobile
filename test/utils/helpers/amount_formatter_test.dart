@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vyapapp/utils/helpers/amount_formatter.dart';
+import 'package:thuga/utils/helpers/amount_formatter.dart';
 
 void main() {
   group('formatDisplayCurrency', () {

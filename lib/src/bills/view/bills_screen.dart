@@ -2,14 +2,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/res/constants/string_constants.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/res/styles/font_palette.dart';
-import 'package:vyapapp/utils/common_widgets/common_app_bar.dart';
-import 'package:vyapapp/utils/common_widgets/common_refresh_indicator.dart';
-import 'package:vyapapp/utils/common_widgets/common_scaffold.dart';
-import 'package:vyapapp/utils/common_widgets/common_search_bar.dart';
-import 'package:vyapapp/utils/common_widgets/common_switch_state.dart';
+import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/font_palette.dart';
+import 'package:thuga/utils/common_widgets/common_app_bar.dart';
+import 'package:thuga/utils/common_widgets/common_refresh_indicator.dart';
+import 'package:thuga/utils/common_widgets/common_scaffold.dart';
+import 'package:thuga/utils/common_widgets/common_search_bar.dart';
+import 'package:thuga/utils/common_widgets/common_switch_state.dart';
 
 import '../model/bill_model.dart';
 import '../notifier/bills_notifier.dart';
@@ -24,19 +24,19 @@ class BillsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final loaderState = ref.watch(
-      billsNotifierProvider.select((s) => s.loaderState),
+      billsProvider.select((s) => s.loaderState),
     );
     final dateRangeFilter = ref.watch(
-      billsNotifierProvider.select((s) => s.dateRangeFilter),
+      billsProvider.select((s) => s.dateRangeFilter),
     );
     final totalCount = ref.watch(
-      billsNotifierProvider.select((s) => s.data?.results.totalCount),
+      billsProvider.select((s) => s.data?.results.totalCount),
     );
     final isLoadingMore = ref.watch(
-      billsNotifierProvider.select((s) => s.isLoadingMore),
+      billsProvider.select((s) => s.isLoadingMore),
     );
     final bills = ref.watch(
-      billsNotifierProvider.select((s) {
+      billsProvider.select((s) {
         final list = List<BillModel>.from(s.data?.results.data ?? []);
         if (s.isNewestFirst) {
           list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
@@ -46,7 +46,7 @@ class BillsScreen extends ConsumerWidget {
         return list;
       }),
     );
-    final notifier = ref.read(billsNotifierProvider.notifier);
+    final notifier = ref.read(billsProvider.notifier);
 
     return CommonScaffold(
       backgroundColor: colors.background,

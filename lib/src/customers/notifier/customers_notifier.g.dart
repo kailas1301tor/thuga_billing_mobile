@@ -6,21 +6,57 @@ part of 'customers_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$customersNotifierHash() => r'fbbf4e822af5ad0bca770f29cbf58c538ecc3561';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [CustomersNotifier].
 @ProviderFor(CustomersNotifier)
-final customersNotifierProvider =
-    AutoDisposeNotifierProvider<CustomersNotifier, CustomersState>.internal(
-      CustomersNotifier.new,
-      name: r'customersNotifierProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$customersNotifierHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+final customersProvider = CustomersNotifierProvider._();
 
-typedef _$CustomersNotifier = AutoDisposeNotifier<CustomersState>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class CustomersNotifierProvider
+    extends $NotifierProvider<CustomersNotifier, CustomersState> {
+  CustomersNotifierProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'customersProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$customersNotifierHash();
+
+  @$internal
+  @override
+  CustomersNotifier create() => CustomersNotifier();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(CustomersState value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<CustomersState>(value),
+    );
+  }
+}
+
+String _$customersNotifierHash() => r'f169c021f257d72be2375aa9900c97b99c6bed4f';
+
+abstract class _$CustomersNotifier extends $Notifier<CustomersState> {
+  CustomersState build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<CustomersState, CustomersState>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<CustomersState, CustomersState>,
+              CustomersState,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}

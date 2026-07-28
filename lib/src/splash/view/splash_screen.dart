@@ -1,11 +1,11 @@
 // lib/src/splash/view/splash_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:vyapapp/res/constants/string_constants.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/res/styles/font_palette.dart';
+import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/font_palette.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/utils/common_widgets/common_scaffold.dart';
+import 'package:thuga/utils/common_widgets/common_scaffold.dart';
 
 import '../notifier/splash_notifier.dart';
 
@@ -44,7 +44,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     _animationController.forward();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(splashNotifierProvider.notifier).initialize(context);
+      if (!mounted) return;
+      ref.read(splashProvider.notifier).initialize();
     });
   }
 
@@ -56,6 +57,14 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<String?>(
+      splashProvider.select((state) => state.pendingRoute),
+      (previous, next) {
+        if (next == null || !context.mounted) return;
+        Navigator.pushNamedAndRemoveUntil(context, next, (_) => false);
+      },
+    );
+
     final colors = context.appColors;
 
     return CommonScaffold(

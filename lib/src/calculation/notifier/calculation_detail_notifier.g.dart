@@ -6,173 +6,107 @@ part of 'calculation_detail_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$calculationDetailNotifierHash() =>
-    r'e9e948183b55e000b49ec97c2c926372da74607a';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-abstract class _$CalculationDetailNotifier
-    extends BuildlessAutoDisposeNotifier<CalculationDetailState> {
-  late final String billId;
-
-  CalculationDetailState build(String billId);
-}
-
-/// See also [CalculationDetailNotifier].
 @ProviderFor(CalculationDetailNotifier)
-const calculationDetailNotifierProvider = CalculationDetailNotifierFamily();
+final calculationDetailProvider = CalculationDetailNotifierFamily._();
 
-/// See also [CalculationDetailNotifier].
-class CalculationDetailNotifierFamily extends Family<CalculationDetailState> {
-  /// See also [CalculationDetailNotifier].
-  const CalculationDetailNotifierFamily();
-
-  /// See also [CalculationDetailNotifier].
-  CalculationDetailNotifierProvider call(String billId) {
-    return CalculationDetailNotifierProvider(billId);
-  }
-
-  @override
-  CalculationDetailNotifierProvider getProviderOverride(
-    covariant CalculationDetailNotifierProvider provider,
-  ) {
-    return call(provider.billId);
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'calculationDetailNotifierProvider';
-}
-
-/// See also [CalculationDetailNotifier].
-class CalculationDetailNotifierProvider
+final class CalculationDetailNotifierProvider
     extends
-        AutoDisposeNotifierProviderImpl<
-          CalculationDetailNotifier,
-          CalculationDetailState
-        > {
-  /// See also [CalculationDetailNotifier].
-  CalculationDetailNotifierProvider(String billId)
-    : this._internal(
-        () => CalculationDetailNotifier()..billId = billId,
-        from: calculationDetailNotifierProvider,
-        name: r'calculationDetailNotifierProvider',
-        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-            ? null
-            : _$calculationDetailNotifierHash,
-        dependencies: CalculationDetailNotifierFamily._dependencies,
-        allTransitiveDependencies:
-            CalculationDetailNotifierFamily._allTransitiveDependencies,
-        billId: billId,
-      );
-
-  CalculationDetailNotifierProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.billId,
-  }) : super.internal();
-
-  final String billId;
+        $NotifierProvider<CalculationDetailNotifier, CalculationDetailState> {
+  CalculationDetailNotifierProvider._({
+    required CalculationDetailNotifierFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'calculationDetailProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
   @override
-  CalculationDetailState runNotifierBuild(
-    covariant CalculationDetailNotifier notifier,
-  ) {
-    return notifier.build(billId);
+  String debugGetCreateSourceHash() => _$calculationDetailNotifierHash();
+
+  @override
+  String toString() {
+    return r'calculationDetailProvider'
+        ''
+        '($argument)';
   }
 
+  @$internal
   @override
-  Override overrideWith(CalculationDetailNotifier Function() create) {
-    return ProviderOverride(
+  CalculationDetailNotifier create() => CalculationDetailNotifier();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(CalculationDetailState value) {
+    return $ProviderOverride(
       origin: this,
-      override: CalculationDetailNotifierProvider._internal(
-        () => create()..billId = billId,
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        billId: billId,
-      ),
+      providerOverride: $SyncValueProvider<CalculationDetailState>(value),
     );
   }
 
   @override
-  AutoDisposeNotifierProviderElement<
-    CalculationDetailNotifier,
-    CalculationDetailState
-  >
-  createElement() {
-    return _CalculationDetailNotifierProviderElement(this);
-  }
-
-  @override
   bool operator ==(Object other) {
-    return other is CalculationDetailNotifierProvider && other.billId == billId;
+    return other is CalculationDetailNotifierProvider &&
+        other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, billId.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin CalculationDetailNotifierRef
-    on AutoDisposeNotifierProviderRef<CalculationDetailState> {
-  /// The parameter `billId` of this provider.
-  String get billId;
-}
+String _$calculationDetailNotifierHash() =>
+    r'e9e948183b55e000b49ec97c2c926372da74607a';
 
-class _CalculationDetailNotifierProviderElement
-    extends
-        AutoDisposeNotifierProviderElement<
+final class CalculationDetailNotifierFamily extends $Family
+    with
+        $ClassFamilyOverride<
           CalculationDetailNotifier,
-          CalculationDetailState
-        >
-    with CalculationDetailNotifierRef {
-  _CalculationDetailNotifierProviderElement(super.provider);
+          CalculationDetailState,
+          CalculationDetailState,
+          CalculationDetailState,
+          String
+        > {
+  CalculationDetailNotifierFamily._()
+    : super(
+        retry: null,
+        name: r'calculationDetailProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  CalculationDetailNotifierProvider call(String billId) =>
+      CalculationDetailNotifierProvider._(argument: billId, from: this);
 
   @override
-  String get billId => (origin as CalculationDetailNotifierProvider).billId;
+  String toString() => r'calculationDetailProvider';
 }
 
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+abstract class _$CalculationDetailNotifier
+    extends $Notifier<CalculationDetailState> {
+  late final _$args = ref.$arg as String;
+  String get billId => _$args;
+
+  CalculationDetailState build(String billId);
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref =
+        this.ref as $Ref<CalculationDetailState, CalculationDetailState>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<CalculationDetailState, CalculationDetailState>,
+              CalculationDetailState,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, () => build(_$args));
+  }
+}

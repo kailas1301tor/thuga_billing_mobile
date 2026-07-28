@@ -1,20 +1,20 @@
 // /Users/wac/Documents/wac projects/tsuite/lib/src/empty/empty_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/res/constants/string_constants.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/res/styles/font_palette.dart';
-import 'package:vyapapp/utils/common_widgets/common_app_bar.dart';
-import 'package:vyapapp/utils/common_widgets/common_avatar.dart';
-import 'package:vyapapp/utils/common_widgets/common_bottom_sheet.dart';
-import 'package:vyapapp/utils/common_widgets/common_container.dart';
-import 'package:vyapapp/utils/common_widgets/common_dialog_box.dart';
-import 'package:vyapapp/utils/common_widgets/common_empty_state.dart';
-import 'package:vyapapp/utils/common_widgets/common_list_tile_item.dart';
-import 'package:vyapapp/utils/common_widgets/common_nav_bar_button.dart';
-import 'package:vyapapp/utils/common_widgets/common_scaffold.dart';
-import 'package:vyapapp/utils/common_widgets/common_section_header.dart';
-import 'package:vyapapp/utils/common_widgets/primary_button.dart';
+import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/font_palette.dart';
+import 'package:thuga/utils/common_widgets/common_app_bar.dart';
+import 'package:thuga/utils/common_widgets/common_avatar.dart';
+import 'package:thuga/utils/common_widgets/common_bottom_sheet.dart';
+import 'package:thuga/utils/common_widgets/common_container.dart';
+import 'package:thuga/utils/common_widgets/common_dialog_box.dart';
+import 'package:thuga/utils/common_widgets/common_empty_state.dart';
+import 'package:thuga/utils/common_widgets/common_list_tile_item.dart';
+import 'package:thuga/utils/common_widgets/common_nav_bar_button.dart';
+import 'package:thuga/utils/common_widgets/common_scaffold.dart';
+import 'package:thuga/utils/common_widgets/common_section_header.dart';
+import 'package:thuga/utils/common_widgets/primary_button.dart';
 
 class EmptyScreen extends StatelessWidget {
   const EmptyScreen({super.key});

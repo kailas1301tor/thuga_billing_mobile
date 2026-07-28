@@ -2,12 +2,12 @@
 import 'package:flutter/material.dart';
 import 'package:either_dart/either.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:vyapapp/res/enums/enums.dart';
-import 'package:vyapapp/services/repo_di.dart';
-import 'package:vyapapp/utils/helpers/api_error_handler.dart';
-import 'package:vyapapp/utils/helpers/toast_helper.dart';
-import 'package:vyapapp/utils/helpers/debounce_helper.dart';
-import 'package:vyapapp/src/main/notifier/dropdowns_notifier.dart';
+import 'package:thuga/res/enums/enums.dart';
+import 'package:thuga/services/repo_di.dart';
+import 'package:thuga/utils/helpers/api_error_handler.dart';
+import 'package:thuga/utils/helpers/toast_helper.dart';
+import 'package:thuga/utils/helpers/debounce_helper.dart';
+import 'package:thuga/src/main/notifier/dropdowns_notifier.dart';
 import '../model/category_model.dart';
 import '../state/categories_state.dart';
 
@@ -166,7 +166,7 @@ class CategoriesNotifier extends _$CategoriesNotifier {
             nameController.clear();
             showCustomToast(message: right.message);
             fetchCategories(showLoader: false);
-            ref.read(dropdownsNotifierProvider.notifier).refreshDropdowns();
+            ref.read(dropdownsProvider.notifier).refreshDropdowns();
             state = state.copyWith(saveCategoryLoader: false);
             return true;
           },
@@ -193,7 +193,7 @@ class CategoriesNotifier extends _$CategoriesNotifier {
             debugPrint("🟢 API SUCCESS: ${right.message}");
             showCustomToast(message: right.message);
             fetchCategories(showLoader: false);
-            ref.read(dropdownsNotifierProvider.notifier).refreshDropdowns();
+            ref.read(dropdownsProvider.notifier).refreshDropdowns();
             state = state.copyWith(updateCategoryLoader: false);
             return true;
           },
@@ -218,7 +218,7 @@ class CategoriesNotifier extends _$CategoriesNotifier {
             debugPrint("🟢 API SUCCESS: ${right.message}");
             showCustomToast(message: right.message);
             fetchCategories(showLoader: false);
-            ref.read(dropdownsNotifierProvider.notifier).refreshDropdowns();
+            ref.read(dropdownsProvider.notifier).refreshDropdowns();
             state = state.copyWith(deleteCategoryLoader: false);
             return true;
           },

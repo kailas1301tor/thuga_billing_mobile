@@ -6,22 +6,46 @@ part of 'printer_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$printerServiceHash() => r'c78bf20f526ba089c7f301a5026dc048f0e7f2fc';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [printerService].
 @ProviderFor(printerService)
-final printerServiceProvider = Provider<PrinterService>.internal(
-  printerService,
-  name: r'printerServiceProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$printerServiceHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final printerServiceProvider = PrinterServiceProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef PrinterServiceRef = ProviderRef<PrinterService>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class PrinterServiceProvider
+    extends $FunctionalProvider<PrinterService, PrinterService, PrinterService>
+    with $Provider<PrinterService> {
+  PrinterServiceProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'printerServiceProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$printerServiceHash();
+
+  @$internal
+  @override
+  $ProviderElement<PrinterService> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  PrinterService create(Ref ref) {
+    return printerService(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(PrinterService value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<PrinterService>(value),
+    );
+  }
+}
+
+String _$printerServiceHash() => r'8739e730875cd4dcc14702ba2cddf17b0a42aa08';

@@ -6,21 +6,57 @@ part of 'settings_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$settingsNotifierHash() => r'506732a4cc6ff8fbbcf7cf0651a90306e76be98b';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [SettingsNotifier].
 @ProviderFor(SettingsNotifier)
-final settingsNotifierProvider =
-    AutoDisposeNotifierProvider<SettingsNotifier, SettingsState>.internal(
-      SettingsNotifier.new,
-      name: r'settingsNotifierProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$settingsNotifierHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+final settingsProvider = SettingsNotifierProvider._();
 
-typedef _$SettingsNotifier = AutoDisposeNotifier<SettingsState>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class SettingsNotifierProvider
+    extends $NotifierProvider<SettingsNotifier, SettingsState> {
+  SettingsNotifierProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'settingsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$settingsNotifierHash();
+
+  @$internal
+  @override
+  SettingsNotifier create() => SettingsNotifier();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(SettingsState value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<SettingsState>(value),
+    );
+  }
+}
+
+String _$settingsNotifierHash() => r'8cc858b86502c7fdf69a8c1de8f1abd159f2f0bb';
+
+abstract class _$SettingsNotifier extends $Notifier<SettingsState> {
+  SettingsState build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<SettingsState, SettingsState>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<SettingsState, SettingsState>,
+              SettingsState,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}

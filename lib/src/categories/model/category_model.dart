@@ -1,5 +1,5 @@
 // lib/src/categories/model/category_model.dart
-import 'package:vyapapp/utils/helpers/safe_converters.dart';
+import 'package:thuga/utils/helpers/safe_converters.dart';
 
 /// GET /api/categories
 class CategoryResponse {

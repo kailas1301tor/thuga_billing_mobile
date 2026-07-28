@@ -2,13 +2,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/res/constants/string_constants.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/res/styles/font_palette.dart';
-import 'package:vyapapp/src/bills/model/bill_model.dart';
-import 'package:vyapapp/src/bills/notifier/bills_notifier.dart';
-import 'package:vyapapp/utils/common_widgets/common_container.dart';
-import 'package:vyapapp/utils/helpers/extensions.dart';
+import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/font_palette.dart';
+import 'package:thuga/src/bills/model/bill_model.dart';
+import 'package:thuga/src/bills/notifier/bills_notifier.dart';
+import 'package:thuga/utils/common_widgets/common_container.dart';
+import 'package:thuga/utils/helpers/extensions.dart';
 
 import 'bill_payment_status_action.dart';
 import 'bill_summary_card.dart';
@@ -27,9 +27,9 @@ class BillItemCard extends ConsumerWidget {
         : Strings.walkInCustomer;
     final hasBalance = bill.balance > 0;
     final isUpdating = ref.watch(
-      billsNotifierProvider.select((s) => s.updatingBillId == bill.id),
+      billsProvider.select((s) => s.updatingBillId == bill.id),
     );
-    final notifier = ref.read(billsNotifierProvider.notifier);
+    final notifier = ref.read(billsProvider.notifier);
 
     return Padding(
       padding: EdgeInsets.only(bottom: 12.h),

@@ -1,5 +1,5 @@
 // lib/src/new_bill/model/new_bill_model.dart
-import 'package:vyapapp/utils/helpers/safe_converters.dart';
+import 'package:thuga/utils/helpers/safe_converters.dart';
 
 class CategoriesWithProductsResponse {
   final String message;

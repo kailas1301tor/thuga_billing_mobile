@@ -2,9 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/res/styles/font_palette.dart';
-import 'package:vyapapp/utils/helpers/extensions.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/font_palette.dart';
+import 'package:thuga/utils/helpers/extensions.dart';
 import '../../notifier/new_bill_notifier.dart';
 
 class QuickTapCartStrip extends ConsumerWidget {
@@ -14,10 +14,10 @@ class QuickTapCartStrip extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     
-    final isExpanded = ref.watch(newBillNotifierProvider.select((s) => s.isCartExpanded));
-    final cart = ref.watch(newBillNotifierProvider.select((s) => s.cart));
-    ref.watch(newBillNotifierProvider.select((s) => s.discountAmount));
-    final notifier = ref.read(newBillNotifierProvider.notifier);
+    final isExpanded = ref.watch(newBillProvider.select((s) => s.isCartExpanded));
+    final cart = ref.watch(newBillProvider.select((s) => s.cart));
+    ref.watch(newBillProvider.select((s) => s.discountAmount));
+    final notifier = ref.read(newBillProvider.notifier);
     final totals = notifier.billTotals;
     final totalPrice = totals.grandTotal;
 
@@ -29,7 +29,7 @@ class QuickTapCartStrip extends ConsumerWidget {
 
     return GestureDetector(
       onTap: () {
-        ref.read(newBillNotifierProvider.notifier).toggleCartExpanded();
+        ref.read(newBillProvider.notifier).toggleCartExpanded();
       },
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),

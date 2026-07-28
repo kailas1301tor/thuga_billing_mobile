@@ -1,14 +1,14 @@
 // lib/src/main/view/widget/main_sidebar_drawer.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/res/constants/string_constants.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/res/styles/font_palette.dart';
-import 'package:vyapapp/src/categories/view/category_crud_screen.dart';
-import 'package:vyapapp/src/products/view/product_crud_screen.dart';
-import 'package:vyapapp/src/customers/view/customer_crud_screen.dart';
-import 'package:vyapapp/src/purchase/view/purchases_screen.dart';
-import 'package:vyapapp/src/calculation/view/calculation_screen.dart';
+import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/font_palette.dart';
+import 'package:thuga/src/categories/view/category_crud_screen.dart';
+import 'package:thuga/src/products/view/product_crud_screen.dart';
+import 'package:thuga/src/customers/view/customer_crud_screen.dart';
+import 'package:thuga/src/purchase/view/purchases_screen.dart';
+import 'package:thuga/src/calculation/view/calculation_screen.dart';
 
 class MainSidebarDrawer extends StatelessWidget {
   const MainSidebarDrawer({super.key});
@@ -47,7 +47,7 @@ class MainSidebarDrawer extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Thuka Menu',
+                          Strings.appMenuTitle,
                           style: FontPalette.base700(
                             16,
                             color: colors.primaryText,

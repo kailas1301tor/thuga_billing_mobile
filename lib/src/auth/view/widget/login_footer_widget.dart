@@ -1,9 +1,9 @@
 // lib/src/auth/view/widget/login_footer_widget.dart
 import 'package:flutter/material.dart';
-import 'package:vyapapp/res/constants/string_constants.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/res/styles/font_palette.dart';
-import 'package:vyapapp/utils/routes/route_constants.dart';
+import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/font_palette.dart';
+import 'package:thuga/utils/routes/route_constants.dart';
 
 class LoginFooterWidget extends StatelessWidget {
   const LoginFooterWidget({super.key});

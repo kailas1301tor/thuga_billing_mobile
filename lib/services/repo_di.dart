@@ -1,19 +1,19 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:vyapapp/src/auth/repo/auth_repo.dart';
-import 'package:vyapapp/src/home/repo/home_repository.dart';
-import 'package:vyapapp/src/bills/repo/bills_repository.dart';
-import 'package:vyapapp/src/new_bill/repo/new_bill_repository.dart';
-import 'package:vyapapp/src/reports/repo/reports_repository.dart';
-import 'package:vyapapp/src/settings/repo/settings_repository.dart';
-import 'package:vyapapp/data/remote/network_services.dart';
-import 'package:vyapapp/src/main/repo/dropdowns_repository.dart';
-import 'package:vyapapp/src/categories/repo/categories_repository.dart';
-import 'package:vyapapp/src/products/repo/products_repository.dart';
-import 'package:vyapapp/src/customers/repo/customers_repository.dart';
-import 'package:vyapapp/src/purchase/repo/purchase_repository.dart';
-import 'package:vyapapp/data/local/sembast_services.dart';
-import 'package:vyapapp/src/calculation/repo/calculation_repository.dart';
+import 'package:thuga/src/auth/repo/auth_repo.dart';
+import 'package:thuga/src/home/repo/home_repository.dart';
+import 'package:thuga/src/bills/repo/bills_repository.dart';
+import 'package:thuga/src/new_bill/repo/new_bill_repository.dart';
+import 'package:thuga/src/reports/repo/reports_repository.dart';
+import 'package:thuga/src/settings/repo/settings_repository.dart';
+import 'package:thuga/data/remote/network_services.dart';
+import 'package:thuga/src/main/repo/dropdowns_repository.dart';
+import 'package:thuga/src/categories/repo/categories_repository.dart';
+import 'package:thuga/src/products/repo/products_repository.dart';
+import 'package:thuga/src/customers/repo/customers_repository.dart';
+import 'package:thuga/src/purchase/repo/purchase_repository.dart';
+import 'package:thuga/data/local/sembast_services.dart';
+import 'package:thuga/src/calculation/repo/calculation_repository.dart';
 
 part 'repo_di.g.dart';
 

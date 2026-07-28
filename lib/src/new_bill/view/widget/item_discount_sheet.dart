@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/res/enums/enums.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/res/styles/font_palette.dart';
-import 'package:vyapapp/utils/common_widgets/common_text_form_field.dart';
-import 'package:vyapapp/utils/common_widgets/common_loader.dart';
-import 'package:vyapapp/utils/common_widgets/primary_button.dart';
-import 'package:vyapapp/utils/helpers/extensions.dart';
-import 'package:vyapapp/utils/helpers/toast_helper.dart';
-import 'package:vyapapp/utils/common_widgets/common_cached_network_image.dart';
+import 'package:thuga/res/enums/enums.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/font_palette.dart';
+import 'package:thuga/utils/common_widgets/common_text_form_field.dart';
+import 'package:thuga/utils/common_widgets/common_loader.dart';
+import 'package:thuga/utils/common_widgets/primary_button.dart';
+import 'package:thuga/utils/helpers/extensions.dart';
+import 'package:thuga/utils/helpers/toast_helper.dart';
+import 'package:thuga/utils/common_widgets/common_cached_network_image.dart';
 import '../../../main/notifier/dropdowns_notifier.dart';
 import '../../model/new_bill_model.dart';
 
@@ -116,7 +116,7 @@ class _ItemDiscountSheetState extends ConsumerState<ItemDiscountSheet> {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
-    final dropdownsState = ref.watch(dropdownsNotifierProvider);
+    final dropdownsState = ref.watch(dropdownsProvider);
     final discountTypes = dropdownsState.data.discountTypes;
     final isDropdownsLoading =
         dropdownsState.loaderState == LoaderState.loading &&

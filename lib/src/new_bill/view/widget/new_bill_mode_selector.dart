@@ -1,8 +1,8 @@
 // lib/src/new_bill/view/widget/new_bill_mode_selector.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/res/styles/font_palette.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/font_palette.dart';
 
 class NewBillModeSelector extends StatelessWidget {
   const NewBillModeSelector({

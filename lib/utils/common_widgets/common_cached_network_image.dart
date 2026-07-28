@@ -3,9 +3,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:smooth_corner/smooth_corner.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/utils/common_widgets/common_container.dart';
-import 'package:vyapapp/utils/common_widgets/common_shimmer_box.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/utils/common_widgets/common_container.dart';
+import 'package:thuga/utils/common_widgets/common_shimmer_box.dart';
 
 class CommonCachedNetworkImage extends StatelessWidget {
   const CommonCachedNetworkImage({

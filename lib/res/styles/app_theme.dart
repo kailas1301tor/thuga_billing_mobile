@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/color_palette.dart';
 
 class AppTheme {
   AppTheme._(); // ✅ Prevent instantiation — pure static class

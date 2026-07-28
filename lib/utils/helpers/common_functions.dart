@@ -3,9 +3,9 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-export 'package:vyapapp/utils/helpers/debounce_helper.dart';
-export 'package:vyapapp/utils/helpers/throttle_helper.dart';
-export 'package:vyapapp/utils/helpers/toast_helper.dart';
+export 'package:thuga/utils/helpers/debounce_helper.dart';
+export 'package:thuga/utils/helpers/throttle_helper.dart';
+export 'package:thuga/utils/helpers/toast_helper.dart';
 
 /// Check if the device has an active internet connection.
 Future<bool> isInternetAvailable() async {

@@ -5,19 +5,19 @@ import 'package:either_dart/either.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:vyapapp/res/enums/enums.dart';
-import 'package:vyapapp/services/repo_di.dart';
-import 'package:vyapapp/src/printer/notifier/printer_notifier.dart';
-import 'package:vyapapp/src/settings/notifier/settings_notifier.dart';
-import 'package:vyapapp/utils/helpers/api_error_handler.dart';
-import 'package:vyapapp/utils/helpers/bill_tax_helper.dart';
-import 'package:vyapapp/utils/helpers/extensions.dart';
-import 'package:vyapapp/utils/helpers/product_stock_helper.dart';
-import 'package:vyapapp/utils/helpers/receipt_print_helper.dart';
-import 'package:vyapapp/utils/helpers/toast_helper.dart';
-import 'package:vyapapp/res/constants/string_constants.dart';
-import 'package:vyapapp/utils/common_widgets/common_bottom_sheet.dart';
-import 'package:vyapapp/src/new_bill/view/widget/bill_preview_sheet.dart';
+import 'package:thuga/res/enums/enums.dart';
+import 'package:thuga/services/repo_di.dart';
+import 'package:thuga/src/printer/notifier/printer_notifier.dart';
+import 'package:thuga/src/settings/notifier/settings_notifier.dart';
+import 'package:thuga/utils/helpers/api_error_handler.dart';
+import 'package:thuga/utils/helpers/bill_tax_helper.dart';
+import 'package:thuga/utils/helpers/extensions.dart';
+import 'package:thuga/utils/helpers/product_stock_helper.dart';
+import 'package:thuga/utils/helpers/receipt_print_helper.dart';
+import 'package:thuga/utils/helpers/toast_helper.dart';
+import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/utils/common_widgets/common_bottom_sheet.dart';
+import 'package:thuga/src/new_bill/view/widget/bill_preview_sheet.dart';
 import '../../main/model/dropdown_model.dart';
 import '../model/new_bill_model.dart';
 import '../state/new_bill_state.dart';
@@ -504,7 +504,7 @@ class NewBillNotifier extends _$NewBillNotifier {
     required double grandTotal,
     required double balance,
   }) {
-    final storeName = ref.read(settingsNotifierProvider).settings.storeName;
+    final storeName = ref.read(settingsProvider).settings.storeName;
     final amountPaid = (grandTotal - balance).clamp(0.0, grandTotal);
 
     return ReceiptPrintData(
@@ -680,7 +680,7 @@ class NewBillNotifier extends _$NewBillNotifier {
             var printed = false;
             if (printWhenPossible) {
               printed = await ref
-                  .read(printerNotifierProvider.notifier)
+                  .read(printerProvider.notifier)
                   .printReceiptData(receiptData);
               if (printed) {
                 showCustomToast(message: Strings.printerSavedSuccess);

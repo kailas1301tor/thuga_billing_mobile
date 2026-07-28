@@ -1,4 +1,4 @@
-import 'package:vyapapp/utils/helpers/safe_converters.dart';
+import 'package:thuga/utils/helpers/safe_converters.dart';
 
 class AuthModel {
   final int id;

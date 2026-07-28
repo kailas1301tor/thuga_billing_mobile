@@ -5,12 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sembast/sembast_io.dart';
-import 'package:vyapapp/data/local/local_base_services.dart';
+import 'package:thuga/data/local/local_base_services.dart';
 
 part 'sembast_services.g.dart';
 
 @Riverpod(keepAlive: true)
-SembastServices sembastServices(Ref<SembastServices> ref) {
+SembastServices sembastServices(Ref ref) {
   return SembastServices();
 }
 

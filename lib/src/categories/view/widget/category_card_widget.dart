@@ -1,12 +1,12 @@
 // lib/src/categories/view/widget/category_card_widget.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/res/styles/font_palette.dart';
-import 'package:vyapapp/utils/common_widgets/common_container.dart';
-import 'package:vyapapp/utils/common_widgets/common_nav_bar_button.dart';
-import 'package:vyapapp/src/categories/model/category_model.dart';
-import 'package:vyapapp/utils/helpers/date_formatter.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/font_palette.dart';
+import 'package:thuga/utils/common_widgets/common_container.dart';
+import 'package:thuga/utils/common_widgets/common_nav_bar_button.dart';
+import 'package:thuga/src/categories/model/category_model.dart';
+import 'package:thuga/utils/helpers/date_formatter.dart';
 
 class CategoryCardWidget extends StatelessWidget {
   const CategoryCardWidget({

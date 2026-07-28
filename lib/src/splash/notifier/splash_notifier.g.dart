@@ -6,21 +6,57 @@ part of 'splash_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$splashNotifierHash() => r'57f173bae988205365326f111db97aba373a9877';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [SplashNotifier].
 @ProviderFor(SplashNotifier)
-final splashNotifierProvider =
-    AutoDisposeNotifierProvider<SplashNotifier, SplashState>.internal(
-      SplashNotifier.new,
-      name: r'splashNotifierProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$splashNotifierHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+final splashProvider = SplashNotifierProvider._();
 
-typedef _$SplashNotifier = AutoDisposeNotifier<SplashState>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class SplashNotifierProvider
+    extends $NotifierProvider<SplashNotifier, SplashState> {
+  SplashNotifierProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'splashProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$splashNotifierHash();
+
+  @$internal
+  @override
+  SplashNotifier create() => SplashNotifier();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(SplashState value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<SplashState>(value),
+    );
+  }
+}
+
+String _$splashNotifierHash() => r'5f9dea9289db14b1d007be5c840edef419f7e8d5';
+
+abstract class _$SplashNotifier extends $Notifier<SplashState> {
+  SplashState build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<SplashState, SplashState>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<SplashState, SplashState>,
+              SplashState,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}

@@ -1,11 +1,11 @@
 // lib/src/home/view/widget/home_recent_bills_widget.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/res/constants/string_constants.dart';
-import 'package:vyapapp/src/bills/model/bill_model.dart';
-import 'package:vyapapp/src/bills/view/bill_detail_screen.dart';
-import 'package:vyapapp/src/bills/view/widget/bill_summary_card.dart';
-import 'package:vyapapp/utils/common_widgets/common_section_header.dart';
+import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/src/bills/model/bill_model.dart';
+import 'package:thuga/src/bills/view/bill_detail_screen.dart';
+import 'package:thuga/src/bills/view/widget/bill_summary_card.dart';
+import 'package:thuga/utils/common_widgets/common_section_header.dart';
 
 import 'home_section_empty_text.dart';
 

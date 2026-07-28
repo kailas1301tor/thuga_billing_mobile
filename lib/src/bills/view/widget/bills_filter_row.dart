@@ -1,8 +1,8 @@
 // lib/src/bills/view/widget/bills_filter_row.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/res/styles/font_palette.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/font_palette.dart';
 
 class BillsFilterRow extends StatelessWidget {
   const BillsFilterRow({

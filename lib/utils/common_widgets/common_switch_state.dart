@@ -2,13 +2,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:vyapapp/res/constants/assets.dart';
-import 'package:vyapapp/res/constants/string_constants.dart';
-import 'package:vyapapp/res/enums/enums.dart';
-import 'package:vyapapp/services/connectivity_service.dart';
-import 'package:vyapapp/utils/common_widgets/common_empty_state.dart';
-import 'package:vyapapp/utils/common_widgets/common_error_state.dart';
-import 'package:vyapapp/utils/common_widgets/common_loader.dart';
+import 'package:thuga/res/constants/assets.dart';
+import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/res/enums/enums.dart';
+import 'package:thuga/services/connectivity_service.dart';
+import 'package:thuga/utils/common_widgets/common_empty_state.dart';
+import 'package:thuga/utils/common_widgets/common_error_state.dart';
+import 'package:thuga/utils/common_widgets/common_loader.dart';
 
 class CommonSwitchState extends ConsumerStatefulWidget {
   const CommonSwitchState({

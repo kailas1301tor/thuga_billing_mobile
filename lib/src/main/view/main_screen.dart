@@ -2,19 +2,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:vyapapp/res/constants/string_constants.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/src/bills/view/bills_screen.dart';
-import 'package:vyapapp/src/home/view/home_screen.dart';
-import 'package:vyapapp/src/new_bill/view/new_bill_screen.dart';
-import 'package:vyapapp/src/reports/view/reports_screen.dart';
-import 'package:vyapapp/src/settings/view/settings_screen.dart';
-import 'package:vyapapp/utils/common_widgets/custom_toast.dart';
+import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/src/bills/view/bills_screen.dart';
+import 'package:thuga/src/home/view/home_screen.dart';
+import 'package:thuga/src/new_bill/view/new_bill_screen.dart';
+import 'package:thuga/src/reports/view/reports_screen.dart';
+import 'package:thuga/src/settings/view/settings_screen.dart';
+import 'package:thuga/utils/common_widgets/custom_toast.dart';
 
 import '../../../utils/common_widgets/common_scaffold.dart';
 import '../notifier/dropdowns_notifier.dart';
 import '../notifier/selected_tab_notifier.dart';
-import 'widget/vyap_bottom_nav_bar.dart';
+import 'widget/thuga_bottom_nav_bar.dart';
 import 'widget/main_sidebar_drawer.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
@@ -33,7 +33,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     // Pre-fetch global dropdown options (customers, products, payment methods) on startup
     Future.microtask(() {
       if (mounted) {
-        ref.read(dropdownsNotifierProvider.notifier).fetchDropdowns();
+        ref.read(dropdownsProvider.notifier).fetchDropdowns();
       }
     });
   }
@@ -46,7 +46,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final selectedTab = ref.watch(
-      selectedTabNotifierProvider.select((index) => index),
+      selectedTabProvider.select((index) => index),
     );
 
     const pages = [
@@ -62,7 +62,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         if (didPop) return;
 
         if (selectedTab != 0) {
-          ref.read(selectedTabNotifierProvider.notifier).setTab(0);
+          ref.read(selectedTabProvider.notifier).setTab(0);
           return;
         }
 
@@ -82,10 +82,10 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         backgroundColor: colors.background,
         body: IndexedStack(index: selectedTab, children: pages),
         drawer: const MainSidebarDrawer(),
-        bottomNavigationBar: VyapBottomNavBar(
+        bottomNavigationBar: ThugaBottomNavBar(
           selectedTab: selectedTab,
           onTabSelected: (index) =>
-              ref.read(selectedTabNotifierProvider.notifier).setTab(index),
+              ref.read(selectedTabProvider.notifier).setTab(index),
           onNewBillPressed: () {
             Navigator.push(
               context,

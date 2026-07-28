@@ -3,13 +3,13 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:either_dart/either.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:vyapapp/res/enums/enums.dart';
-import 'package:vyapapp/services/repo_di.dart';
-import 'package:vyapapp/utils/helpers/api_error_handler.dart';
-import 'package:vyapapp/utils/helpers/toast_helper.dart';
-import 'package:vyapapp/utils/helpers/debounce_helper.dart';
-import 'package:vyapapp/src/main/notifier/dropdowns_notifier.dart';
-import 'package:vyapapp/utils/helpers/file_picker.dart';
+import 'package:thuga/res/enums/enums.dart';
+import 'package:thuga/services/repo_di.dart';
+import 'package:thuga/utils/helpers/api_error_handler.dart';
+import 'package:thuga/utils/helpers/toast_helper.dart';
+import 'package:thuga/utils/helpers/debounce_helper.dart';
+import 'package:thuga/src/main/notifier/dropdowns_notifier.dart';
+import 'package:thuga/utils/helpers/file_picker.dart';
 import '../model/product_crud_model.dart';
 import '../state/products_state.dart';
 
@@ -303,7 +303,7 @@ class ProductsNotifier extends _$ProductsNotifier {
         clearForm();
         showCustomToast(message: right.message);
         fetchProducts(showLoader: false);
-        ref.read(dropdownsNotifierProvider.notifier).refreshDropdowns();
+        ref.read(dropdownsProvider.notifier).refreshDropdowns();
         state = state.copyWith(saveProductLoader: false);
         return true;
       },
@@ -364,7 +364,7 @@ class ProductsNotifier extends _$ProductsNotifier {
         clearForm();
         showCustomToast(message: right.message);
         fetchProducts(showLoader: false);
-        ref.read(dropdownsNotifierProvider.notifier).refreshDropdowns();
+        ref.read(dropdownsProvider.notifier).refreshDropdowns();
         state = state.copyWith(updateProductLoader: false);
         return true;
       },
@@ -384,7 +384,7 @@ class ProductsNotifier extends _$ProductsNotifier {
         debugPrint("🟢 API SUCCESS: ${right.message}");
         showCustomToast(message: right.message);
         fetchProducts(showLoader: false);
-        ref.read(dropdownsNotifierProvider.notifier).refreshDropdowns();
+        ref.read(dropdownsProvider.notifier).refreshDropdowns();
         state = state.copyWith(deleteProductLoader: false);
         return true;
       },

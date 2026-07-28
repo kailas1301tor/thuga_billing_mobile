@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/res/constants/string_constants.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/res/styles/font_palette.dart';
-import 'package:vyapapp/utils/common_widgets/common_text_form_field.dart';
-import 'package:vyapapp/utils/common_widgets/primary_button.dart';
-import 'package:vyapapp/utils/common_widgets/common_cached_network_image.dart';
-import 'package:vyapapp/utils/helpers/extensions.dart';
-import 'package:vyapapp/utils/helpers/product_stock_helper.dart';
-import 'package:vyapapp/utils/helpers/toast_helper.dart';
+import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/font_palette.dart';
+import 'package:thuga/utils/common_widgets/common_text_form_field.dart';
+import 'package:thuga/utils/common_widgets/primary_button.dart';
+import 'package:thuga/utils/common_widgets/common_cached_network_image.dart';
+import 'package:thuga/utils/helpers/extensions.dart';
+import 'package:thuga/utils/helpers/product_stock_helper.dart';
+import 'package:thuga/utils/helpers/toast_helper.dart';
 import '../../model/new_bill_model.dart';
 import '../../notifier/new_bill_notifier.dart';
 
@@ -30,7 +30,7 @@ class QuantityPickerSheet extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
-    final notifier = ref.read(newBillNotifierProvider.notifier);
+    final notifier = ref.read(newBillProvider.notifier);
     final maxQty = maxPurchasableQuantity(product.quantity);
     final isTracked = isStockTracked(product.quantity);
 

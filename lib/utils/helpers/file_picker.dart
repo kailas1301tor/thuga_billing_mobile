@@ -4,7 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:vyapapp/res/constants/app_constants.dart';
+import 'package:thuga/res/constants/app_constants.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -37,9 +37,7 @@ class FileSelectionService {
     try {
       // Samsung's MediaStore can return stale URIs — verify first.
       if (!await file.exists()) {
-        showCustomErrorToast(
-          message: 'Could not access the selected file.',
-        );
+        showCustomErrorToast(message: 'Could not access the selected file.');
         return null;
       }
 
@@ -155,7 +153,7 @@ class FileSelectionService {
     bool allowMultiple = true,
   }) async {
     try {
-      final result = await FilePicker.platform.pickFiles(
+      final result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: allowedExtensions ?? ['pdf', 'doc'],
         allowMultiple: allowMultiple,
@@ -173,7 +171,7 @@ class FileSelectionService {
       }
     } on PlatformException catch (_) {
       showCustomErrorToast(
-        message: 'Please allow VyapApp to access storage from settings.',
+        message: 'Please allow Thuka to access storage from settings.',
       );
       await openAppSettings();
     } catch (_) {
@@ -192,7 +190,7 @@ class FileSelectionService {
   //     final bytes = await source.readAsBytes();
   //     final decoded = img.decodeImage(bytes);
   //     if (decoded == null) return source;
-  // 
+  //
   //     // Resize to max 800px maintaining aspect ratio.
   //     final maxDim = _maxDimension.toInt();
   //     img.Image resized;
@@ -205,12 +203,12 @@ class FileSelectionService {
   //     } else {
   //       resized = decoded;
   //     }
-  // 
+  //
   //     // Encode as JPEG at quality 50 → ~30-70 KB
   //     final compressed = Uint8List.fromList(
   //       img.encodeJpg(resized, quality: _pickQuality),
   //     );
-  // 
+  //
   //     // Write to unique temp file
   //     final tempDir = await getTemporaryDirectory();
   //     final tempPath = p.join(
@@ -219,10 +217,10 @@ class FileSelectionService {
   //     );
   //     final compressedFile = File(tempPath);
   //     await compressedFile.writeAsBytes(compressed);
-  // 
+  //
   //     // Clean up original captured file
   //     await _safeDelete(source);
-  // 
+  //
   //     return compressedFile;
   //   } catch (_) {
   //     // If compression fails, return original — better than nothing

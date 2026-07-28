@@ -2,9 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:either_dart/either.dart';
-import 'package:vyapapp/services/repo_di.dart';
-import 'package:vyapapp/utils/helpers/common_functions.dart';
-import 'package:vyapapp/src/main/model/dropdown_model.dart';
+import 'package:thuga/services/repo_di.dart';
+import 'package:thuga/utils/helpers/common_functions.dart';
+import 'package:thuga/src/main/model/dropdown_model.dart';
 import '../repo/purchase_repository.dart';
 import '../state/create_purchase_state.dart';
 import 'purchases_notifier.dart';
@@ -137,7 +137,7 @@ class CreatePurchaseNotifier extends _$CreatePurchaseNotifier {
         showCustomToast(message: right.message);
         
         // Refresh listing
-        ref.read(purchasesNotifierProvider.notifier).fetchPurchases();
+        ref.read(purchasesProvider.notifier).fetchPurchases();
         
         Navigator.pop(context);
       },

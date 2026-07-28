@@ -1,13 +1,13 @@
 // lib/src/products/view/widget/product_card_widget.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/res/constants/string_constants.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/res/styles/font_palette.dart';
-import 'package:vyapapp/utils/common_widgets/common_container.dart';
-import 'package:vyapapp/utils/common_widgets/common_cached_network_image.dart';
-import 'package:vyapapp/utils/helpers/extensions.dart';
-import 'package:vyapapp/src/products/model/product_crud_model.dart';
+import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/font_palette.dart';
+import 'package:thuga/utils/common_widgets/common_container.dart';
+import 'package:thuga/utils/common_widgets/common_cached_network_image.dart';
+import 'package:thuga/utils/helpers/extensions.dart';
+import 'package:thuga/src/products/model/product_crud_model.dart';
 
 class ProductCardWidget extends StatelessWidget {
   const ProductCardWidget({

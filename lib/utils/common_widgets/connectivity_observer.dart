@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:vyapapp/services/connectivity_service.dart';
+import 'package:thuga/services/connectivity_service.dart';
 
 /// A single, app-root-level widget that observes connectivity changes
 /// and shows a global snackbar (online / offline).
@@ -27,7 +27,7 @@ class _ConnectivityObserverState extends ConsumerState<ConnectivityObserver> {
   @override
   Widget build(BuildContext context) {
     ref.listen<AsyncValue<bool>>(connectivityStatusProvider, (previous, next) {
-      final isOnline = next.valueOrNull ?? true;
+      final isOnline = next.value ?? true;
 
       // Skip the very first emission — don't show snackbar on app launch
       if (_previousStatus == null) {

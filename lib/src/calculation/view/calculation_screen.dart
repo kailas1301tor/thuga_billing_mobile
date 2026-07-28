@@ -2,13 +2,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/res/constants/string_constants.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/utils/common_widgets/common_app_bar.dart';
-import 'package:vyapapp/utils/common_widgets/common_dialog_box.dart';
-import 'package:vyapapp/utils/common_widgets/common_empty_state.dart';
-import 'package:vyapapp/utils/common_widgets/common_scaffold.dart';
-import 'package:vyapapp/utils/common_widgets/common_switch_state.dart';
+import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/utils/common_widgets/common_app_bar.dart';
+import 'package:thuga/utils/common_widgets/common_dialog_box.dart';
+import 'package:thuga/utils/common_widgets/common_empty_state.dart';
+import 'package:thuga/utils/common_widgets/common_scaffold.dart';
+import 'package:thuga/utils/common_widgets/common_switch_state.dart';
 
 import '../notifier/calculation_list_notifier.dart';
 import 'calculation_detail_screen.dart';
@@ -22,12 +22,12 @@ class CalculationScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final loaderState = ref.watch(
-      calculationListNotifierProvider.select((s) => s.loaderState),
+      calculationListProvider.select((s) => s.loaderState),
     );
     final bills = ref.watch(
-      calculationListNotifierProvider.select((s) => s.bills),
+      calculationListProvider.select((s) => s.bills),
     );
-    final notifier = ref.read(calculationListNotifierProvider.notifier);
+    final notifier = ref.read(calculationListProvider.notifier);
 
     return CommonScaffold(
       backgroundColor: colors.background,

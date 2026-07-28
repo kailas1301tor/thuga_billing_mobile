@@ -1,5 +1,5 @@
 // lib/src/home/model/home_top_product_model.dart
-import 'package:vyapapp/utils/helpers/safe_converters.dart';
+import 'package:thuga/utils/helpers/safe_converters.dart';
 
 enum HomeProductIconType { tea, coffee, samosa }
 

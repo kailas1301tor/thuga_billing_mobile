@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ColorPalette {
-  // VyapApp POS brand — Emerald Mint primary
+  // Thuka POS brand — Emerald Mint primary
   static const primaryColor = Color(0xFF05B064);
   static const primaryColorDark = Color(0xFF039151);
   static const accentIndigo = Color(0xFF05B064);
@@ -130,10 +130,10 @@ class AppColors extends ThemeExtension<AppColors> {
   });
 
   LinearGradient get primaryGradient => LinearGradient(
-        begin: Alignment.centerLeft,
-        end: Alignment.centerRight,
-        colors: [primary, primaryDark],
-      );
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+    colors: [primary, primaryDark],
+  );
 
   @override
   AppColors copyWith({
@@ -187,7 +187,7 @@ class AppColors extends ThemeExtension<AppColors> {
     );
   }
 
-  /// Preset for Light Mode — VyapApp POS aesthetics
+  /// Preset for Light Mode — Thuka POS aesthetics
   static const AppColors light = AppColors(
     primaryText: Color(0xFF111827),
     secondaryText: Color(0xFF6B7280),

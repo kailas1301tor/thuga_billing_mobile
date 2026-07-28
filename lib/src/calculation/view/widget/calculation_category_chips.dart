@@ -1,8 +1,8 @@
 // lib/src/calculation/view/widget/calculation_category_chips.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/res/styles/font_palette.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/font_palette.dart';
 
 import '../../model/calculation_catalog_model.dart';
 

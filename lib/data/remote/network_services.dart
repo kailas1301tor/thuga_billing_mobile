@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:vyapapp/utils/routes/app_navigator.dart';
+import 'package:thuga/utils/routes/app_navigator.dart';
 import '../../res/constants/app_constants.dart';
 import '../../utils/helpers/api_error_message_helper.dart';
 import '../../utils/helpers/common_functions.dart';
@@ -19,7 +19,7 @@ import '../../services/token_service.dart';
 part 'network_services.g.dart';
 
 @Riverpod(keepAlive: true)
-NetworkServices networkServices(Ref<NetworkServices> ref) {
+NetworkServices networkServices(Ref ref) {
   return NetworkServices(ref);
 }
 

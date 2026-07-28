@@ -1,20 +1,20 @@
 ---
-description: Flutter production engineering rules for VyapApp
+description: Flutter production engineering rules for Thuka
 alwaysApply: true
 ---
 
-# VyapApp Flutter Rules
+# Thuka Flutter Rules
 
 Follow all rules in [AGENTS.md](../../AGENTS.md) at the repository root.
 
 ## Project adapters (quick reference)
 
-| Use this in rules/docs | Use this in VyapApp code |
+| Use this in rules/docs | Use this in Thuka code |
 |------------------------|--------------------------|
 | `FontPalette` / font palette | `lib/res/styles/font_palette.dart` |
 | `PrimaryButton` | `lib/utils/common_widgets/primary_button.dart` |
 | `CommonTextFormField` | `lib/utils/common_widgets/common_text_form_field.dart` |
-| Package imports | `package:vyapapp/...` |
+| Package imports | `package:thuga/...` |
 | Strings / colors | `Strings.` / `ColorPalette.` from `res/` |
 
 ## Non-negotiables

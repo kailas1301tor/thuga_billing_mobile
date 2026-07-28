@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:vyapapp/res/enums/enums.dart';
+import 'package:thuga/res/enums/enums.dart';
 import '../model/product_crud_model.dart';
 
 part 'products_state.freezed.dart';

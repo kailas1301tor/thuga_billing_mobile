@@ -33,14 +33,14 @@ class ThemeNotifier extends AsyncNotifier<ThemeMode> {
 
   // ✅ Handles system mode correctly
   Future<void> toggleTheme() async {
-    final current = state.valueOrNull ?? ThemeMode.system;
+    final current = state.value ?? ThemeMode.system;
     final next = current == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
     await setThemeMode(next);
   }
 
-  bool get isDark => state.valueOrNull == ThemeMode.dark;
-  bool get isLight => state.valueOrNull == ThemeMode.light;
-  bool get isSystem => state.valueOrNull == ThemeMode.system;
+  bool get isDark => state.value == ThemeMode.dark;
+  bool get isLight => state.value == ThemeMode.light;
+  bool get isSystem => state.value == ThemeMode.system;
 }
 
 final themeNotifierProvider =

@@ -1,8 +1,8 @@
 // lib/src/new_bill/view/widget/quick_tap_category_chips.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/res/styles/font_palette.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/font_palette.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../notifier/new_bill_notifier.dart';
@@ -23,7 +23,7 @@ class QuickTapCategoryChips extends ConsumerWidget {
 
     // Watch categories from state
     final categoriesData = ref.watch(
-      newBillNotifierProvider.select((s) => s.categories),
+      newBillProvider.select((s) => s.categories),
     );
 
     return SingleChildScrollView(

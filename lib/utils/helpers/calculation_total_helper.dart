@@ -1,6 +1,6 @@
 // lib/utils/helpers/calculation_total_helper.dart
-import 'package:vyapapp/src/calculation/model/calculation_bill_model.dart';
-import 'package:vyapapp/src/calculation/model/calculation_catalog_model.dart';
+import 'package:thuga/src/calculation/model/calculation_bill_model.dart';
+import 'package:thuga/src/calculation/model/calculation_catalog_model.dart';
 
 Map<int, double> buildCalculationPriceMap(
   List<CalculationCategoryModel> categories,

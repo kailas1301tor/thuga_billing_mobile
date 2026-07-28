@@ -2,10 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:vyapapp/res/constants/assets.dart';
-import 'package:vyapapp/res/constants/string_constants.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/utils/common_widgets/common_text_form_field.dart';
+import 'package:thuga/res/constants/assets.dart';
+import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/utils/common_widgets/common_text_form_field.dart';
 
 class CommonSearchBar extends StatelessWidget {
   const CommonSearchBar({

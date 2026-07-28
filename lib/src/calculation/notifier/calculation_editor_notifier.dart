@@ -1,15 +1,15 @@
 // lib/src/calculation/notifier/calculation_editor_notifier.dart
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:vyapapp/data/local/sembast_services.dart';
-import 'package:vyapapp/res/constants/string_constants.dart';
-import 'package:vyapapp/res/enums/enums.dart';
-import 'package:vyapapp/services/repo_di.dart';
-import 'package:vyapapp/src/main/model/dropdown_model.dart';
-import 'package:vyapapp/utils/helpers/api_error_handler.dart';
-import 'package:vyapapp/utils/helpers/calculation_total_helper.dart';
-import 'package:vyapapp/utils/helpers/debounce_helper.dart';
-import 'package:vyapapp/utils/helpers/toast_helper.dart';
+import 'package:thuga/data/local/sembast_services.dart';
+import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/res/enums/enums.dart';
+import 'package:thuga/services/repo_di.dart';
+import 'package:thuga/src/main/model/dropdown_model.dart';
+import 'package:thuga/utils/helpers/api_error_handler.dart';
+import 'package:thuga/utils/helpers/calculation_total_helper.dart';
+import 'package:thuga/utils/helpers/debounce_helper.dart';
+import 'package:thuga/utils/helpers/toast_helper.dart';
 
 import '../model/calculation_bill_model.dart';
 import '../model/calculation_catalog_model.dart';

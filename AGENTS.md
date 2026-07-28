@@ -1,17 +1,17 @@
 # AGENTS.md — Flutter Production Engineering Rules
 
-## PROJECT ADAPTERS (VyapApp)
+## PROJECT ADAPTERS (Thuka)
 
 This repo uses the following mappings from generic rule names to actual project code:
 
-| Rule / template name | VyapApp implementation |
+| Rule / template name | Thuka implementation |
 |----------------------|------------------------|
-| Package imports | `package:vyapapp/...` |
+| Package imports | `package:thuga/...` |
 | Font styles | [`FontPalette`](lib/res/styles/font_palette.dart) (`onest` family) |
 | Primary CTA button | [`PrimaryButton`](lib/utils/common_widgets/primary_button.dart) |
 | Text inputs | [`CommonTextFormField`](lib/utils/common_widgets/common_text_form_field.dart) |
 | Body text | `Text` with `FontPalette` styles (no `CommonTextWidget` in this repo yet) |
-| App display name | `Strings.appName` → **VyapApp** |
+| App display name | `Strings.appName` → **Thuka** |
 
 ---
 

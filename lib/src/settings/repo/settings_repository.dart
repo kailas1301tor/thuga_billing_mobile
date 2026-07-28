@@ -2,11 +2,12 @@
 import 'package:either_dart/either.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:vyapapp/data/remote/network_base_services.dart';
-import 'package:vyapapp/data/remote/network_services.dart';
-import 'package:vyapapp/res/constants/app_constants.dart';
-import 'package:vyapapp/src/auth/model/auth_model.dart';
-import 'package:vyapapp/utils/helpers/safe_converters.dart';
+import 'package:thuga/data/remote/network_base_services.dart';
+import 'package:thuga/data/remote/network_services.dart';
+import 'package:thuga/res/constants/app_constants.dart';
+import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/src/auth/model/auth_model.dart';
+import 'package:thuga/utils/helpers/safe_converters.dart';
 import '../model/settings_model.dart';
 import '../model/company_details_model.dart';
 
@@ -39,11 +40,11 @@ class SettingsRepoImpl implements SettingsRepo {
 
   String _normalizeStoreName(String? value) {
     final trimmed = value?.trim() ?? '';
-    if (trimmed.isEmpty) return 'Thuka';
+    if (trimmed.isEmpty) return Strings.appName;
 
     final normalized = trimmed.toLowerCase();
     if (normalized == 'tortilon bakery' || normalized == 'tortillon') {
-      return 'Thuka';
+      return Strings.appName;
     }
 
     return trimmed;
@@ -55,7 +56,7 @@ class SettingsRepoImpl implements SettingsRepo {
       final prefs = await SharedPreferences.getInstance();
 
       final storeName = _normalizeStoreName(prefs.getString(_kStoreNameKey));
-      final email = prefs.getString(_kEmailKey) ?? 'contact@thuka.com';
+      final email = prefs.getString(_kEmailKey) ?? 'contact@thuga.com';
       final autoPrint = prefs.getBool(_kAutoPrintKey) ?? false;
       final defaultPayment = prefs.getString(_kDefaultPaymentMethodKey) ?? 'Cash';
       final taxRate = prefs.getDouble(_kTaxRateKey) ?? 5.0;
@@ -130,12 +131,12 @@ class SettingsRepoImpl implements SettingsRepo {
   CompanyDetailsModel _getMockCompany(int id) {
     return CompanyDetailsModel(
       id: id,
-      companyName: 'Thuka',
+      companyName: Strings.appName,
       status: 'Active',
       address: 'thrissur',
       phoneNumber: '9987654656',
       isActive: true,
-      email: 'contact@thuka.com',
+      email: 'contact@thuga.com',
       startWorkingHour: '00:00:00',
       endWorkingHour: '12:00:00',
     );

@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/res/constants/string_constants.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/res/styles/font_palette.dart';
-import 'package:vyapapp/utils/common_widgets/bottomsheet_content.dart';
-import 'package:vyapapp/utils/common_widgets/common_text_form_field.dart';
-import 'package:vyapapp/utils/common_widgets/primary_button.dart';
-import 'package:vyapapp/utils/helpers/extensions.dart';
+import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/font_palette.dart';
+import 'package:thuga/utils/common_widgets/bottomsheet_content.dart';
+import 'package:thuga/utils/common_widgets/common_text_form_field.dart';
+import 'package:thuga/utils/common_widgets/primary_button.dart';
+import 'package:thuga/utils/helpers/extensions.dart';
 import '../../../main/model/dropdown_model.dart';
 import '../../../main/notifier/dropdowns_notifier.dart';
 
@@ -62,7 +62,7 @@ class NewBillFooter extends ConsumerWidget {
         },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
-          padding: EdgeInsets.symmetric(vertical: 8.h),
+          padding: EdgeInsets.symmetric(vertical: 6.h),
           decoration: BoxDecoration(
             color: isSelected
                 ? colors.primary.withValues(alpha: 0.1)
@@ -77,9 +77,11 @@ class NewBillFooter extends ConsumerWidget {
           child: Text(
             label,
             style: FontPalette.base700(
-              12,
+              10,
               color: isSelected ? colors.primary : colors.secondaryText,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ),
@@ -90,7 +92,7 @@ class NewBillFooter extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
 
-    final dropdownsState = ref.watch(dropdownsNotifierProvider);
+    final dropdownsState = ref.watch(dropdownsProvider);
     final paymentMethods = dropdownsState.data.paymentMethods;
     final dropdownsLoader = dropdownsState.loaderState;
 
@@ -111,33 +113,33 @@ class NewBillFooter extends ConsumerWidget {
             Row(
               children: [
                 Text(
-                  'Payment Status:',
-                  style: FontPalette.base700(12, color: colors.secondaryText),
-                ),
-                12.horizontalSpace,
-                _buildChoiceChip(
-                  context: context,
-                  label: 'Paid',
-                  isSelected: paymentStatus == 'Paid',
-                  onTap: () => onPaymentStatusChanged('Paid'),
+                  Strings.paymentStatusLabel,
+                  style: FontPalette.base700(11, color: colors.secondaryText),
                 ),
                 8.horizontalSpace,
                 _buildChoiceChip(
                   context: context,
-                  label: 'Credit',
-                  isSelected: paymentStatus == 'Credit',
-                  onTap: () => onPaymentStatusChanged('Credit'),
+                  label: Strings.paid,
+                  isSelected: paymentStatus == Strings.paid,
+                  onTap: () => onPaymentStatusChanged(Strings.paid),
                 ),
-                8.horizontalSpace,
+                6.horizontalSpace,
                 _buildChoiceChip(
                   context: context,
-                  label: 'Partially Paid',
-                  isSelected: paymentStatus == 'Partially Paid',
-                  onTap: () => onPaymentStatusChanged('Partially Paid'),
+                  label: Strings.unpaid,
+                  isSelected: paymentStatus == Strings.credit,
+                  onTap: () => onPaymentStatusChanged(Strings.credit),
+                ),
+                6.horizontalSpace,
+                _buildChoiceChip(
+                  context: context,
+                  label: Strings.partiallyPaid,
+                  isSelected: paymentStatus == Strings.partiallyPaid,
+                  onTap: () => onPaymentStatusChanged(Strings.partiallyPaid),
                 ),
               ],
             ),
-            if (paymentStatus == 'Partially Paid')
+            if (paymentStatus == Strings.partiallyPaid)
               Padding(
                 padding: EdgeInsets.only(top: 12.h),
                 child: CommonTextFormField(
@@ -159,7 +161,7 @@ class NewBillFooter extends ConsumerWidget {
                   ),
                 ),
               ),
-            if (paymentStatus == 'Credit')
+            if (paymentStatus == Strings.credit)
               Padding(
                 padding: EdgeInsets.only(top: 8.h),
                 child: Row(

@@ -1,10 +1,10 @@
 // lib/src/bills/repo/bills_repository.dart
 import 'package:either_dart/either.dart';
-import 'package:vyapapp/data/remote/network_base_services.dart';
-import 'package:vyapapp/data/remote/network_services.dart';
-import 'package:vyapapp/res/constants/app_constants.dart';
-import 'package:vyapapp/src/auth/model/auth_model.dart';
-import 'package:vyapapp/utils/helpers/safe_converters.dart';
+import 'package:thuga/data/remote/network_base_services.dart';
+import 'package:thuga/data/remote/network_services.dart';
+import 'package:thuga/res/constants/app_constants.dart';
+import 'package:thuga/src/auth/model/auth_model.dart';
+import 'package:thuga/utils/helpers/safe_converters.dart';
 import '../model/bill_model.dart';
 import '../model/bill_detail_model.dart';
 

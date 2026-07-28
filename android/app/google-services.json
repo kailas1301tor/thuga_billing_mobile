@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "914040002853",
+    "project_id": "thuga-billing",
+    "storage_bucket": "thuga-billing.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:914040002853:android:588c02acb73cc971a3a2cc",
+        "android_client_info": {
+          "package_name": "com.thuga.billing"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA8mR25lcm2eY6pK5INAsA5uemdP2drBkk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

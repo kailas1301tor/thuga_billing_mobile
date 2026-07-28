@@ -1,7 +1,7 @@
 // lib/utils/common_widgets/common_progress_bar.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/color_palette.dart';
 
 class CommonProgressBar extends StatelessWidget {
   const CommonProgressBar({

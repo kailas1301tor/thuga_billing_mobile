@@ -3,18 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tuple/tuple.dart';
-import 'package:vyapapp/res/constants/string_constants.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/utils/common_widgets/common_app_bar.dart';
-import 'package:vyapapp/utils/common_widgets/common_bottom_sheet.dart';
-import 'package:vyapapp/utils/common_widgets/common_dialog_box.dart';
-import 'package:vyapapp/utils/common_widgets/common_nav_bar_button.dart';
-import 'package:vyapapp/utils/common_widgets/common_scaffold.dart';
-import 'package:vyapapp/utils/common_widgets/common_switch_state.dart';
-import 'package:vyapapp/utils/common_widgets/common_text_form_field.dart';
-import 'package:vyapapp/utils/common_widgets/common_search_bar.dart';
-import 'package:vyapapp/utils/common_widgets/common_refresh_indicator.dart';
-import 'package:vyapapp/utils/common_widgets/primary_button.dart';
+import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/utils/common_widgets/common_app_bar.dart';
+import 'package:thuga/utils/common_widgets/common_bottom_sheet.dart';
+import 'package:thuga/utils/common_widgets/common_dialog_box.dart';
+import 'package:thuga/utils/common_widgets/common_nav_bar_button.dart';
+import 'package:thuga/utils/common_widgets/common_scaffold.dart';
+import 'package:thuga/utils/common_widgets/common_switch_state.dart';
+import 'package:thuga/utils/common_widgets/common_text_form_field.dart';
+import 'package:thuga/utils/common_widgets/common_search_bar.dart';
+import 'package:thuga/utils/common_widgets/common_refresh_indicator.dart';
+import 'package:thuga/utils/common_widgets/primary_button.dart';
 import 'widget/category_card_widget.dart';
 import '../model/category_model.dart';
 import '../notifier/categories_notifier.dart';
@@ -26,20 +26,20 @@ class CategoryCrudScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final loaderState = ref.watch(
-      categoriesNotifierProvider.select((value) => value.loaderState),
+      categoriesProvider.select((value) => value.loaderState),
     );
 
     final categoryList = ref.watch(
-      categoriesNotifierProvider.select(
+      categoriesProvider.select(
         (value) => value.response?.results.data,
       ),
     );
 
     final isLoadingMore = ref.watch(
-      categoriesNotifierProvider.select((value) => value.isLoadingMore),
+      categoriesProvider.select((value) => value.isLoadingMore),
     );
 
-    final notifier = ref.read(categoriesNotifierProvider.notifier);
+    final notifier = ref.read(categoriesProvider.notifier);
 
     return CommonScaffold(
       backgroundColor: colors.background,
@@ -148,7 +148,7 @@ class CategoryCrudScreen extends ConsumerWidget {
               Consumer(
                 builder: (context, ref, _) {
                   final loaders = ref.watch(
-                    categoriesNotifierProvider.select(
+                    categoriesProvider.select(
                       (value) => Tuple2(
                         value.saveCategoryLoader,
                         value.updateCategoryLoader,
@@ -201,7 +201,7 @@ class CategoryCrudScreen extends ConsumerWidget {
       builder: (_) => Consumer(
         builder: (context, ref, _) {
           final isDeleting = ref.watch(
-            categoriesNotifierProvider.select(
+            categoriesProvider.select(
               (value) => value.deleteCategoryLoader,
             ),
           );

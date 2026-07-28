@@ -1,11 +1,12 @@
 // lib/src/settings/notifier/settings_notifier.dart
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:vyapapp/res/enums/enums.dart';
-import 'package:vyapapp/services/repo_di.dart';
-import 'package:vyapapp/services/token_service.dart';
-import 'package:vyapapp/utils/helpers/toast_helper.dart';
-import 'package:vyapapp/utils/helpers/working_hour_helper.dart';
+import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/res/enums/enums.dart';
+import 'package:thuga/services/repo_di.dart';
+import 'package:thuga/services/token_service.dart';
+import 'package:thuga/utils/helpers/toast_helper.dart';
+import 'package:thuga/utils/helpers/working_hour_helper.dart';
 import '../model/settings_model.dart';
 import '../model/company_details_model.dart';
 import '../state/settings_state.dart';
@@ -208,8 +209,8 @@ class SettingsNotifier extends _$SettingsNotifier {
 
   Future<void> resetToDefaults() async {
     final defaults = const SettingsModel(
-      storeName: 'Thuka',
-      email: 'contact@thuka.com',
+      storeName: Strings.appName,
+      email: 'contact@thuga.com',
       autoPrint: false,
       defaultPaymentMethod: 'Cash',
       taxRate: 5.0,

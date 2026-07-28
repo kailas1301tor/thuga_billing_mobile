@@ -1,9 +1,9 @@
 // lib/src/calculation/view/widget/calculation_line_item_row.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/res/styles/font_palette.dart';
-import 'package:vyapapp/utils/helpers/extensions.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/font_palette.dart';
+import 'package:thuga/utils/helpers/extensions.dart';
 
 import '../../model/calculation_bill_model.dart';
 

@@ -1,8 +1,8 @@
 // lib/src/settings/state/settings_state.dart
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:vyapapp/res/enums/enums.dart';
-import 'package:vyapapp/utils/helpers/working_hour_helper.dart';
+import 'package:thuga/res/enums/enums.dart';
+import 'package:thuga/utils/helpers/working_hour_helper.dart';
 import '../model/settings_model.dart';
 import '../model/company_details_model.dart';
 

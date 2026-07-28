@@ -2,14 +2,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/res/styles/font_palette.dart';
-import 'package:vyapapp/utils/common_widgets/common_app_bar.dart';
-import 'package:vyapapp/utils/common_widgets/common_container.dart';
-import 'package:vyapapp/utils/common_widgets/common_refresh_indicator.dart';
-import 'package:vyapapp/utils/common_widgets/common_scaffold.dart';
-import 'package:vyapapp/utils/common_widgets/common_switch_state.dart';
-import 'package:vyapapp/utils/helpers/common_functions.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/font_palette.dart';
+import 'package:thuga/utils/common_widgets/common_app_bar.dart';
+import 'package:thuga/utils/common_widgets/common_container.dart';
+import 'package:thuga/utils/common_widgets/common_refresh_indicator.dart';
+import 'package:thuga/utils/common_widgets/common_scaffold.dart';
+import 'package:thuga/utils/common_widgets/common_switch_state.dart';
+import 'package:thuga/utils/helpers/common_functions.dart';
 import '../notifier/purchases_notifier.dart';
 import 'widget/purchase_item_card.dart';
 import 'create_purchase_screen.dart';
@@ -20,8 +20,8 @@ class PurchasesScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
-    final state = ref.watch(purchasesNotifierProvider);
-    final notifier = ref.read(purchasesNotifierProvider.notifier);
+    final state = ref.watch(purchasesProvider);
+    final notifier = ref.read(purchasesProvider.notifier);
 
     return CommonScaffold(
       backgroundColor: colors.background,

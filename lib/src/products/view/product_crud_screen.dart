@@ -4,29 +4,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tuple/tuple.dart';
-import 'package:vyapapp/res/constants/string_constants.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/res/styles/font_palette.dart';
-import 'package:vyapapp/utils/common_widgets/common_app_bar.dart';
-import 'package:vyapapp/utils/common_widgets/common_bottom_sheet.dart';
-import 'package:vyapapp/utils/common_widgets/common_cached_network_image.dart';
-import 'package:vyapapp/utils/common_widgets/common_dialog_box.dart';
-import 'package:vyapapp/utils/common_widgets/common_nav_bar_button.dart';
-import 'package:vyapapp/utils/common_widgets/common_scaffold.dart';
-import 'package:vyapapp/utils/common_widgets/common_search_bar.dart';
-import 'package:vyapapp/utils/common_widgets/common_switch_state.dart';
-import 'package:vyapapp/utils/common_widgets/common_text_form_field.dart';
-import 'package:vyapapp/utils/common_widgets/common_refresh_indicator.dart';
-import 'package:vyapapp/utils/common_widgets/primary_button.dart';
+import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/font_palette.dart';
+import 'package:thuga/utils/common_widgets/common_app_bar.dart';
+import 'package:thuga/utils/common_widgets/common_bottom_sheet.dart';
+import 'package:thuga/utils/common_widgets/common_cached_network_image.dart';
+import 'package:thuga/utils/common_widgets/common_dialog_box.dart';
+import 'package:thuga/utils/common_widgets/common_nav_bar_button.dart';
+import 'package:thuga/utils/common_widgets/common_scaffold.dart';
+import 'package:thuga/utils/common_widgets/common_search_bar.dart';
+import 'package:thuga/utils/common_widgets/common_switch_state.dart';
+import 'package:thuga/utils/common_widgets/common_text_form_field.dart';
+import 'package:thuga/utils/common_widgets/common_refresh_indicator.dart';
+import 'package:thuga/utils/common_widgets/primary_button.dart';
 import 'widget/product_card_widget.dart';
 import '../model/product_crud_model.dart';
 import '../notifier/products_notifier.dart';
 import '../state/products_state.dart';
-import 'package:vyapapp/res/enums/enums.dart';
-import 'package:vyapapp/src/categories/notifier/categories_notifier.dart';
-import 'package:vyapapp/src/categories/model/category_model.dart';
-import 'package:vyapapp/utils/common_widgets/bottomsheet_content.dart';
-import 'package:vyapapp/utils/helpers/extensions.dart';
+import 'package:thuga/res/enums/enums.dart';
+import 'package:thuga/src/categories/notifier/categories_notifier.dart';
+import 'package:thuga/src/categories/model/category_model.dart';
+import 'package:thuga/utils/common_widgets/bottomsheet_content.dart';
+import 'package:thuga/utils/helpers/extensions.dart';
 
 class ProductCrudScreen extends ConsumerWidget {
   const ProductCrudScreen({super.key});
@@ -61,8 +61,8 @@ class ProductCrudScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
-    final state = ref.watch(productsNotifierProvider);
-    final notifier = ref.read(productsNotifierProvider.notifier);
+    final state = ref.watch(productsProvider);
+    final notifier = ref.read(productsProvider.notifier);
 
     return CommonScaffold(
       backgroundColor: colors.background,
@@ -119,12 +119,12 @@ class ProductCrudScreen extends ConsumerWidget {
           Consumer(
             builder: (context, ref, _) {
               final categoryResponse = ref.watch(
-                categoriesNotifierProvider.select((c) => c.response),
+                categoriesProvider.select((c) => c.response),
               );
               final categories = categoryResponse?.results.data ?? [];
               final selectedFilter = state.filterCategoryId;
               final categoryLoader = ref.watch(
-                categoriesNotifierProvider.select((value) => value.loaderState),
+                categoriesProvider.select((value) => value.loaderState),
               );
               if (categoryLoader == LoaderState.loading) {
                 return const CategoryShimmerWidget();
@@ -290,7 +290,7 @@ class ProductCrudScreen extends ConsumerWidget {
               Consumer(
                 builder: (context, ref, _) {
                   final selectedImagePath = ref.watch(
-                    productsNotifierProvider.select((s) => s.selectedImagePath),
+                    productsProvider.select((s) => s.selectedImagePath),
                   );
                   final hasImage =
                       selectedImagePath != null ||
@@ -421,10 +421,10 @@ class ProductCrudScreen extends ConsumerWidget {
               16.verticalSpace,
               Consumer(
                 builder: (context, ref, child) {
-                  final state = ref.watch(productsNotifierProvider);
+                  final state = ref.watch(productsProvider);
                   final categories =
                       ref
-                          .watch(categoriesNotifierProvider)
+                          .watch(categoriesProvider)
                           .response
                           ?.results
                           .data ??
@@ -545,7 +545,7 @@ class ProductCrudScreen extends ConsumerWidget {
               Consumer(
                 builder: (context, ref, _) {
                   final isQuickProduct = ref.watch(
-                    productsNotifierProvider.select((s) => s.isQuickProduct),
+                    productsProvider.select((s) => s.isQuickProduct),
                   );
 
                   return SwitchListTile.adaptive(
@@ -574,7 +574,7 @@ class ProductCrudScreen extends ConsumerWidget {
               Consumer(
                 builder: (context, ref, _) {
                   final loaders = ref.watch(
-                    productsNotifierProvider.select(
+                    productsProvider.select(
                       (value) => Tuple2(
                         value.saveProductLoader,
                         value.updateProductLoader,
@@ -630,7 +630,7 @@ class ProductCrudScreen extends ConsumerWidget {
       builder: (_) => Consumer(
         builder: (context, ref, _) {
           final isDeleting = ref.watch(
-            productsNotifierProvider.select(
+            productsProvider.select(
               (value) => value.deleteProductLoader,
             ),
           );

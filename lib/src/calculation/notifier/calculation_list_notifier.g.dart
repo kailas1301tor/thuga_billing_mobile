@@ -6,25 +6,59 @@ part of 'calculation_list_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
+@ProviderFor(CalculationListNotifier)
+final calculationListProvider = CalculationListNotifierProvider._();
+
+final class CalculationListNotifierProvider
+    extends $NotifierProvider<CalculationListNotifier, CalculationListState> {
+  CalculationListNotifierProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'calculationListProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$calculationListNotifierHash();
+
+  @$internal
+  @override
+  CalculationListNotifier create() => CalculationListNotifier();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(CalculationListState value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<CalculationListState>(value),
+    );
+  }
+}
+
 String _$calculationListNotifierHash() =>
     r'bce21f78a086e32a9f083f114a0e5463b2b5ce90';
 
-/// See also [CalculationListNotifier].
-@ProviderFor(CalculationListNotifier)
-final calculationListNotifierProvider =
-    AutoDisposeNotifierProvider<
-      CalculationListNotifier,
-      CalculationListState
-    >.internal(
-      CalculationListNotifier.new,
-      name: r'calculationListNotifierProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$calculationListNotifierHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
-
-typedef _$CalculationListNotifier = AutoDisposeNotifier<CalculationListState>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+abstract class _$CalculationListNotifier
+    extends $Notifier<CalculationListState> {
+  CalculationListState build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<CalculationListState, CalculationListState>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<CalculationListState, CalculationListState>,
+              CalculationListState,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}

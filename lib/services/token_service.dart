@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:vyapapp/data/local/sembast_services.dart';
-import 'package:vyapapp/res/constants/app_constants.dart';
+import 'package:thuga/data/local/sembast_services.dart';
+import 'package:thuga/res/constants/app_constants.dart';
 
 /// Service for managing local storage of authentication tokens and session data.
 class TokenService {

@@ -2,18 +2,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/res/constants/string_constants.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/res/styles/font_palette.dart';
-import 'package:vyapapp/res/styles/theme_provider.dart';
-import 'package:vyapapp/src/auth/notifier/auth_notifier.dart';
-import 'package:vyapapp/src/printer/notifier/printer_notifier.dart';
-import 'package:vyapapp/utils/common_widgets/common_container.dart';
-import 'package:vyapapp/utils/common_widgets/common_bottom_sheet.dart';
-import 'package:vyapapp/utils/common_widgets/common_dialog_box.dart';
-import 'package:vyapapp/utils/common_widgets/common_text_form_field.dart';
-import 'package:vyapapp/utils/common_widgets/primary_button.dart';
-import 'package:vyapapp/utils/helpers/working_hour_helper.dart';
+import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/font_palette.dart';
+import 'package:thuga/res/styles/theme_provider.dart';
+import 'package:thuga/src/auth/notifier/auth_notifier.dart';
+import 'package:thuga/src/printer/model/printer_paper_size.dart';
+import 'package:thuga/src/printer/notifier/printer_notifier.dart';
+import 'package:thuga/utils/common_widgets/common_container.dart';
+import 'package:thuga/utils/common_widgets/common_bottom_sheet.dart';
+import 'package:thuga/utils/common_widgets/common_dialog_box.dart';
+import 'package:thuga/utils/common_widgets/common_text_form_field.dart';
+import 'package:thuga/utils/common_widgets/primary_button.dart';
+import 'package:thuga/utils/helpers/working_hour_helper.dart';
 import '../../notifier/settings_notifier.dart';
 import '../../model/settings_model.dart';
 
@@ -25,9 +26,9 @@ class SettingsContentWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
-    final notifier = ref.read(settingsNotifierProvider.notifier);
+    final notifier = ref.read(settingsProvider.notifier);
     final themeMode =
-        ref.watch(themeNotifierProvider).valueOrNull ?? ThemeMode.system;
+        ref.watch(themeNotifierProvider).value ?? ThemeMode.system;
     final firstLetter = settings.storeName.isNotEmpty
         ? settings.storeName.trim()[0].toUpperCase()
         : 'S';
@@ -186,12 +187,12 @@ class SettingsContentWidget extends ConsumerWidget {
 
   Widget _buildWorkingHourFields(BuildContext context, WidgetRef ref) {
     final startTime = ref.watch(
-      settingsNotifierProvider.select((s) => s.startWorkingTime),
+      settingsProvider.select((s) => s.startWorkingTime),
     );
     final endTime = ref.watch(
-      settingsNotifierProvider.select((s) => s.endWorkingTime),
+      settingsProvider.select((s) => s.endWorkingTime),
     );
-    final notifier = ref.read(settingsNotifierProvider.notifier);
+    final notifier = ref.read(settingsProvider.notifier);
 
     return Row(
       children: [
@@ -320,8 +321,8 @@ class SettingsContentWidget extends ConsumerWidget {
 
   Widget _buildPrinterSection(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
-    final printerState = ref.watch(printerNotifierProvider);
-    final notifier = ref.read(printerNotifierProvider.notifier);
+    final printerState = ref.watch(printerProvider);
+    final notifier = ref.read(printerProvider.notifier);
 
     return CommonContainer(
       padding: EdgeInsets.all(16.r),
@@ -402,8 +403,56 @@ class SettingsContentWidget extends ConsumerWidget {
     );
   }
 
+  Widget _buildPaperWidthSelector(BuildContext context, WidgetRef ref) {
+    final colors = context.appColors;
+    final paperSize = ref.watch(
+      printerProvider.select((state) => state.paperSize),
+    );
+    final printerNotifier = ref.read(printerProvider.notifier);
+
+    return CommonContainer(
+      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+      borderRadius: 14.r,
+      color: colors.inputBackground,
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              Strings.paperWidth,
+              style: FontPalette.base600(13, color: colors.primaryText),
+            ),
+          ),
+          12.horizontalSpace,
+          DropdownButtonHideUnderline(
+            child: DropdownButton<PrinterPaperSize>(
+              value: paperSize,
+              borderRadius: BorderRadius.circular(12.r),
+              style: FontPalette.base600(13, color: colors.primaryText),
+              dropdownColor: colors.surface,
+              items: const [
+                DropdownMenuItem(
+                  value: PrinterPaperSize.mm58,
+                  child: Text(Strings.paperWidth58),
+                ),
+                DropdownMenuItem(
+                  value: PrinterPaperSize.mm80,
+                  child: Text(Strings.paperWidth80),
+                ),
+              ],
+              onChanged: (value) {
+                if (value != null) {
+                  printerNotifier.setPaperSize(value);
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showPrinterSheet(BuildContext context, WidgetRef ref) {
-    final notifier = ref.read(printerNotifierProvider.notifier);
+    final notifier = ref.read(printerProvider.notifier);
     notifier.rescanPrinters();
 
     CommonBottomSheet.show(
@@ -412,8 +461,8 @@ class SettingsContentWidget extends ConsumerWidget {
       isScrollControlled: true,
       child: Consumer(
         builder: (context, ref, _) {
-          final printerState = ref.watch(printerNotifierProvider);
-          final printerNotifier = ref.read(printerNotifierProvider.notifier);
+          final printerState = ref.watch(printerProvider);
+          final printerNotifier = ref.read(printerProvider.notifier);
           final colors = context.appColors;
 
           return ConstrainedBox(
@@ -422,6 +471,8 @@ class SettingsContentWidget extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                _buildPaperWidthSelector(context, ref),
+                12.verticalSpace,
                 PrimaryButton(
                   text: Strings.scanPrinters,
                   radius: 12,
@@ -435,7 +486,7 @@ class SettingsContentWidget extends ConsumerWidget {
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 12.h),
                     child: Text(
-                      Strings.noPrinterConnected,
+                      Strings.pairedPrinterHint,
                       style: FontPalette.base500(
                         13,
                         color: colors.secondaryText,
@@ -521,7 +572,7 @@ class SettingsContentWidget extends ConsumerWidget {
       primaryLabel: 'Logout',
       secondaryLabel: 'Cancel',
       onPrimary: () {
-        ref.read(authNotifierProvider.notifier).logout();
+        ref.read(authProvider.notifier).logout();
       },
     );
   }

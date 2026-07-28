@@ -1,5 +1,5 @@
-import 'package:vyapapp/res/constants/string_constants.dart';
-import 'package:vyapapp/utils/helpers/extensions.dart';
+import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/utils/helpers/extensions.dart';
 
 /// Common form validators.
 class Validators {

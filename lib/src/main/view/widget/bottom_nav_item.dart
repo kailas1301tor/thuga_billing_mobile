@@ -1,8 +1,8 @@
 // lib/src/main/view/widget/bottom_nav_item.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/res/styles/font_palette.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/font_palette.dart';
 
 class BottomNavItem extends StatelessWidget {
   const BottomNavItem({

@@ -1,8 +1,8 @@
 // lib/src/home/view/widget/home_section_list_card.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/utils/common_widgets/common_container.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/utils/common_widgets/common_container.dart';
 
 class HomeSectionListCard extends StatelessWidget {
   const HomeSectionListCard({super.key, required this.children});

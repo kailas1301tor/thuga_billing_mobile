@@ -2,12 +2,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/res/constants/string_constants.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/src/printer/notifier/printer_notifier.dart';
-import 'package:vyapapp/utils/common_widgets/common_dialog_box.dart';
-import 'package:vyapapp/utils/common_widgets/common_scaffold.dart';
-import 'package:vyapapp/utils/common_widgets/common_switch_state.dart';
+import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/src/printer/notifier/printer_notifier.dart';
+import 'package:thuga/utils/common_widgets/common_dialog_box.dart';
+import 'package:thuga/utils/common_widgets/common_scaffold.dart';
+import 'package:thuga/utils/common_widgets/common_switch_state.dart';
 
 import '../notifier/new_bill_notifier.dart';
 import 'widget/amount_entry_view.dart';
@@ -20,8 +20,8 @@ void _onPaymentStatusChanged(
   WidgetRef ref,
   String status,
 ) {
-  final state = ref.read(newBillNotifierProvider);
-  final notifier = ref.read(newBillNotifierProvider.notifier);
+  final state = ref.read(newBillProvider);
+  final notifier = ref.read(newBillProvider.notifier);
 
   final needsConfirm = state.selectedCustomer == null &&
       status != 'Paid' &&
@@ -48,10 +48,10 @@ class NewBillScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
-    final state = ref.watch(newBillNotifierProvider);
-    final notifier = ref.read(newBillNotifierProvider.notifier);
+    final state = ref.watch(newBillProvider);
+    final notifier = ref.read(newBillProvider.notifier);
     final isPrinterConnected = ref.watch(
-      printerNotifierProvider.select((value) => value.isConnected),
+      printerProvider.select((value) => value.isConnected),
     );
 
     // Compute tax-inclusive grand total

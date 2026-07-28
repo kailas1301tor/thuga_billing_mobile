@@ -6,170 +6,95 @@ part of 'bill_detail_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$billDetailNotifierHash() =>
-    r'eb930b4f56625e12d277352503ac50c96a800099';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-abstract class _$BillDetailNotifier
-    extends BuildlessAutoDisposeAsyncNotifier<BillDetailModel> {
-  late final int id;
-
-  FutureOr<BillDetailModel> build(int id);
-}
-
-/// See also [BillDetailNotifier].
 @ProviderFor(BillDetailNotifier)
-const billDetailNotifierProvider = BillDetailNotifierFamily();
+final billDetailProvider = BillDetailNotifierFamily._();
 
-/// See also [BillDetailNotifier].
-class BillDetailNotifierFamily extends Family<AsyncValue<BillDetailModel>> {
-  /// See also [BillDetailNotifier].
-  const BillDetailNotifierFamily();
+final class BillDetailNotifierProvider
+    extends $AsyncNotifierProvider<BillDetailNotifier, BillDetailModel> {
+  BillDetailNotifierProvider._({
+    required BillDetailNotifierFamily super.from,
+    required int super.argument,
+  }) : super(
+         retry: null,
+         name: r'billDetailProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
-  /// See also [BillDetailNotifier].
-  BillDetailNotifierProvider call(int id) {
-    return BillDetailNotifierProvider(id);
+  @override
+  String debugGetCreateSourceHash() => _$billDetailNotifierHash();
+
+  @override
+  String toString() {
+    return r'billDetailProvider'
+        ''
+        '($argument)';
   }
 
+  @$internal
   @override
-  BillDetailNotifierProvider getProviderOverride(
-    covariant BillDetailNotifierProvider provider,
-  ) {
-    return call(provider.id);
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'billDetailNotifierProvider';
-}
-
-/// See also [BillDetailNotifier].
-class BillDetailNotifierProvider
-    extends
-        AutoDisposeAsyncNotifierProviderImpl<
-          BillDetailNotifier,
-          BillDetailModel
-        > {
-  /// See also [BillDetailNotifier].
-  BillDetailNotifierProvider(int id)
-    : this._internal(
-        () => BillDetailNotifier()..id = id,
-        from: billDetailNotifierProvider,
-        name: r'billDetailNotifierProvider',
-        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-            ? null
-            : _$billDetailNotifierHash,
-        dependencies: BillDetailNotifierFamily._dependencies,
-        allTransitiveDependencies:
-            BillDetailNotifierFamily._allTransitiveDependencies,
-        id: id,
-      );
-
-  BillDetailNotifierProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.id,
-  }) : super.internal();
-
-  final int id;
-
-  @override
-  FutureOr<BillDetailModel> runNotifierBuild(
-    covariant BillDetailNotifier notifier,
-  ) {
-    return notifier.build(id);
-  }
-
-  @override
-  Override overrideWith(BillDetailNotifier Function() create) {
-    return ProviderOverride(
-      origin: this,
-      override: BillDetailNotifierProvider._internal(
-        () => create()..id = id,
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        id: id,
-      ),
-    );
-  }
-
-  @override
-  AutoDisposeAsyncNotifierProviderElement<BillDetailNotifier, BillDetailModel>
-  createElement() {
-    return _BillDetailNotifierProviderElement(this);
-  }
+  BillDetailNotifier create() => BillDetailNotifier();
 
   @override
   bool operator ==(Object other) {
-    return other is BillDetailNotifierProvider && other.id == id;
+    return other is BillDetailNotifierProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, id.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin BillDetailNotifierRef
-    on AutoDisposeAsyncNotifierProviderRef<BillDetailModel> {
-  /// The parameter `id` of this provider.
-  int get id;
-}
+String _$billDetailNotifierHash() =>
+    r'eb930b4f56625e12d277352503ac50c96a800099';
 
-class _BillDetailNotifierProviderElement
-    extends
-        AutoDisposeAsyncNotifierProviderElement<
+final class BillDetailNotifierFamily extends $Family
+    with
+        $ClassFamilyOverride<
           BillDetailNotifier,
-          BillDetailModel
-        >
-    with BillDetailNotifierRef {
-  _BillDetailNotifierProviderElement(super.provider);
+          AsyncValue<BillDetailModel>,
+          BillDetailModel,
+          FutureOr<BillDetailModel>,
+          int
+        > {
+  BillDetailNotifierFamily._()
+    : super(
+        retry: null,
+        name: r'billDetailProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  BillDetailNotifierProvider call(int id) =>
+      BillDetailNotifierProvider._(argument: id, from: this);
 
   @override
-  int get id => (origin as BillDetailNotifierProvider).id;
+  String toString() => r'billDetailProvider';
 }
 
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+abstract class _$BillDetailNotifier extends $AsyncNotifier<BillDetailModel> {
+  late final _$args = ref.$arg as int;
+  int get id => _$args;
+
+  FutureOr<BillDetailModel> build(int id);
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<BillDetailModel>, BillDetailModel>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<BillDetailModel>, BillDetailModel>,
+              AsyncValue<BillDetailModel>,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, () => build(_$args));
+  }
+}

@@ -6,21 +6,57 @@ part of 'new_bill_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$newBillNotifierHash() => r'd143a59bad08b35b4f00fcb9e1c3dc3a44a0c0dc';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [NewBillNotifier].
 @ProviderFor(NewBillNotifier)
-final newBillNotifierProvider =
-    AutoDisposeNotifierProvider<NewBillNotifier, NewBillState>.internal(
-      NewBillNotifier.new,
-      name: r'newBillNotifierProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$newBillNotifierHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+final newBillProvider = NewBillNotifierProvider._();
 
-typedef _$NewBillNotifier = AutoDisposeNotifier<NewBillState>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class NewBillNotifierProvider
+    extends $NotifierProvider<NewBillNotifier, NewBillState> {
+  NewBillNotifierProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'newBillProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$newBillNotifierHash();
+
+  @$internal
+  @override
+  NewBillNotifier create() => NewBillNotifier();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(NewBillState value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<NewBillState>(value),
+    );
+  }
+}
+
+String _$newBillNotifierHash() => r'9b64833ef62a3bb8427c6d5dd9b3cd1456f803b7';
+
+abstract class _$NewBillNotifier extends $Notifier<NewBillState> {
+  NewBillState build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<NewBillState, NewBillState>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<NewBillState, NewBillState>,
+              NewBillState,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}

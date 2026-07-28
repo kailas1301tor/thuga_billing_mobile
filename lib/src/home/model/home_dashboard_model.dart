@@ -1,6 +1,6 @@
 // lib/src/home/model/home_dashboard_model.dart
-import 'package:vyapapp/utils/helpers/safe_converters.dart';
-import 'package:vyapapp/src/bills/model/bill_model.dart';
+import 'package:thuga/utils/helpers/safe_converters.dart';
+import 'package:thuga/src/bills/model/bill_model.dart';
 import 'home_top_product_model.dart';
 
 class HomeDashboardModel {

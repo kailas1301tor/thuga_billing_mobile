@@ -1,5 +1,5 @@
-import 'package:vyapapp/data/remote/network_base_services.dart';
-import 'package:vyapapp/res/enums/enums.dart';
+import 'package:thuga/data/remote/network_base_services.dart';
+import 'package:thuga/res/enums/enums.dart';
 
 LoaderState handleResponseError(ApiErrorTypes errorType) {
   return switch (errorType) {

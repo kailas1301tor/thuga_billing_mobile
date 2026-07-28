@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vyapapp/src/new_bill/model/new_bill_model.dart';
-import 'package:vyapapp/utils/helpers/bill_tax_helper.dart';
+import 'package:thuga/src/new_bill/model/new_bill_model.dart';
+import 'package:thuga/utils/helpers/bill_tax_helper.dart';
 
 CartItemModel _item({
   required double price,

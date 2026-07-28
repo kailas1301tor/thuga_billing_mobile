@@ -163,7 +163,9 @@ class Strings {
   static const String noRecentBills = "No recent bills";
   static const String paid = "Paid";
   static const String credit = "Credit";
+  static const String unpaid = "Unpaid";
   static const String partiallyPaid = "Partially Paid";
+  static const String paymentStatusLabel = "Payment Status:";
   static const String markAsPaid = "Mark as Paid";
   static const String markAsUnpaid = "Mark as Unpaid";
   static const String paidOn = "Paid on";
@@ -186,6 +188,9 @@ class Strings {
   static const String pcs = "Pcs";
   static const String ofSales = "of sales";
   static const String homeMenu = "Menu";
+  static const String appMenuTitle = "Thuka Menu";
+  static const String billedViaApp = "Billed via Thuka App";
+  static const String appBrandFooter = "Thuka App";
   static const String notifications = "Notifications";
 
   // CRUD Screen Titles
@@ -257,6 +262,11 @@ class Strings {
   static const String selectStartTime = "Select start time";
   static const String selectEndTime = "Select end time";
   static const String managePrinter = "Manage Printer";
+  static const String paperWidth = "Paper Width";
+  static const String paperWidth58 = "58 mm";
+  static const String paperWidth80 = "80 mm";
+  static const String pairedPrinterHint =
+      "Make sure your printer is paired in Bluetooth settings before scanning.";
   static const String noPrinterConnected = "No printer connected";
   static const String printerConnected = "Printer connected";
   static const String bluetoothPrinterHint =
@@ -266,4 +276,19 @@ class Strings {
   static const String printerSavedSuccess = "Receipt sent to printer";
   static const String printerFallbackPreview =
       "Printer unavailable. Showing bill preview instead.";
+  static const String printerBluetoothDisabled =
+      "Bluetooth is turned off. Enable Bluetooth to use the printer.";
+  static const String printerPermissionDenied =
+      "Bluetooth permission is required to connect to the printer.";
+  static const String printerConnectionFailed =
+      "Failed to connect to the printer. Check that it is paired and powered on.";
+  static const String printerDeviceNotFound =
+      "Printer not found. Scan for printers and try again.";
+  static const String printerNotConnected = "No Bluetooth printer connected.";
+  static const String printerPrintFailed =
+      "Failed to print receipt. Check the printer connection.";
+  static const String printerScanFailed =
+      "Failed to scan for printers. Check Bluetooth and permissions.";
+  static const String printerUnknownError =
+      "An unexpected printer error occurred. Please try again.";
 }

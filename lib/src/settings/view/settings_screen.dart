@@ -1,11 +1,11 @@
 // lib/src/settings/view/settings_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:vyapapp/res/constants/string_constants.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
-import 'package:vyapapp/utils/common_widgets/common_app_bar.dart';
-import 'package:vyapapp/utils/common_widgets/common_scaffold.dart';
-import 'package:vyapapp/utils/common_widgets/common_switch_state.dart';
+import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/utils/common_widgets/common_app_bar.dart';
+import 'package:thuga/utils/common_widgets/common_scaffold.dart';
+import 'package:thuga/utils/common_widgets/common_switch_state.dart';
 import '../notifier/settings_notifier.dart';
 import 'widget/settings_content_widget.dart';
 
@@ -15,8 +15,8 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
-    final loaderState = ref.watch(settingsNotifierProvider.select((s) => s.loaderState));
-    final settings = ref.watch(settingsNotifierProvider.select((s) => s.settings));
+    final loaderState = ref.watch(settingsProvider.select((s) => s.loaderState));
+    final settings = ref.watch(settingsProvider.select((s) => s.settings));
 
     return CommonScaffold(
       backgroundColor: colors.background,
@@ -26,7 +26,7 @@ class SettingsScreen extends ConsumerWidget {
       ),
       body: CommonSwitchState(
         loaderState: loaderState,
-        reload: () => ref.read(settingsNotifierProvider.notifier).fetchSettings(),
+        reload: () => ref.read(settingsProvider.notifier).fetchSettings(),
         child: SettingsContentWidget(settings: settings),
       ),
     );

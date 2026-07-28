@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:smooth_corner/smooth_corner.dart';
-import 'package:vyapapp/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/color_palette.dart';
 
 class CommonContainer extends StatelessWidget {
   const CommonContainer({

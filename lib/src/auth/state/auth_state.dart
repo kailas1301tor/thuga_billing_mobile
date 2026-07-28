@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:vyapapp/res/enums/enums.dart';
+import 'package:thuga/res/enums/enums.dart';
 import '../model/auth_model.dart';
 
 part 'auth_state.freezed.dart';

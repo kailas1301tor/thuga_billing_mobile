@@ -1,7 +1,6 @@
 // lib/utils/helpers/receipt_print_helper.dart
-import 'package:flutter_thermal_printer_plus/commands/print_builder.dart';
-import 'package:flutter_thermal_printer_plus/models/paper_size.dart';
-import 'package:vyapapp/res/constants/string_constants.dart';
+import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
+import 'package:thuga/res/constants/string_constants.dart';
 
 class ReceiptPrintLineItem {
   const ReceiptPrintLineItem({
@@ -114,105 +113,194 @@ String buildReceiptShareText(ReceiptPrintData data) {
   }
   receiptBuffer.writeln('----------------------------------');
   receiptBuffer.writeln('Thank you for shopping with us!');
-  receiptBuffer.writeln('Billed via Thuka App');
+  receiptBuffer.writeln(Strings.billedViaApp);
   return receiptBuffer.toString();
 }
 
-PrintBuilder buildReceiptPrintBuilder(
+const _itemColWidth = 7;
+const _qtyColWidth = 1;
+const _totalColWidth = 4;
+
+const _compressedStyle = PosStyles(fontType: PosFontType.fontB);
+const _headerRowStyle = PosStyles(
+  fontType: PosFontType.fontB,
+  bold: true,
+);
+const _titleStyle = PosStyles(
+  align: PosAlign.center,
+  bold: true,
+  height: PosTextSize.size2,
+  width: PosTextSize.size2,
+);
+const _receiptLabelStyle = PosStyles(
+  align: PosAlign.center,
+  fontType: PosFontType.fontB,
+);
+const _grandTotalStyle = PosStyles(
+  align: PosAlign.right,
+  bold: true,
+  height: PosTextSize.size2,
+  width: PosTextSize.size2,
+);
+const _rightBoldStyle = PosStyles(align: PosAlign.right, bold: true);
+const _rightStyle = PosStyles(align: PosAlign.right);
+const _centerStyle = PosStyles(align: PosAlign.center);
+
+Future<List<int>> buildReceiptEscPosBytes(
   ReceiptPrintData data, {
-  PaperSize paperSize = PaperSize.mm80,
-}) {
-  final builder = PrintBuilder(paperSize)
-    ..text(
+  required PaperSize paperSize,
+}) async {
+  final profile = await CapabilityProfile.load();
+  final generator = Generator(paperSize, profile);
+  final bytes = <int>[];
+
+  bytes.addAll(generator.reset());
+  bytes.addAll(
+    generator.text(
       normalizeReceiptStoreName(data.storeName),
-      align: AlignPos.center,
-      fontSize: FontSize.big,
-      bold: true,
-    )
-    ..text('RECEIPT', align: AlignPos.center, fontSize: FontSize.compressed)
-    ..line()
-    ..text('Invoice No: ${data.orderNumber}', bold: true)
-    ..text('Date: ${data.dateString}')
-    ..text('Customer: ${data.customerName}');
+      styles: _titleStyle,
+    ),
+  );
+  bytes.addAll(
+    generator.text('RECEIPT', styles: _receiptLabelStyle),
+  );
+  bytes.addAll(generator.hr());
+  bytes.addAll(
+    generator.text('Invoice No: ${data.orderNumber}', styles: const PosStyles(bold: true)),
+  );
+  bytes.addAll(generator.text('Date: ${data.dateString}'));
+  bytes.addAll(generator.text('Customer: ${data.customerName}'));
 
   if (data.customerPhone?.isNotEmpty == true) {
-    builder.text('Phone: ${data.customerPhone}');
+    bytes.addAll(generator.text('Phone: ${data.customerPhone}'));
   }
 
-  builder
-    ..text('Payment: ${data.paymentMethod} (${data.paymentStatus})')
-    ..line()
-    ..row(
-      const ['Item', 'Qty', 'Total'],
-      const [56, 12, 32],
-      aligns: const [ColumnAlign.left, ColumnAlign.center, ColumnAlign.right],
-      wrapColumns: const [true, false, false],
-      fontSize: FontSize.compressed,
-    )
-    ..line(char: '-');
+  bytes.addAll(
+    generator.text('Payment: ${data.paymentMethod} (${data.paymentStatus})'),
+  );
+  bytes.addAll(generator.hr());
+  bytes.addAll(
+    generator.row(
+      [
+        PosColumn(text: 'Item', width: _itemColWidth, styles: _headerRowStyle),
+        PosColumn(
+          text: 'Qty',
+          width: _qtyColWidth,
+          styles: _headerRowStyle.copyWith(align: PosAlign.center),
+        ),
+        PosColumn(
+          text: 'Total',
+          width: _totalColWidth,
+          styles: _headerRowStyle.copyWith(align: PosAlign.right),
+        ),
+      ],
+    ),
+  );
+  bytes.addAll(generator.hr(ch: '-'));
 
   for (final item in data.items) {
-    builder
-      ..row(
-        [item.name, item.quantityText, item.lineTotalText],
-        const [56, 12, 32],
-        aligns: const [ColumnAlign.left, ColumnAlign.center, ColumnAlign.right],
-        wrapColumns: const [true, false, false],
-      )
-      ..text('@ ${item.unitPriceText}', fontSize: FontSize.compressed);
+    bytes.addAll(
+      generator.row(
+        [
+          PosColumn(text: item.name, width: _itemColWidth),
+          PosColumn(
+            text: item.quantityText,
+            width: _qtyColWidth,
+            styles: const PosStyles(align: PosAlign.center),
+          ),
+          PosColumn(
+            text: item.lineTotalText,
+            width: _totalColWidth,
+            styles: const PosStyles(align: PosAlign.right),
+          ),
+        ],
+      ),
+    );
+    bytes.addAll(
+      generator.text(
+        '@ ${item.unitPriceText}',
+        styles: _compressedStyle,
+      ),
+    );
     if (item.discountLabel?.isNotEmpty == true) {
-      builder.text(item.discountLabel!, fontSize: FontSize.compressed);
+      bytes.addAll(
+        generator.text(item.discountLabel!, styles: _compressedStyle),
+      );
     }
   }
 
-  builder
-    ..line()
-    ..text('Subtotal: ${data.subtotalText}', align: AlignPos.right);
+  bytes.addAll(generator.hr());
+  bytes.addAll(
+    generator.text('Subtotal: ${data.subtotalText}', styles: _rightStyle),
+  );
 
   if (data.itemDiscountText != null) {
-    builder.text(
-      'Item Discounts: -${data.itemDiscountText}',
-      align: AlignPos.right,
+    bytes.addAll(
+      generator.text(
+        'Item Discounts: -${data.itemDiscountText}',
+        styles: _rightStyle,
+      ),
     );
   }
   if (data.billDiscountText != null) {
-    builder.text(
-      'Bill Discount: -${data.billDiscountText}',
-      align: AlignPos.right,
+    bytes.addAll(
+      generator.text(
+        'Bill Discount: -${data.billDiscountText}',
+        styles: _rightStyle,
+      ),
     );
   }
   if (data.sgstTotalText != null) {
-    builder.text(
-      '${Strings.sgstTotal}: ${data.sgstTotalText}',
-      align: AlignPos.right,
+    bytes.addAll(
+      generator.text(
+        '${Strings.sgstTotal}: ${data.sgstTotalText}',
+        styles: _rightStyle,
+      ),
     );
   }
   if (data.cgstTotalText != null) {
-    builder.text(
-      '${Strings.cgstTotal}: ${data.cgstTotalText}',
-      align: AlignPos.right,
+    bytes.addAll(
+      generator.text(
+        '${Strings.cgstTotal}: ${data.cgstTotalText}',
+        styles: _rightStyle,
+      ),
     );
   }
 
-  builder.text(
-    'Grand Total: ${data.grandTotalText}',
-    align: AlignPos.right,
-    bold: true,
-    fontSize: FontSize.big,
+  bytes.addAll(
+    generator.text(
+      'Grand Total: ${data.grandTotalText}',
+      styles: _grandTotalStyle,
+    ),
   );
 
   if (data.balanceText != '₹0') {
-    builder
-      ..text('Amount Paid: ${data.amountPaidText}', align: AlignPos.right)
-      ..text('Remaining: ${data.balanceText}', align: AlignPos.right, bold: true);
+    bytes.addAll(
+      generator.text(
+        'Amount Paid: ${data.amountPaidText}',
+        styles: _rightStyle,
+      ),
+    );
+    bytes.addAll(
+      generator.text(
+        'Remaining: ${data.balanceText}',
+        styles: _rightBoldStyle,
+      ),
+    );
   }
 
-  builder
-    ..line()
-    ..text('Thank you for shopping with us!', align: AlignPos.center)
-    ..text('Billed via Thuka App', align: AlignPos.center)
-    ..feed(2)
-    ..cut();
+  bytes.addAll(generator.hr());
+  bytes.addAll(
+    generator.text(
+      'Thank you for shopping with us!',
+      styles: _centerStyle,
+    ),
+  );
+  bytes.addAll(
+    generator.text(Strings.billedViaApp, styles: _centerStyle),
+  );
+  bytes.addAll(generator.feed(2));
+  bytes.addAll(generator.cut());
 
-  return builder;
+  return bytes;
 }

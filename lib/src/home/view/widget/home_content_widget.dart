@@ -1,7 +1,7 @@
 // lib/src/home/view/widget/home_content_widget.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vyapapp/src/home/model/home_dashboard_model.dart';
+import 'package:thuga/src/home/model/home_dashboard_model.dart';
 
 import 'home_greeting_row_widget.dart';
 import 'home_header_widget.dart';
