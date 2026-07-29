@@ -151,8 +151,8 @@ class _SidebarContent extends StatelessWidget {
     final colors = context.appColors;
 
     return SafeArea(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: ListView(
+        padding: const EdgeInsets.only(bottom: WebSpacing.md),
         children: [
           MainSidebarHeader(compact: !expanded),
           const Divider(height: 1),
@@ -202,34 +202,33 @@ class _SidebarContent extends StatelessWidget {
             );
           }),
           const Divider(height: 1),
-          const Padding(
-            padding: EdgeInsets.fromLTRB(
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
               WebSpacing.lg,
               WebSpacing.md,
               WebSpacing.lg,
               WebSpacing.xs,
             ),
-            child: Text('MANAGE'),
-          ),
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: WebSpacing.sm),
-              children: [
-                for (final item in MainSidebarMenuItems.secondaryItems)
-                  MainSidebarMenuTile(
-                    item: item,
-                    compact: !expanded,
-                    onTap: () {
-                      final scaffold = Scaffold.maybeOf(context);
-                      if (scaffold?.isDrawerOpen ?? false) {
-                        Navigator.of(context).pop();
-                      }
-                      context.push(item.route);
-                    },
-                  ),
-              ],
+            child: Text(
+              Strings.manageSectionTitle,
+              style: FontPalette.base600(11, color: colors.secondaryText),
             ),
           ),
+          for (final item in MainSidebarMenuItems.secondaryItems)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: WebSpacing.sm),
+              child: MainSidebarMenuTile(
+                item: item,
+                compact: !expanded,
+                onTap: () {
+                  final scaffold = Scaffold.maybeOf(context);
+                  if (scaffold?.isDrawerOpen ?? false) {
+                    Navigator.of(context).pop();
+                  }
+                  context.push(item.route);
+                },
+              ),
+            ),
         ],
       ),
     );

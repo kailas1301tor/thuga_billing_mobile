@@ -53,6 +53,7 @@ class _HomeWebScreenState extends ConsumerState<HomeWebScreen> {
       reload: () => ref.read(homeProvider.notifier).fetchDashboard(),
       child: WebPageLayout(
         title: Strings.homeTitle,
+        onRefresh: () => ref.read(homeProvider.notifier).fetchDashboard(),
         actions: [
           FilledButton.icon(
             onPressed: () => context.push(RouteConstants.routeNewBill),

@@ -1,0 +1,3 @@
+dependency_overrides:
+  print_bluetooth_thermal:
+    path: packages/print_bluetooth_thermal_stub

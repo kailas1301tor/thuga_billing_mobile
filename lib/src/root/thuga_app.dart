@@ -10,7 +10,6 @@ import 'package:thuga/res/constants/string_constants.dart';
 import 'package:thuga/res/styles/app_theme.dart';
 import 'package:thuga/res/styles/theme_provider.dart';
 import 'package:thuga/utils/common_widgets/connectivity_observer.dart';
-import 'package:thuga/utils/common_widgets/thuga_logo.dart';
 import 'package:thuga/utils/common_widgets/web_screen_util_host.dart';
 import 'package:thuga/utils/routes/app_router.dart';
 
@@ -57,9 +56,7 @@ class ThugaApp extends ConsumerWidget {
     final app = _buildApp(themeMode);
 
     if (kIsWeb) {
-      return WebScreenUtilHost(
-        child: ThugaLogoPrecacheHost(child: app),
-      );
+      return WebScreenUtilHost(child: app);
     }
 
     return ScreenUtilInit(

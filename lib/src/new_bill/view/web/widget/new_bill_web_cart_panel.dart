@@ -51,8 +51,15 @@ class NewBillWebCartPanel extends ConsumerWidget {
     final isPrinterConnected = ref.watch(
       printerProvider.select((value) => value.isConnected),
     );
-    final dropdownsState = ref.watch(dropdownsProvider);
-    final paymentMethods = dropdownsState.data.paymentMethods;
+    final isSavingBill = ref.watch(
+      newBillProvider.select((s) => s.isSavingBill),
+    );
+    final paymentMethods = ref.watch(
+      dropdownsProvider.select((s) => s.data.paymentMethods),
+    );
+    final dropdownsLoaderState = ref.watch(
+      dropdownsProvider.select((s) => s.loaderState),
+    );
     final totals = notifier.billTotals;
     final grandTotal = totals.grandTotal;
 
@@ -225,14 +232,15 @@ class NewBillWebCartPanel extends ConsumerWidget {
                           onSelected: (method) =>
                               notifier.setPaymentMethod(method.id),
                           displayText: (method) => method.name,
-                          loaderState: dropdownsState.loaderState,
+                          loaderState: dropdownsLoaderState,
                         );
                       },
                     ),
                     const SizedBox(width: WebSpacing.sm),
                     Expanded(
                       child: PrimaryButton(
-                        onPressed: grandTotal > 0 ? onSubmit : null,
+                        onPressed: grandTotal > 0 && !isSavingBill ? onSubmit : null,
+                        isLoading: isSavingBill,
                         radius: 12,
                         height: 48,
                         prefixIcon: Icon(

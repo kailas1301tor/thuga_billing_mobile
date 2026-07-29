@@ -2,9 +2,12 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:thuga/res/styles/web_spacing.dart';
-import 'package:thuga/utils/common_widgets/web/web_grid.dart';
+import 'package:thuga/utils/helpers/web_responsive.dart';
 
-/// List on mobile/native; responsive [WebGrid] on web for listing screens.
+/// List on mobile/native; lazy responsive grid on web for listing screens.
+///
+/// Web uses a row-based [ListView] so cards keep their natural height instead
+/// of stretching to fill a fixed-aspect grid cell.
 class ResponsiveListGrid extends StatelessWidget {
   const ResponsiveListGrid({
     super.key,
@@ -35,6 +38,18 @@ class ResponsiveListGrid extends StatelessWidget {
   final double minItemWidth;
   final double gridSpacing;
 
+  int _columnCount(BuildContext context, double maxWidth) {
+    final cap = webGridColumns(
+      context,
+      mobile: mobileColumns,
+      tablet: tabletColumns,
+      desktop: desktopColumns,
+    );
+
+    final fit = ((maxWidth + gridSpacing) / (minItemWidth + gridSpacing)).floor();
+    return fit.clamp(1, cap);
+  }
+
   @override
   Widget build(BuildContext context) {
     final effectivePhysics = physics ?? const AlwaysScrollableScrollPhysics();
@@ -54,24 +69,64 @@ class ResponsiveListGrid extends StatelessWidget {
       );
     }
 
-    return ListView(
-      controller: controller,
-      padding: padding,
-      physics: effectivePhysics,
-      children: [
-        WebGrid(
-          mobileColumns: mobileColumns,
-          tabletColumns: tabletColumns,
-          desktopColumns: desktopColumns,
-          minItemWidth: minItemWidth,
-          spacing: gridSpacing,
-          runSpacing: gridSpacing,
-          children: [
-            for (var i = 0; i < itemCount; i++) itemBuilder(context, i),
-          ],
-        ),
-        if (isLoadingMore) loadingIndicator ?? const SizedBox.shrink(),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final columns = _columnCount(context, constraints.maxWidth);
+        final totalSlots = itemCount + (isLoadingMore ? 1 : 0);
+
+        if (columns == 1) {
+          return ListView.builder(
+            controller: controller,
+            padding: padding,
+            physics: effectivePhysics,
+            itemCount: totalSlots,
+            itemBuilder: (context, index) {
+              if (isLoadingMore && index == itemCount) {
+                return loadingIndicator ?? const SizedBox.shrink();
+              }
+              return itemBuilder(context, index);
+            },
+          );
+        }
+
+        final rowCount = (totalSlots + columns - 1) ~/ columns;
+
+        return ListView.builder(
+          controller: controller,
+          padding: padding,
+          physics: effectivePhysics,
+          itemCount: rowCount,
+          itemBuilder: (context, rowIndex) {
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: rowIndex < rowCount - 1 ? gridSpacing : 0,
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: List.generate(columns, (columnIndex) {
+                  final index = rowIndex * columns + columnIndex;
+                  if (index >= totalSlots) {
+                    return Expanded(child: SizedBox(width: gridSpacing));
+                  }
+
+                  final child = isLoadingMore && index == itemCount
+                      ? (loadingIndicator ?? const SizedBox.shrink())
+                      : itemBuilder(context, index);
+
+                  return Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        right: columnIndex < columns - 1 ? gridSpacing : 0,
+                      ),
+                      child: child,
+                    ),
+                  );
+                }),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

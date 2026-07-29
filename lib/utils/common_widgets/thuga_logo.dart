@@ -41,25 +41,3 @@ class ThugaLogo extends StatelessWidget {
     );
   }
 }
-
-/// Preloads compact logo assets on web so auth/sidebar screens paint faster.
-class ThugaLogoPrecacheHost extends StatefulWidget {
-  const ThugaLogoPrecacheHost({super.key, required this.child});
-
-  final Widget child;
-
-  @override
-  State<ThugaLogoPrecacheHost> createState() => _ThugaLogoPrecacheHostState();
-}
-
-class _ThugaLogoPrecacheHostState extends State<ThugaLogoPrecacheHost> {
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    precacheImage(const AssetImage(Assets.pngThugaLogo96), context);
-    precacheImage(const AssetImage(Assets.pngThugaLogo144), context);
-  }
-
-  @override
-  Widget build(BuildContext context) => widget.child;
-}

@@ -11,7 +11,6 @@ class Assets {
   static const String iconsBackButton = "assets/icons/back_button.svg";
   static const String svgGoogleLogo = "assets/icons/google_logo.svg";
 
-  static const String pngThugaLogo = "assets/images/png/thuga_logo.png";
   static const String pngThugaLogo96 = "assets/images/png/thuga_logo_96.png";
   static const String pngThugaLogo144 = "assets/images/png/thuga_logo_144.png";
 

@@ -108,9 +108,9 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/images/png/thuga_logo.png"
+  image_path: "assets/launcher/thuga_logo.png"
   adaptive_icon_background: "#05B064"
-  adaptive_icon_foreground: "assets/images/png/thuga_logo.png"
+  adaptive_icon_foreground: "assets/launcher/thuga_logo.png"
   remove_alpha_ios: true
 
 # For information on the generic Dart part of this file, see the
@@ -127,8 +127,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/lottie/
-    - assets/images/png/thuga_logo_96.png
-    - assets/images/png/thuga_logo_144.png
+    - assets/images/png/
     - assets/icons/
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg

@@ -23,6 +23,7 @@ class SettingsWebScreen extends ConsumerWidget {
       reload: () => ref.read(settingsProvider.notifier).fetchSettings(),
       child: WebPageLayout(
         title: Strings.settingsTitle,
+        onRefresh: () => ref.read(settingsProvider.notifier).fetchSettings(),
         child: SettingsContentWidget(
           settings: settings,
           embeddedInParentScroll: true,

@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:thuga/res/constants/assets.dart';
 import 'package:thuga/res/constants/string_constants.dart';
 import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/res/styles/font_palette.dart';
 import 'package:thuga/utils/common_widgets/common_text_form_field.dart';
 
 class CommonSearchBar extends StatelessWidget {
@@ -29,6 +30,18 @@ class CommonSearchBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final fieldHeight = dense ? 40.h : 48.h;
+    final horizontalPadding = dense ? 12.w : 16.w;
+    final fieldTextStyle = FontPalette.base500(
+      14,
+      color: colors.primaryText,
+    ).copyWith(height: 1.2);
+    final hintTextStyle = FontPalette.base400(
+      14,
+      color: colors.secondaryText,
+    ).copyWith(height: 1.2);
+
     return ValueListenableBuilder<TextEditingValue>(
       valueListenable: controller,
       builder: (context, value, _) {
@@ -41,11 +54,11 @@ class CommonSearchBar extends StatelessWidget {
           onChanged: onChanged,
           onSubmitted: onSubmitted,
           inputAction: TextInputAction.search,
-          height: dense ? 40.h : 48.h,
+          height: fieldHeight,
+          style: fieldTextStyle,
+          hintFontStyle: hintTextStyle,
           borderRadius: 24, // Search bar should be pill-shaped
-          contentPadding: dense
-              ? EdgeInsets.symmetric(horizontal: 12.w)
-              : EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+          contentPadding: EdgeInsets.symmetric(horizontal: horizontalPadding),
           suffix: hasText
               ? IconButton(
                   tooltip: Strings.clear,
@@ -84,7 +97,7 @@ class CommonSearchBar extends StatelessWidget {
           ),
           prefixIconConstraints: BoxConstraints(
             minWidth: dense ? 34.w : 48.w,
-            minHeight: dense ? 16.r : 18.r,
+            minHeight: fieldHeight,
           ),
           onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
         );

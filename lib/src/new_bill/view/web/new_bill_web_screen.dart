@@ -13,6 +13,7 @@ import 'package:thuga/src/printer/notifier/printer_notifier.dart';
 import 'package:thuga/utils/common_widgets/bottomsheet_content.dart';
 import 'package:thuga/utils/common_widgets/common_search_bar.dart';
 import 'package:thuga/utils/common_widgets/common_switch_state.dart';
+import 'package:thuga/utils/common_widgets/common_loader.dart';
 import 'package:thuga/utils/common_widgets/common_text_form_field.dart';
 import 'package:thuga/utils/common_widgets/primary_button.dart';
 import 'package:thuga/utils/helpers/extensions.dart';
@@ -29,7 +30,10 @@ class NewBillWebScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
-    final state = ref.watch(newBillProvider);
+    final loaderState = ref.watch(
+      newBillProvider.select((s) => s.loaderState),
+    );
+    final billNumber = ref.watch(newBillProvider.select((s) => s.billNumber));
     final notifier = ref.read(newBillProvider.notifier);
     final isPrinterConnected = ref.watch(
       printerProvider.select((value) => value.isConnected),
@@ -38,12 +42,12 @@ class NewBillWebScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: colors.background,
       body: CommonSwitchState(
-        loaderState: state.loaderState,
+        loaderState: loaderState,
         reload: () => notifier.fetchProducts(),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Expanded(child: _CatalogPane(billNumber: state.billNumber)),
+            Expanded(child: _CatalogPane(billNumber: billNumber)),
             NewBillWebCartPanel(
               onSubmit: () => notifier.saveAndMaybePrint(
                 context,
@@ -172,7 +176,12 @@ class _CatalogPane extends ConsumerWidget {
     final selectedCustomer = ref.watch(
       newBillProvider.select((s) => s.selectedCustomer),
     );
-    final dropdownsState = ref.watch(dropdownsProvider);
+    final customers = ref.watch(
+      dropdownsProvider.select((s) => s.data.customers),
+    );
+    final dropdownsLoaderState = ref.watch(
+      dropdownsProvider.select((s) => s.loaderState),
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -201,8 +210,8 @@ class _CatalogPane extends ConsumerWidget {
                 flex: 2,
                 child: _CustomerSelector(
                   selectedCustomer: selectedCustomer,
-                  customers: dropdownsState.data.customers,
-                  loaderState: dropdownsState.loaderState,
+                  customers: customers,
+                  loaderState: dropdownsLoaderState,
                   onSelected: notifier.selectCustomer,
                   onClear: () => notifier.selectCustomer(null),
                 ),
@@ -277,11 +286,8 @@ class _CatalogPane extends ConsumerWidget {
                     itemCount: products.length + (isLoadingMore ? 1 : 0),
                     itemBuilder: (context, index) {
                       if (index == products.length) {
-                        return Center(
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: colors.primary,
-                          ),
+                        return const Center(
+                          child: CommonLoader(size: 24, strokeWidth: 2),
                         );
                       }
                       final product = products[index];

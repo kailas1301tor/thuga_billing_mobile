@@ -81,7 +81,12 @@ class MainSidebarMenuTile extends StatelessWidget {
     final colors = context.appColors;
 
     return ListTile(
-      dense: compact,
+      dense: true,
+      visualDensity: VisualDensity.compact,
+      contentPadding: EdgeInsets.symmetric(
+        horizontal: compact ? 12 : 16,
+        vertical: compact ? 4 : 2,
+      ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       leading: Icon(item.icon, color: colors.secondaryText, size: 22),
       title: compact

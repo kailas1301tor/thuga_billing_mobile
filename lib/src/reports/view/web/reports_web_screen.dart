@@ -23,6 +23,7 @@ class ReportsWebScreen extends ConsumerWidget {
       reload: () => ref.read(reportsProvider.notifier).fetchReportsData(),
       child: WebPageLayout(
         title: Strings.reportsTitle,
+        onRefresh: () => ref.read(reportsProvider.notifier).fetchReportsData(),
         child: ReportsContentWidget(
           data: data,
           embeddedInParentScroll: true,

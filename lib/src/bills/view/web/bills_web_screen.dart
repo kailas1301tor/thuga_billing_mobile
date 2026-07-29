@@ -6,6 +6,8 @@ import 'package:thuga/res/constants/string_constants.dart';
 import 'package:thuga/res/styles/color_palette.dart';
 import 'package:thuga/res/styles/font_palette.dart';
 import 'package:thuga/res/styles/web_spacing.dart';
+import 'package:thuga/utils/common_widgets/common_loader.dart';
+import 'package:thuga/utils/common_widgets/common_refresh_indicator.dart';
 import 'package:thuga/utils/common_widgets/common_search_bar.dart';
 import 'package:thuga/utils/common_widgets/common_switch_state.dart';
 import 'package:thuga/utils/helpers/web_breakpoints.dart';
@@ -19,6 +21,16 @@ import '../widget/bills_filter_row.dart';
 
 class BillsWebScreen extends ConsumerWidget {
   const BillsWebScreen({super.key});
+
+  List<BillModel> _sortedBills(List<BillModel> raw, bool isNewestFirst) {
+    final bills = List<BillModel>.from(raw);
+    if (isNewestFirst) {
+      bills.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    } else {
+      bills.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    }
+    return bills;
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -36,119 +48,107 @@ class BillsWebScreen extends ConsumerWidget {
     final isLoadingMore = ref.watch(
       billsProvider.select((s) => s.isLoadingMore),
     );
-    final bills = ref.watch(
-      billsProvider.select((s) {
-        final list = List<BillModel>.from(s.data?.results.data ?? []);
-        if (s.isNewestFirst) {
-          list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-        } else {
-          list.sort((a, b) => a.createdAt.compareTo(b.createdAt));
-        }
-        return list;
-      }),
+    final rawBills = ref.watch(
+      billsProvider.select((s) => s.data?.results.data ?? const <BillModel>[]),
     );
+    final isNewestFirst = ref.watch(
+      billsProvider.select((s) => s.isNewestFirst),
+    );
+    final bills = _sortedBills(rawBills, isNewestFirst);
     final notifier = ref.read(billsProvider.notifier);
 
     return ColoredBox(
       color: colors.background,
-      child: MaxWidthBox(
-        maxWidth: WebBreakpoints.maxContentWidth,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(
-                pagePadding,
-                WebSpacing.lg,
-                pagePadding,
-                WebSpacing.md,
+      child: Align(
+        alignment: Alignment.topLeft,
+        child: MaxWidthBox(
+          maxWidth: WebBreakpoints.maxContentWidth,
+          alignment: Alignment.topLeft,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: EdgeInsets.fromLTRB(
+                  pagePadding,
+                  WebSpacing.lg,
+                  pagePadding,
+                  WebSpacing.md,
+                ),
+                child: Text(
+                  Strings.billsTitle,
+                  style: FontPalette.base700(24, color: colors.primaryText),
+                ),
               ),
-              child: Text(
-                Strings.billsTitle,
-                style: FontPalette.base700(24, color: colors.primaryText),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: pagePadding),
+                child: CommonSearchBar(
+                  controller: notifier.searchController,
+                  hintText: Strings.searchBillsHint,
+                  onClear: notifier.clearSearch,
+                ),
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: pagePadding),
-              child: CommonSearchBar(
-                controller: notifier.searchController,
-                hintText: Strings.searchBillsHint,
-                onClear: notifier.clearSearch,
+              const SizedBox(height: WebSpacing.sm),
+              BillsFilterRow(
+                selectedDate: dateRangeFilter,
+                onDateChanged: notifier.setDateRangeFilter,
+                horizontalPadding: pagePadding,
               ),
-            ),
-            const SizedBox(height: WebSpacing.sm),
-            BillsFilterRow(
-              selectedDate: dateRangeFilter,
-              onDateChanged: notifier.setDateRangeFilter,
-              horizontalPadding: pagePadding,
-            ),
-            const SizedBox(height: WebSpacing.sm),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: pagePadding),
-              child: Text(
-                '${totalCount ?? bills.length} ${Strings.billsTitle}',
-                style: FontPalette.base700(15, color: colors.primaryText),
+              const SizedBox(height: WebSpacing.sm),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: pagePadding),
+                child: Text(
+                  '${totalCount ?? bills.length} ${Strings.billsTitle}',
+                  style: FontPalette.base700(15, color: colors.primaryText),
+                ),
               ),
-            ),
-            const SizedBox(height: WebSpacing.sm),
-            Expanded(
-              child: CommonSwitchState(
-                loaderState: loaderState,
-                reload: () => notifier.fetchBills(),
-                child: bills.isEmpty
-                    ? Center(
-                        child: Text(
-                          Strings.noDataAvailable,
-                          style: FontPalette.base400(
-                            14,
-                            color: colors.secondaryText,
-                          ),
-                        ),
-                      )
-                    : ListView.builder(
-                        controller: notifier.scrollController,
-                        padding: EdgeInsets.fromLTRB(
-                          pagePadding,
-                          0,
-                          pagePadding,
-                          WebSpacing.xxl,
-                        ),
-                        itemCount: bills.length + (isLoadingMore ? 1 : 0),
-                        itemBuilder: (context, index) {
-                          if (index == bills.length) {
-                            return const Padding(
-                              padding: EdgeInsets.symmetric(
-                                vertical: WebSpacing.md,
-                              ),
-                              child: Center(
-                                child: SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                ),
+              const SizedBox(height: WebSpacing.sm),
+              Expanded(
+                child: CommonSwitchState(
+                  loaderState: loaderState,
+                  reload: () => notifier.fetchBills(),
+                  child: CommonRefreshIndicator(
+                    onRefresh: () => notifier.fetchBills(),
+                    child: ListView.builder(
+                      controller: notifier.scrollController,
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: EdgeInsets.fromLTRB(
+                        pagePadding,
+                        0,
+                        pagePadding,
+                        WebSpacing.xxl,
+                      ),
+                      itemCount: bills.length + (isLoadingMore ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (index == bills.length) {
+                          return const Padding(
+                            padding: EdgeInsets.symmetric(
+                              vertical: WebSpacing.md,
+                            ),
+                            child: Center(
+                              child: CommonLoader(size: 24, strokeWidth: 2),
+                            ),
+                          );
+                        }
+
+                        final bill = bills[index];
+                        return BillItemCard(
+                          bill: bill,
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (context) =>
+                                    BillDetailScreen(billId: bill.id),
                               ),
                             );
-                          }
-
-                          final bill = bills[index];
-                          return BillItemCard(
-                            bill: bill,
-                            onTap: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute<void>(
-                                  builder: (context) =>
-                                      BillDetailScreen(billId: bill.id),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

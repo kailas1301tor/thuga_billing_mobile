@@ -206,6 +206,7 @@ class Strings {
   static const String homeMenu = "Menu";
   static const String appMenuTitle = "Thuka Menu";
   static const String appMenuSubtitle = "Manage business inventory";
+  static const String manageSectionTitle = "MANAGE";
   static const String billedViaApp = "Billed via Thuka App";
   static const String appBrandFooter = "Thuka App";
   static const String notifications = "Notifications";

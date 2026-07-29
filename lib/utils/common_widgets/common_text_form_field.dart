@@ -246,6 +246,7 @@ class _CommonTextFormFieldState extends State<CommonTextFormField> {
                   required maxLength,
                 }) => null,
             decoration: InputDecoration(
+              isDense: widget.height != null,
               prefix: widget.prefix,
               prefixIcon: widget.prefixIcon,
               prefixIconConstraints: widget.prefixIconConstraints,
