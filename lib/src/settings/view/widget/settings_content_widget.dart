@@ -13,7 +13,9 @@ import 'package:thuga/utils/common_widgets/common_container.dart';
 import 'package:thuga/utils/common_widgets/common_bottom_sheet.dart';
 import 'package:thuga/utils/common_widgets/common_dialog_box.dart';
 import 'package:thuga/utils/common_widgets/common_text_form_field.dart';
+import 'package:thuga/utils/common_widgets/printer_state_sync_host.dart';
 import 'package:thuga/utils/common_widgets/primary_button.dart';
+import 'package:thuga/utils/helpers/toast_helper.dart';
 import 'package:thuga/utils/helpers/working_hour_helper.dart';
 import '../../notifier/settings_notifier.dart';
 import '../../model/settings_model.dart';
@@ -322,9 +324,17 @@ class SettingsContentWidget extends ConsumerWidget {
   Widget _buildPrinterSection(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final printerState = ref.watch(printerProvider);
+    final isPrinting = ref.watch(
+      printerProvider.select((state) => state.isPrinting),
+    );
     final notifier = ref.read(printerProvider.notifier);
+    final storeName =
+        settings.storeName.trim().isNotEmpty
+            ? settings.storeName
+            : Strings.appName;
 
-    return CommonContainer(
+    return PrinterStateSyncHost(
+      child: CommonContainer(
       padding: EdgeInsets.all(16.r),
       borderRadius: 16.r,
       child: Column(
@@ -373,7 +383,7 @@ class SettingsContentWidget extends ConsumerWidget {
                   onPressed: () => _showPrinterSheet(context, ref),
                 ),
               ),
-              if (printerState.isConnected) ...[
+              if (printerState.connectedPrinter != null) ...[
                 10.horizontalSpace,
                 Expanded(
                   child: PrimaryButton(
@@ -391,6 +401,42 @@ class SettingsContentWidget extends ConsumerWidget {
               ],
             ],
           ),
+          if (printerState.connectedPrinter != null) ...[
+            10.verticalSpace,
+            PrimaryButton(
+              text: Strings.testPrint,
+              radius: 12,
+              height: 46,
+              isLoading: isPrinting,
+              backgroundColor: colors.inputBackground,
+              fontStyle: FontPalette.base700(14, color: colors.primaryText),
+              onPressed:
+                  isPrinting
+                      ? () {}
+                      : () async {
+                        final success = await notifier.printDemoReceipt(
+                          storeName: storeName,
+                          source: 'settings_test_print',
+                        );
+                        if (!context.mounted) {
+                          return;
+                        }
+                        if (success) {
+                          showCustomToast(
+                            message: Strings.printerTestSuccess,
+                          );
+                          return;
+                        }
+                        final errorMessage = ref
+                            .read(printerProvider)
+                            .errorMessage;
+                        showCustomErrorToast(
+                          message:
+                              errorMessage ?? Strings.printerPrintFailed,
+                        );
+                      },
+            ),
+          ],
           if (printerState.errorMessage?.isNotEmpty == true) ...[
             10.verticalSpace,
             Text(
@@ -400,6 +446,7 @@ class SettingsContentWidget extends ConsumerWidget {
           ],
         ],
       ),
+    ),
     );
   }
 
@@ -499,7 +546,7 @@ class SettingsContentWidget extends ConsumerWidget {
                     child: ListView.separated(
                       shrinkWrap: true,
                       itemCount: printerState.availablePrinters.length,
-                      separatorBuilder: (_, __) => 10.verticalSpace,
+                      separatorBuilder: (_, _) => 10.verticalSpace,
                       itemBuilder: (context, index) {
                         final printer = printerState.availablePrinters[index];
                         final isSelected =
@@ -512,6 +559,7 @@ class SettingsContentWidget extends ConsumerWidget {
                               ? colors.primary.withValues(alpha: 0.08)
                               : colors.inputBackground,
                           child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Expanded(
                                 child: Column(
@@ -523,6 +571,8 @@ class SettingsContentWidget extends ConsumerWidget {
                                         13,
                                         color: colors.primaryText,
                                       ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                     4.verticalSpace,
                                     Text(
@@ -531,17 +581,24 @@ class SettingsContentWidget extends ConsumerWidget {
                                         11,
                                         color: colors.secondaryText,
                                       ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ],
                                 ),
                               ),
                               10.horizontalSpace,
                               PrimaryButton(
+                                width: 96.w,
                                 text: isSelected
-                                    ? Strings.printerConnected
-                                    : Strings.printBill,
+                                    ? Strings.printerConnectedShort
+                                    : Strings.connectPrinter,
                                 radius: 10,
                                 height: 38,
+                                fontStyle: FontPalette.base600(
+                                  12,
+                                  color: ColorPalette.white,
+                                ),
                                 isLoading: printerState.isConnecting,
                                 onPressed: isSelected
                                     ? null

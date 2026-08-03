@@ -36,7 +36,7 @@ class ProductsRepoImpl implements ProductsRepo {
   }) async {
     final Map<String, dynamic> queryParameters = {
       if (search.isNotEmpty) 'search': search,
-      if (categoryId != null) 'category': categoryId,
+      'category': ?categoryId,
       'sort': sort,
       'page': page,
       'page_size': pageSize,

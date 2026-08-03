@@ -13,6 +13,7 @@ import 'package:thuga/res/styles/font_palette.dart';
 import 'package:thuga/src/new_bill/model/new_bill_model.dart';
 import 'package:thuga/src/printer/notifier/printer_notifier.dart';
 import 'package:thuga/src/settings/notifier/settings_notifier.dart';
+import 'package:thuga/utils/common_widgets/printer_state_sync_host.dart';
 import 'package:thuga/utils/common_widgets/primary_button.dart';
 import 'package:thuga/utils/helpers/extensions.dart';
 import 'package:thuga/utils/helpers/receipt_print_helper.dart';
@@ -60,9 +61,11 @@ class _BillPreviewSheetState extends ConsumerState<BillPreviewSheet> {
   ReceiptPrintData _buildReceiptData(String storeName) {
     final amountPaid =
         (widget.grandTotal - widget.balance).clamp(0.0, widget.grandTotal);
+    final storePhone = ref.read(settingsProvider).companyDetails?.phoneNumber;
 
     return ReceiptPrintData(
       storeName: storeName,
+      storePhone: storePhone,
       orderNumber: widget.orderNumber,
       dateString: widget.dateString,
       customerName: widget.customerName,
@@ -188,8 +191,8 @@ class _BillPreviewSheetState extends ConsumerState<BillPreviewSheet> {
       settingsProvider.select((s) => s.settings.storeName),
     );
     final displayName = normalizeReceiptStoreName(storeName);
-    final isPrinterConnected = ref.watch(
-      printerProvider.select((value) => value.isConnected),
+    final canAttemptPrint = ref.watch(
+      printerProvider.select(selectCanAttemptPrint),
     );
 
     final orderNumber = widget.orderNumber;
@@ -204,7 +207,8 @@ class _BillPreviewSheetState extends ConsumerState<BillPreviewSheet> {
     final cgstTotal = widget.cgstTotal;
     final grandTotal = widget.grandTotal;
 
-    return SingleChildScrollView(
+    return PrinterStateSyncHost(
+      child: SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
@@ -586,12 +590,15 @@ class _BillPreviewSheetState extends ConsumerState<BillPreviewSheet> {
                     size: 20.r,
                     color: Colors.white,
                   ),
-                  onPressed: isPrinterConnected
+                  onPressed: canAttemptPrint
                       ? () async {
                           final navigator = Navigator.of(context);
                           final success = await ref
                               .read(printerProvider.notifier)
-                              .printReceiptData(_buildReceiptData(storeName));
+                              .printReceiptData(
+                                _buildReceiptData(storeName),
+                                source: 'bill_preview',
+                              );
                           if (!mounted) return;
                           if (success) {
                             showCustomToast(
@@ -606,11 +613,7 @@ class _BillPreviewSheetState extends ConsumerState<BillPreviewSheet> {
                             );
                           }
                         }
-                      : () {
-                          showCustomErrorToast(
-                            message: Strings.noPrinterConnected,
-                          );
-                  },
+                      : null,
                 ),
               ),
             ],
@@ -618,6 +621,7 @@ class _BillPreviewSheetState extends ConsumerState<BillPreviewSheet> {
           8.verticalSpace,
         ],
       ),
+    ),
     );
   }
 

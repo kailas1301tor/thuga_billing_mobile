@@ -79,7 +79,7 @@ class AmountEntryView extends StatelessWidget {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: manualItems.length,
-                      separatorBuilder: (_, __) => Divider(
+                      separatorBuilder: (_, _) => Divider(
                         color: colors.inputBorder,
                         height: 1.h,
                       ),

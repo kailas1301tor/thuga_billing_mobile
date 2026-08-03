@@ -31,7 +31,7 @@ class QuickTapCartList extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: cartItems.length,
-      separatorBuilder: (_, __) => Divider(color: colors.inputBorder, height: 1.h),
+      separatorBuilder: (_, _) => Divider(color: colors.inputBorder, height: 1.h),
       itemBuilder: (context, index) {
         final item = cartItems[index];
         final keyString = '${item.productId ?? "custom"}_${item.name}';

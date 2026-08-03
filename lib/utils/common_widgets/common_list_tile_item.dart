@@ -52,7 +52,7 @@ class CommonListTileItem extends StatelessWidget {
               ],
             ),
           ),
-          if (trailing != null) trailing!,
+          ?trailing,
         ],
       ),
     );

@@ -190,6 +190,7 @@ class Strings {
   static const String homeMenu = "Menu";
   static const String appMenuTitle = "Thuka Menu";
   static const String billedViaApp = "Billed via Thuka App";
+  static const String receiptStorePhoneLabel = "Ph";
   static const String appBrandFooter = "Thuka App";
   static const String notifications = "Notifications";
 
@@ -272,7 +273,12 @@ class Strings {
   static const String bluetoothPrinterHint =
       "Connect a Bluetooth receipt printer to enable direct bill printing.";
   static const String scanPrinters = "Scan Printers";
+  static const String connectPrinter = "Connect";
+  static const String printerConnectedShort = "Connected";
   static const String disconnectPrinter = "Disconnect Printer";
+  static const String testPrint = "Test Print";
+  static const String printerTestLabel = "TEST PRINT";
+  static const String printerTestSuccess = "Test print sent successfully";
   static const String printerSavedSuccess = "Receipt sent to printer";
   static const String printerFallbackPreview =
       "Printer unavailable. Showing bill preview instead.";

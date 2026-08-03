@@ -1,4 +1,5 @@
 import 'package:either_dart/either.dart';
+import 'package:thuga/services/di_services.dart';
 import 'package:thuga/services/firebase_service.dart';
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -254,6 +255,7 @@ class AuthNotifier extends _$AuthNotifier {
     // Clear local storage and tokens
     await ref.read(tokenServiceProvider).clearTokens();
     await safeCrashlyticsSetUserIdentifier('');
+    disposeProviders(ref);
 
     state = state.copyWith(loaderState: LoaderState.loaded);
 

@@ -150,13 +150,11 @@ class FileSelectionService {
 
   Future<File?> selectFile({
     List<String>? allowedExtensions,
-    bool allowMultiple = true,
   }) async {
     try {
       final result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: allowedExtensions ?? ['pdf', 'doc'],
-        allowMultiple: allowMultiple,
       );
 
       if (result != null && result.files.single.path != null) {

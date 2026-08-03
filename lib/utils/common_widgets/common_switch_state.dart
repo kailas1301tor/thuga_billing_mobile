@@ -147,7 +147,7 @@ class _CommonSwitchStateState extends ConsumerState<CommonSwitchState> {
     return connectivityAsync.when(
       data: (connected) => connected,
       loading: () => true,
-      error: (_, __) => true,
+      error: (_, _) => true,
     );
   }
 
@@ -279,7 +279,7 @@ class _CommonSwitchStateSliverState
     final hasNetwork = connectivityAsync.when(
       data: (connected) => connected,
       loading: () => true,
-      error: (_, __) => true,
+      error: (_, _) => true,
     );
 
     if (_lastNetworkState == false &&

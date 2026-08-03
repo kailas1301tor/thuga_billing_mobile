@@ -6,6 +6,7 @@ import 'package:thuga/res/constants/string_constants.dart';
 import 'package:thuga/res/styles/color_palette.dart';
 import 'package:thuga/src/printer/notifier/printer_notifier.dart';
 import 'package:thuga/utils/common_widgets/common_dialog_box.dart';
+import 'package:thuga/utils/common_widgets/printer_state_sync_host.dart';
 import 'package:thuga/utils/common_widgets/common_scaffold.dart';
 import 'package:thuga/utils/common_widgets/common_switch_state.dart';
 
@@ -50,15 +51,16 @@ class NewBillScreen extends ConsumerWidget {
     final colors = context.appColors;
     final state = ref.watch(newBillProvider);
     final notifier = ref.read(newBillProvider.notifier);
-    final isPrinterConnected = ref.watch(
-      printerProvider.select((value) => value.isConnected),
+    final canAttemptPrint = ref.watch(
+      printerProvider.select(selectCanAttemptPrint),
     );
 
     // Compute tax-inclusive grand total
     final totals = notifier.billTotals;
     final totalAmount = totals.grandTotal;
 
-    return CommonScaffold(
+    return PrinterStateSyncHost(
+      child: CommonScaffold(
       backgroundColor: colors.background,
       appBar: NewBillHeader(billNumber: state.billNumber),
       body: CommonSwitchState(
@@ -90,7 +92,7 @@ class NewBillScreen extends ConsumerWidget {
             // Footer Section
             NewBillFooter(
               totalAmount: totalAmount,
-              isPrinterConnected: isPrinterConnected,
+              isPrinterConnected: canAttemptPrint,
               paymentMethod: state.paymentMethod,
               selectedCustomer: state.selectedCustomer,
               paymentStatus: state.paymentStatus,
@@ -99,13 +101,11 @@ class NewBillScreen extends ConsumerWidget {
               onPaymentMethodChanged: (val) => notifier.setPaymentMethod(val),
               onPaymentStatusChanged: (status) =>
                   _onPaymentStatusChanged(context, ref, status),
-              onSubmitPressed: () => notifier.saveAndMaybePrint(
-                context,
-                printWhenPossible: isPrinterConnected,
-              ),
+              onSubmitPressed: () => notifier.saveAndMaybePrint(context),
             ),
           ],
         ),
+      ),
       ),
     );
   }

@@ -23,7 +23,7 @@ class HomeContentWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          HomeHeaderWidget(notificationCount: data?.notificationCount ?? 0),
+          const HomeHeaderWidget(),
           HomeGreetingRowWidget(
             greetingPrefix: greetingPrefix,
             shopName: data?.shopName ?? '',

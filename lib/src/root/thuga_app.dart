@@ -24,7 +24,7 @@ class ThugaApp extends ConsumerWidget {
       designSize: const Size(393, 852),
       minTextAdapt: true,
       splitScreenMode: true,
-      builder: (_, __) => ToastificationWrapper(
+      builder: (_, _) => ToastificationWrapper(
         child: ConnectivityObserver(
           child: MaterialApp(
             title: Strings.appName,

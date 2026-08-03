@@ -8,6 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:thuga/res/enums/enums.dart';
 import 'package:thuga/services/repo_di.dart';
 import 'package:thuga/src/printer/notifier/printer_notifier.dart';
+import 'package:thuga/src/printer/service/printer_service.dart';
 import 'package:thuga/src/settings/notifier/settings_notifier.dart';
 import 'package:thuga/utils/helpers/api_error_handler.dart';
 import 'package:thuga/utils/helpers/bill_tax_helper.dart';
@@ -505,10 +506,12 @@ class NewBillNotifier extends _$NewBillNotifier {
     required double balance,
   }) {
     final storeName = ref.read(settingsProvider).settings.storeName;
+    final storePhone = ref.read(settingsProvider).companyDetails?.phoneNumber;
     final amountPaid = (grandTotal - balance).clamp(0.0, grandTotal);
 
     return ReceiptPrintData(
       storeName: storeName,
+      storePhone: storePhone,
       orderNumber: orderNumber,
       dateString: dateString,
       customerName: state.selectedCustomer?.name ?? Strings.walkInCustomer,
@@ -586,10 +589,7 @@ class NewBillNotifier extends _$NewBillNotifier {
   }
 
   // ── Save / Print Bill ──────────────────────────────────────────
-  Future<void> saveAndMaybePrint(
-    BuildContext context, {
-    required bool printWhenPossible,
-  }) async {
+  Future<void> saveAndMaybePrint(BuildContext context) async {
     if (state.cart.isEmpty) {
       showCustomErrorToast(message: 'Your bill cart is empty');
       return;
@@ -606,6 +606,29 @@ class NewBillNotifier extends _$NewBillNotifier {
     final balance = calculateBalance(totals.grandTotal);
     final paymentStatus =
         resolvePaymentStatus(totals.grandTotal, balance);
+
+    const printSource = 'new_bill_save';
+    final printerNotifier = ref.read(printerProvider.notifier);
+    printerNotifier.logPrintFlow(
+      stage: 'save_started',
+      source: printSource,
+      context: {
+        'itemCount': state.cart.length,
+        'grandTotal': totals.grandTotal,
+      },
+    );
+
+    final savedPrinter =
+        await ref.read(printerServiceProvider).getSavedPrinter();
+    if (savedPrinter != null) {
+      await printerNotifier.warmUpConnection(source: printSource);
+    } else {
+      printerNotifier.logPrintFlow(
+        stage: 'warmup_skipped',
+        source: printSource,
+        context: {'reason': 'no_saved_printer'},
+      );
+    }
 
     final payload = {
       'customer': state.selectedCustomer?.id,
@@ -678,14 +701,40 @@ class NewBillNotifier extends _$NewBillNotifier {
             );
 
             var printed = false;
-            if (printWhenPossible) {
-              printed = await ref
-                  .read(printerProvider.notifier)
-                  .printReceiptData(receiptData);
+            if (savedPrinter != null) {
+              printerNotifier.logPrintFlow(
+                stage: 'print_started',
+                source: printSource,
+                context: {
+                  'orderNumber': previewOrderNumber,
+                  'itemCount': state.cart.length,
+                },
+              );
+              printed = await printerNotifier.printReceiptData(
+                receiptData,
+                source: printSource,
+              );
+              printerNotifier.logPrintFlow(
+                stage: printed ? 'print_success' : 'print_failed',
+                source: printSource,
+                context: {
+                  'orderNumber': previewOrderNumber,
+                  'itemCount': state.cart.length,
+                  'printed': printed,
+                  if (!printed)
+                    'errorMessage':
+                        ref.read(printerProvider).errorMessage ??
+                        Strings.printerPrintFailed,
+                },
+              );
               if (printed) {
                 showCustomToast(message: Strings.printerSavedSuccess);
               } else {
-                showCustomErrorToast(message: Strings.printerFallbackPreview);
+                showCustomErrorToast(
+                  message:
+                      ref.read(printerProvider).errorMessage ??
+                      Strings.printerPrintFailed,
+                );
               }
             }
 

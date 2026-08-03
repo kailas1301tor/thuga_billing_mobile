@@ -5,7 +5,6 @@ import 'package:dio/dio.dart';
 import 'package:either_dart/either.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:thuga/utils/routes/app_navigator.dart';
 import '../../res/constants/app_constants.dart';
@@ -14,6 +13,7 @@ import '../../utils/helpers/common_functions.dart';
 import '../../utils/routes/route_constants.dart';
 import 'network_base_services.dart';
 import '../../services/connectivity_service.dart';
+import '../../services/di_services.dart';
 import '../../services/token_service.dart';
 
 part 'network_services.g.dart';
@@ -605,6 +605,7 @@ class NetworkServices extends NetWorkBaseServices {
   Future<void> _logout() async {
     debugPrint('🔴 Failed to refresh token — forcing logout');
     await _ref.read(tokenServiceProvider).clearTokens();
+    disposeProviders(_ref);
 
     if (appNavigatorKey.currentState != null) {
       executeAfterFrame(() {

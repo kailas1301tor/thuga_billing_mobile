@@ -109,7 +109,7 @@ class _ErrorIllustration extends StatelessWidget {
         child: Lottie.asset(
           assetPath!,
           repeat: false,
-          errorBuilder: (_, __, ___) => Icon(
+          errorBuilder: (_, _, _) => Icon(
             Icons.error_outline_rounded,
             size: 82.r,
             color: context.appColors.secondaryText,

@@ -46,7 +46,7 @@ class CommonSectionHeader extends StatelessWidget {
               style: FontPalette.base700(20, color: colors.primaryText),
             ),
           ),
-          if (action != null) action,
+          ?action,
         ],
       );
     }
@@ -70,7 +70,7 @@ class CommonSectionHeader extends StatelessWidget {
             ],
           ),
         ),
-        if (action != null) action,
+        ?action,
       ],
     );
   }

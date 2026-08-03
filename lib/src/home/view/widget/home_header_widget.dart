@@ -5,15 +5,9 @@ import 'package:thuga/res/constants/string_constants.dart';
 import 'package:thuga/res/styles/color_palette.dart';
 import 'package:thuga/res/styles/font_palette.dart';
 import 'package:thuga/utils/common_widgets/common_container.dart';
-import 'package:thuga/utils/common_widgets/common_nav_bar_button.dart';
 
 class HomeHeaderWidget extends StatelessWidget {
-  const HomeHeaderWidget({
-    super.key,
-    required this.notificationCount,
-  });
-
-  final int notificationCount;
+  const HomeHeaderWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -59,15 +53,7 @@ class HomeHeaderWidget extends StatelessWidget {
               ],
             ),
           ),
-          CommonNavBarButton(
-            icon: Icon(
-              Icons.notifications_none_rounded,
-              size: 20.r,
-              color: colors.primaryText,
-            ),
-            badgeCount: notificationCount,
-            onTap: () {},
-          ),
+          SizedBox(width: 40.r),
         ],
       ),
     );

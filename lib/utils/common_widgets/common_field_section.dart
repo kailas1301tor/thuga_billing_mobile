@@ -35,7 +35,7 @@ class CommonFieldSection extends StatelessWidget {
                 style: FontPalette.base600(14, color: colors.primaryText),
               ),
             ),
-            if (trailing != null) trailing!,
+            ?trailing,
           ],
         ),
         if (helperText != null) ...[

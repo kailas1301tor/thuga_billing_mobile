@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:thuga/src/auth/repo/auth_repo.dart';
 import 'package:thuga/src/home/repo/home_repository.dart';

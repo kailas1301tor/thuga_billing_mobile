@@ -2,7 +2,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -11,6 +10,8 @@ import 'package:thuga/res/constants/string_constants.dart';
 import 'package:thuga/src/printer/model/printer_device_model.dart';
 import 'package:thuga/src/printer/model/printer_paper_size.dart';
 import 'package:thuga/src/printer/service/printer_crashlytics_service.dart';
+import 'package:thuga/utils/helpers/date_formatter.dart';
+import 'package:thuga/utils/helpers/extensions.dart';
 import 'package:thuga/utils/helpers/printer_error_helper.dart';
 import 'package:thuga/utils/helpers/receipt_print_helper.dart';
 
@@ -34,6 +35,10 @@ abstract class PrinterService {
   Future<bool> printReceipt(
     ReceiptPrintData data, {
     required PrinterPaperSize paperSize,
+  });
+  Future<bool> printDemoReceipt({
+    required PrinterPaperSize paperSize,
+    required String storeName,
   });
 }
 
@@ -86,6 +91,47 @@ class PrinterServiceImpl implements PrinterService {
         context: context,
       ),
     );
+  }
+
+  Future<bool> _writeBytesInChunks(
+    List<int> bytes, {
+    int chunkSize = 512,
+    required String action,
+    Map<String, Object?>? context,
+  }) async {
+    if (bytes.isEmpty) {
+      return true;
+    }
+
+    final chunks = bytes.chunk(chunkSize);
+    for (var index = 0; index < chunks.length; index++) {
+      final success = await PrintBluetoothThermal.writeBytes(chunks[index]);
+      if (!success) {
+        _recordPrinterError(
+          action,
+          PrinterError(
+            code: PrinterErrorCodes.printFailed,
+            message:
+                'writeBytes returned false at chunk ${index + 1}/${chunks.length}',
+            userMessage: Strings.printerPrintFailed,
+          ),
+          context: {
+            ...?context,
+            'byteCount': bytes.length,
+            'chunkIndex': index + 1,
+            'chunkCount': chunks.length,
+            'chunkSize': chunkSize,
+          },
+        );
+        return false;
+      }
+
+      if (chunks.length > 1 && index < chunks.length - 1) {
+        await Future<void>.delayed(const Duration(milliseconds: 75));
+      }
+    }
+
+    return true;
   }
 
   @override
@@ -345,24 +391,84 @@ class PrinterServiceImpl implements PrinterService {
         data,
         paperSize: paperSize.toEscPosPaperSize,
       );
-      final success = await PrintBluetoothThermal.writeBytes(bytes);
+      final success = await _writeBytesInChunks(
+        bytes,
+        action: 'printReceipt',
+        context: context,
+      );
       if (success) {
         logPrinterSuccess('printReceipt', context: context);
         return true;
       }
 
-      _recordPrinterError(
-        'printReceipt',
-        const PrinterError(
-          code: PrinterErrorCodes.printFailed,
-          message: 'writeBytes returned false',
-          userMessage: Strings.printerPrintFailed,
-        ),
-        context: context,
-      );
+      if (_lastError == null) {
+        _recordPrinterError(
+          'printReceipt',
+          const PrinterError(
+            code: PrinterErrorCodes.printFailed,
+            message: 'writeBytes returned false',
+            userMessage: Strings.printerPrintFailed,
+          ),
+          context: {
+            ...context,
+            'byteCount': bytes.length,
+          },
+        );
+      }
       return false;
     } catch (error) {
       _recordError('printReceipt', error, context: context);
+      return false;
+    }
+  }
+
+  String _paperWidthLabel(PrinterPaperSize paperSize) => switch (paperSize) {
+    PrinterPaperSize.mm58 => Strings.paperWidth58,
+    PrinterPaperSize.mm80 => Strings.paperWidth80,
+  };
+
+  @override
+  Future<bool> printDemoReceipt({
+    required PrinterPaperSize paperSize,
+    required String storeName,
+  }) async {
+    _clearLastError();
+    final context = {'paperSize': paperSize.storageValue};
+    try {
+      logPrinterAction('printDemoReceipt', context: context);
+      final bytes = await buildDemoEscPosBytes(
+        paperSize: paperSize.toEscPosPaperSize,
+        storeName: storeName,
+        dateTimeText: formatDate(DateTime.now()),
+        paperWidthLabel: _paperWidthLabel(paperSize),
+      );
+      final success = await _writeBytesInChunks(
+        bytes,
+        action: 'printDemoReceipt',
+        context: context,
+      );
+      if (success) {
+        logPrinterSuccess('printDemoReceipt', context: context);
+        return true;
+      }
+
+      if (_lastError == null) {
+        _recordPrinterError(
+          'printDemoReceipt',
+          const PrinterError(
+            code: PrinterErrorCodes.printFailed,
+            message: 'writeBytes returned false',
+            userMessage: Strings.printerPrintFailed,
+          ),
+          context: {
+            ...context,
+            'byteCount': bytes.length,
+          },
+        );
+      }
+      return false;
+    } catch (error) {
+      _recordError('printDemoReceipt', error, context: context);
       return false;
     }
   }

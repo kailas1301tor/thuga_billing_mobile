@@ -106,7 +106,7 @@ class _StateIllustration extends StatelessWidget {
         child: Lottie.asset(
           assetPath!,
           repeat: false,
-          errorBuilder: (_, __, ___) => Icon(
+          errorBuilder: (_, _, _) => Icon(
             Icons.inbox_outlined,
             size: 82.r,
             color: context.appColors.secondaryText,

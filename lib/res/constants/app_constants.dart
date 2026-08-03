@@ -1,5 +1,4 @@
 class AppConstants {
-  // TODO: Update these with your actual API URLs
   static const String baseURL = "https://vyapapp-stage-backend.tsuite.in";
   static String accessToken = "";
   static String api = "/api";

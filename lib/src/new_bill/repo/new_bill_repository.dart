@@ -37,7 +37,7 @@ class NewBillRepoImpl implements NewBillRepo {
             endPoint: AppConstants.categoriesWithProducts,
             queryParameters: {
               if (search != null && search.isNotEmpty) 'search': search,
-              if (categoryId != null) 'category_id': categoryId,
+              'category_id': ?categoryId,
               'page': page,
               'page_size': pageSize,
             },

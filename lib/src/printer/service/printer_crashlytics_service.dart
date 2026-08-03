@@ -1,8 +1,8 @@
 // lib/src/printer/service/printer_crashlytics_service.dart
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:thuga/services/firebase_service.dart';
 import 'package:thuga/services/token_service.dart';
 import 'package:thuga/utils/helpers/device_info_helper.dart';
 import 'package:thuga/utils/helpers/printer_error_helper.dart';
@@ -46,6 +46,39 @@ class PrinterCrashlyticsService {
     );
   }
 
+  /// Breadcrumb log for printer scan/connect lifecycle (non-fatal).
+  Future<void> logAction({
+    required String action,
+    String? message,
+    Map<String, Object?>? context,
+  }) async {
+    try {
+      final details = _formatContext(context);
+      final line = details.isEmpty
+          ? 'printer:$action${message != null ? ' — $message' : ''}'
+          : 'printer:$action${message != null ? ' — $message' : ''} | $details';
+
+      if (kDebugMode) {
+        debugPrint('🔵 PRINTER CRASHLYTICS: $line');
+        return;
+      }
+
+      if (!isFirebaseInitialized) {
+        return;
+      }
+
+      final crashlytics = FirebaseCrashlytics.instance;
+      await crashlytics.log(line);
+      await crashlytics.setCustomKey('printer_action', action);
+      if (message != null && message.isNotEmpty) {
+        await crashlytics.setCustomKey('printer_log_message', message);
+      }
+      await _applyContext(crashlytics, context);
+    } catch (logError) {
+      debugPrint('🔴 PRINTER CRASHLYTICS LOG FAILED: $logError');
+    }
+  }
+
   Future<void> _report({
     required String eventType,
     required String action,
@@ -54,6 +87,10 @@ class PrinterCrashlyticsService {
   }) async {
     try {
       if (kDebugMode) {
+        return;
+      }
+
+      if (!isFirebaseInitialized) {
         return;
       }
 
@@ -74,21 +111,7 @@ class PrinterCrashlyticsService {
         await crashlytics.setCustomKey('company_id', companyId);
       }
 
-      for (final entry in context?.entries ?? <MapEntry<String, Object?>>[]) {
-        final value = entry.value;
-        if (value == null) continue;
-
-        final key = switch (entry.key) {
-          'name' => 'printer_name',
-          'address' => 'printer_address',
-          'orderNumber' => 'order_number',
-          _ => 'ctx_${entry.key}',
-        };
-        final stringValue = key == 'printer_address'
-            ? _maskBluetoothAddress(value.toString())
-            : value.toString();
-        await crashlytics.setCustomKey(key, stringValue);
-      }
+      await _applyContext(crashlytics, context);
 
       await crashlytics.recordError(
         Exception('PrinterError: ${error.code}'),
@@ -99,6 +122,58 @@ class PrinterCrashlyticsService {
     } catch (reportError) {
       debugPrint('🔴 PRINTER CRASHLYTICS REPORT FAILED: $reportError');
     }
+  }
+
+  Future<void> _applyContext(
+    FirebaseCrashlytics crashlytics,
+    Map<String, Object?>? context,
+  ) async {
+    for (final entry in context?.entries ?? <MapEntry<String, Object?>>[]) {
+      final value = entry.value;
+      if (value == null) continue;
+
+      final key = switch (entry.key) {
+        'name' => 'printer_name',
+        'address' => 'printer_address',
+        'orderNumber' => 'order_number',
+        'count' => 'printer_count',
+        'silently' => 'printer_silent_connect',
+        'attempt' => 'printer_connect_attempt',
+        'maxAttempts' => 'printer_connect_max_attempts',
+        'paperSize' => 'printer_paper_size',
+        'source' => 'printer_source',
+        'byteCount' => 'printer_byte_count',
+        'chunkIndex' => 'printer_chunk_index',
+        'chunkCount' => 'printer_chunk_count',
+        'chunkSize' => 'printer_chunk_size',
+        'itemCount' => 'printer_item_count',
+        'stage' => 'printer_flow_stage',
+        'warmupSuccess' => 'printer_warmup_success',
+        'printAttempt' => 'printer_print_attempt',
+        'printed' => 'printer_printed',
+        _ => 'ctx_${entry.key}',
+      };
+      final stringValue = key == 'printer_address'
+          ? _maskBluetoothAddress(value.toString())
+          : value.toString();
+      await crashlytics.setCustomKey(key, stringValue);
+    }
+  }
+
+  String _formatContext(Map<String, Object?>? context) {
+    if (context == null || context.isEmpty) {
+      return '';
+    }
+
+    return context.entries
+        .where((entry) => entry.value != null)
+        .map((entry) {
+          final value = entry.key == 'address'
+              ? _maskBluetoothAddress(entry.value.toString())
+              : entry.value.toString();
+          return '${entry.key}=$value';
+        })
+        .join(' ');
   }
 
   String _maskBluetoothAddress(String address) {
