@@ -35,7 +35,7 @@ class ReceiptPrintData {
     this.billDiscountText,
     this.sgstTotalText,
     this.cgstTotalText,
-    this.customerPhone,
+    this.storePhone,
   });
 
   final String storeName;
@@ -53,7 +53,15 @@ class ReceiptPrintData {
   final String? billDiscountText;
   final String? sgstTotalText;
   final String? cgstTotalText;
-  final String? customerPhone;
+  final String? storePhone;
+}
+
+String? formatReceiptStorePhoneLine(String? storePhone) {
+  final trimmed = storePhone?.trim() ?? '';
+  if (trimmed.isEmpty) {
+    return null;
+  }
+  return '${Strings.receiptStorePhoneLabel}: $trimmed';
 }
 
 String normalizeReceiptStoreName(String storeName) {
@@ -67,18 +75,37 @@ String normalizeReceiptStoreName(String storeName) {
   return trimmed.toUpperCase();
 }
 
+/// Thermal ESC/POS printers encode with Latin-1 by default and reject
+/// characters such as ₹ (U+20B9). UI/share text can keep Unicode symbols.
+String sanitizeEscPosText(String text) {
+  final buffer = StringBuffer();
+  for (final codeUnit in text.runes) {
+    if (codeUnit == 0x20B9) {
+      buffer.write('Rs.');
+      continue;
+    }
+    if (codeUnit <= 0xFF) {
+      buffer.writeCharCode(codeUnit);
+      continue;
+    }
+    buffer.write('?');
+  }
+  return buffer.toString();
+}
+
 String buildReceiptShareText(ReceiptPrintData data) {
   final receiptBuffer = StringBuffer();
   receiptBuffer.writeln('----------------------------------');
   receiptBuffer.writeln(normalizeReceiptStoreName(data.storeName));
+  final storePhoneLine = formatReceiptStorePhoneLine(data.storePhone);
+  if (storePhoneLine != null) {
+    receiptBuffer.writeln('          $storePhoneLine');
+  }
   receiptBuffer.writeln('             RECEIPT');
   receiptBuffer.writeln('----------------------------------');
   receiptBuffer.writeln('Invoice No: ${data.orderNumber}');
   receiptBuffer.writeln('Date: ${data.dateString}');
   receiptBuffer.writeln('Customer: ${data.customerName}');
-  if (data.customerPhone?.isNotEmpty == true) {
-    receiptBuffer.writeln('Phone: ${data.customerPhone}');
-  }
   receiptBuffer.writeln(
     'Payment: ${data.paymentMethod} (${data.paymentStatus})',
   );
@@ -150,6 +177,8 @@ Future<List<int>> buildReceiptEscPosBytes(
   ReceiptPrintData data, {
   required PaperSize paperSize,
 }) async {
+  String escPos(String text) => sanitizeEscPosText(text);
+
   final profile = await CapabilityProfile.load();
   final generator = Generator(paperSize, profile);
   final bytes = <int>[];
@@ -157,26 +186,36 @@ Future<List<int>> buildReceiptEscPosBytes(
   bytes.addAll(generator.reset());
   bytes.addAll(
     generator.text(
-      normalizeReceiptStoreName(data.storeName),
+      escPos(normalizeReceiptStoreName(data.storeName)),
       styles: _titleStyle,
     ),
   );
+  final storePhoneLine = formatReceiptStorePhoneLine(data.storePhone);
+  if (storePhoneLine != null) {
+    bytes.addAll(
+      generator.text(
+        escPos(storePhoneLine),
+        styles: _centerStyle,
+      ),
+    );
+  }
   bytes.addAll(
     generator.text('RECEIPT', styles: _receiptLabelStyle),
   );
   bytes.addAll(generator.hr());
   bytes.addAll(
-    generator.text('Invoice No: ${data.orderNumber}', styles: const PosStyles(bold: true)),
+    generator.text(
+      escPos('Invoice No: ${data.orderNumber}'),
+      styles: const PosStyles(bold: true),
+    ),
   );
-  bytes.addAll(generator.text('Date: ${data.dateString}'));
-  bytes.addAll(generator.text('Customer: ${data.customerName}'));
-
-  if (data.customerPhone?.isNotEmpty == true) {
-    bytes.addAll(generator.text('Phone: ${data.customerPhone}'));
-  }
+  bytes.addAll(generator.text(escPos('Date: ${data.dateString}')));
+  bytes.addAll(generator.text(escPos('Customer: ${data.customerName}')));
 
   bytes.addAll(
-    generator.text('Payment: ${data.paymentMethod} (${data.paymentStatus})'),
+    generator.text(
+      escPos('Payment: ${data.paymentMethod} (${data.paymentStatus})'),
+    ),
   );
   bytes.addAll(generator.hr());
   bytes.addAll(
@@ -202,14 +241,14 @@ Future<List<int>> buildReceiptEscPosBytes(
     bytes.addAll(
       generator.row(
         [
-          PosColumn(text: item.name, width: _itemColWidth),
+          PosColumn(text: escPos(item.name), width: _itemColWidth),
           PosColumn(
-            text: item.quantityText,
+            text: escPos(item.quantityText),
             width: _qtyColWidth,
             styles: const PosStyles(align: PosAlign.center),
           ),
           PosColumn(
-            text: item.lineTotalText,
+            text: escPos(item.lineTotalText),
             width: _totalColWidth,
             styles: const PosStyles(align: PosAlign.right),
           ),
@@ -218,26 +257,32 @@ Future<List<int>> buildReceiptEscPosBytes(
     );
     bytes.addAll(
       generator.text(
-        '@ ${item.unitPriceText}',
+        escPos('@ ${item.unitPriceText}'),
         styles: _compressedStyle,
       ),
     );
     if (item.discountLabel?.isNotEmpty == true) {
       bytes.addAll(
-        generator.text(item.discountLabel!, styles: _compressedStyle),
+        generator.text(
+          escPos(item.discountLabel!),
+          styles: _compressedStyle,
+        ),
       );
     }
   }
 
   bytes.addAll(generator.hr());
   bytes.addAll(
-    generator.text('Subtotal: ${data.subtotalText}', styles: _rightStyle),
+    generator.text(
+      escPos('Subtotal: ${data.subtotalText}'),
+      styles: _rightStyle,
+    ),
   );
 
   if (data.itemDiscountText != null) {
     bytes.addAll(
       generator.text(
-        'Item Discounts: -${data.itemDiscountText}',
+        escPos('Item Discounts: -${data.itemDiscountText}'),
         styles: _rightStyle,
       ),
     );
@@ -245,7 +290,7 @@ Future<List<int>> buildReceiptEscPosBytes(
   if (data.billDiscountText != null) {
     bytes.addAll(
       generator.text(
-        'Bill Discount: -${data.billDiscountText}',
+        escPos('Bill Discount: -${data.billDiscountText}'),
         styles: _rightStyle,
       ),
     );
@@ -253,7 +298,7 @@ Future<List<int>> buildReceiptEscPosBytes(
   if (data.sgstTotalText != null) {
     bytes.addAll(
       generator.text(
-        '${Strings.sgstTotal}: ${data.sgstTotalText}',
+        escPos('${Strings.sgstTotal}: ${data.sgstTotalText}'),
         styles: _rightStyle,
       ),
     );
@@ -261,7 +306,7 @@ Future<List<int>> buildReceiptEscPosBytes(
   if (data.cgstTotalText != null) {
     bytes.addAll(
       generator.text(
-        '${Strings.cgstTotal}: ${data.cgstTotalText}',
+        escPos('${Strings.cgstTotal}: ${data.cgstTotalText}'),
         styles: _rightStyle,
       ),
     );
@@ -269,7 +314,7 @@ Future<List<int>> buildReceiptEscPosBytes(
 
   bytes.addAll(
     generator.text(
-      'Grand Total: ${data.grandTotalText}',
+      escPos('Grand Total: ${data.grandTotalText}'),
       styles: _grandTotalStyle,
     ),
   );
@@ -277,13 +322,13 @@ Future<List<int>> buildReceiptEscPosBytes(
   if (data.balanceText != '₹0') {
     bytes.addAll(
       generator.text(
-        'Amount Paid: ${data.amountPaidText}',
+        escPos('Amount Paid: ${data.amountPaidText}'),
         styles: _rightStyle,
       ),
     );
     bytes.addAll(
       generator.text(
-        'Remaining: ${data.balanceText}',
+        escPos('Remaining: ${data.balanceText}'),
         styles: _rightBoldStyle,
       ),
     );
@@ -298,6 +343,40 @@ Future<List<int>> buildReceiptEscPosBytes(
   );
   bytes.addAll(
     generator.text(Strings.billedViaApp, styles: _centerStyle),
+  );
+  bytes.addAll(generator.feed(2));
+  bytes.addAll(generator.cut());
+
+  return bytes;
+}
+
+Future<List<int>> buildDemoEscPosBytes({
+  required PaperSize paperSize,
+  required String storeName,
+  required String dateTimeText,
+  required String paperWidthLabel,
+}) async {
+  final profile = await CapabilityProfile.load();
+  final generator = Generator(paperSize, profile);
+  final bytes = <int>[];
+
+  bytes.addAll(generator.reset());
+  bytes.addAll(
+    generator.text(
+      normalizeReceiptStoreName(storeName),
+      styles: _titleStyle,
+    ),
+  );
+  bytes.addAll(
+    generator.text(Strings.printerTestLabel, styles: _receiptLabelStyle),
+  );
+  bytes.addAll(generator.hr());
+  bytes.addAll(generator.text(dateTimeText, styles: _centerStyle));
+  bytes.addAll(
+    generator.text(
+      '${Strings.paperWidth}: $paperWidthLabel',
+      styles: _centerStyle,
+    ),
   );
   bytes.addAll(generator.feed(2));
   bytes.addAll(generator.cut());

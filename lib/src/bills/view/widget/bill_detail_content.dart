@@ -1,9 +1,11 @@
 // lib/src/bills/view/widget/bill_detail_content.dart
+import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:thuga/res/constants/string_constants.dart';
 import 'package:thuga/res/styles/color_palette.dart';
@@ -15,10 +17,10 @@ import 'package:thuga/src/main/notifier/dropdowns_notifier.dart';
 import 'package:thuga/src/main/model/dropdown_model.dart';
 import 'package:thuga/src/printer/notifier/printer_notifier.dart';
 import 'package:thuga/src/settings/notifier/settings_notifier.dart';
+import 'package:thuga/utils/common_widgets/printer_state_sync_host.dart';
 import 'package:thuga/utils/common_widgets/primary_button.dart';
 import 'package:thuga/utils/helpers/extensions.dart';
 import 'package:thuga/utils/helpers/receipt_print_helper.dart';
-import 'package:thuga/utils/helpers/share_image_helper.dart';
 import 'package:thuga/utils/helpers/toast_helper.dart';
 
 class BillDetailContent extends ConsumerStatefulWidget {
@@ -42,13 +44,14 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
   }) {
     final amountPaid = (widget.billDetail.totalAmount - widget.billDetail.balance)
         .clamp(0.0, widget.billDetail.totalAmount);
+    final storePhone = ref.read(settingsProvider).companyDetails?.phoneNumber;
 
     return ReceiptPrintData(
       storeName: storeName,
+      storePhone: storePhone,
       orderNumber: widget.billDetail.orderNumber,
       dateString: widget.billDetail.dateString,
       customerName: customerName,
-      customerPhone: widget.billDetail.customerPhone,
       paymentMethod: widget.billDetail.paymentMethod,
       paymentStatus: widget.billDetail.paymentStatus,
       subtotalText: subtotal.toCurrency(),
@@ -90,10 +93,15 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
 
       final pngBytes = byteData.buffer.asUint8List();
 
-      await sharePngBytes(
-        bytes: pngBytes,
-        fileName: 'invoice_${widget.billDetail.orderNumber}.png',
-        shareText: 'Invoice ${widget.billDetail.orderNumber}',
+      final tempDir = await getTemporaryDirectory();
+      final tempFile = File('${tempDir.path}/invoice_${widget.billDetail.orderNumber}.png');
+      await tempFile.writeAsBytes(pngBytes);
+
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile(tempFile.path)],
+          text: 'Invoice ${widget.billDetail.orderNumber}',
+        ),
       );
     } catch (e) {
       debugPrint("🔴 SHARE IMAGE ERROR: $e");
@@ -179,8 +187,8 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
       settingsProvider.select((s) => s.settings.storeName),
     );
     final displayName = normalizeReceiptStoreName(storeName);
-    final isPrinterConnected = ref.watch(
-      printerProvider.select((value) => value.isConnected),
+    final canAttemptPrint = ref.watch(
+      printerProvider.select(selectCanAttemptPrint),
     );
     final isUpdatingPayment = ref.watch(
       billsProvider.select(
@@ -203,7 +211,8 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
     );
     final billDiscountAmount = (widget.billDetail.discountAmount - itemDiscountAmount).clamp(0.0, double.infinity);
 
-    return Padding(
+    return PrinterStateSyncHost(
+      child: Padding(
       padding: EdgeInsets.all(20.w),
       child: Column(
         children: [
@@ -529,38 +538,40 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
                     size: 20.r,
                     color: Colors.white,
                   ),
-                  onPressed: () async {
-                    if (!isPrinterConnected) {
-                      showCustomErrorToast(message: Strings.noPrinterConnected);
-                      return;
-                    }
-                    final success = await ref
-                        .read(printerProvider.notifier)
-                        .printReceiptData(
-                          _buildReceiptData(
-                            storeName: storeName,
-                            customerName: customerName,
-                            subtotal: subtotal,
-                            itemDiscountAmount: itemDiscountAmount,
-                            billDiscountAmount: billDiscountAmount,
-                          ),
-                        );
-                    if (success) {
-                      showCustomToast(message: Strings.printerSavedSuccess);
-                    } else {
-                      showCustomErrorToast(
-                        message:
-                            ref.read(printerProvider).errorMessage ??
-                            Strings.printerFallbackPreview,
-                      );
-                    }
-                  },
+                  onPressed: canAttemptPrint
+                      ? () async {
+                          final success = await ref
+                              .read(printerProvider.notifier)
+                              .printReceiptData(
+                                _buildReceiptData(
+                                  storeName: storeName,
+                                  customerName: customerName,
+                                  subtotal: subtotal,
+                                  itemDiscountAmount: itemDiscountAmount,
+                                  billDiscountAmount: billDiscountAmount,
+                                ),
+                                source: 'bill_detail',
+                              );
+                          if (success) {
+                            showCustomToast(
+                              message: Strings.printerSavedSuccess,
+                            );
+                          } else {
+                            showCustomErrorToast(
+                              message:
+                                  ref.read(printerProvider).errorMessage ??
+                                  Strings.printerFallbackPreview,
+                            );
+                          }
+                        }
+                      : null,
                 ),
               ),
             ],
           ),
         ],
       ),
+    ),
     );
   }
 

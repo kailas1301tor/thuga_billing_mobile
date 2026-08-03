@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/src/printer/model/printer_connection_type.dart';
 import 'package:thuga/src/printer/model/printer_device_model.dart';
 import 'package:thuga/src/printer/model/printer_paper_size.dart';
 import 'package:thuga/src/printer/service/printer_crashlytics_service.dart';
@@ -14,15 +15,16 @@ PrinterService createPrinterService(PrinterCrashlyticsService crashlytics) {
   return PrinterServiceWeb(crashlytics);
 }
 
-/// Web stub — Bluetooth thermal printing is mobile-only.
+/// Web stub — thermal printing requires mobile or Windows desktop.
 class PrinterServiceWeb implements PrinterService {
   PrinterServiceWeb(this._crashlytics);
 
   static const _kPaperSizeKey = 'pref_printer_paper_size';
+  static const _kConnectionTypeKey = 'pref_printer_connection_type';
 
   static const _unsupportedError = PrinterError(
     code: PrinterErrorCodes.bluetoothNotAvailable,
-    message: 'Bluetooth printing is not supported on web',
+    message: 'Thermal printing is not supported on web',
     userMessage: Strings.bluetoothPrinterHint,
   );
 
@@ -40,6 +42,12 @@ class PrinterServiceWeb implements PrinterService {
 
   @override
   Future<bool> isBluetoothSupported() async {
+    _lastError = null;
+    return false;
+  }
+
+  @override
+  Future<bool> isUsbSupported() async {
     _lastError = null;
     return false;
   }
@@ -63,25 +71,45 @@ class PrinterServiceWeb implements PrinterService {
   }
 
   @override
-  Future<List<PrinterDeviceModel>> scanBluetoothPrinters() async {
-    _setUnsupported('scanBluetoothPrinters');
+  Future<PrinterConnectionType> getConnectionType() async {
+    return PrinterConnectionType.bluetooth;
+  }
+
+  @override
+  Future<void> setConnectionType(PrinterConnectionType type) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_kConnectionTypeKey, type.storageValue);
+    } catch (error) {
+      logPrinterUnexpected('setConnectionType', error);
+      unawaited(
+        _crashlytics.reportUnexpected(action: 'setConnectionType', error: error),
+      );
+    }
+  }
+
+  @override
+  Future<List<PrinterDeviceModel>> scanPrinters(
+    PrinterConnectionType type,
+  ) async {
+    _setUnsupported('scanPrinters');
     return const [];
   }
 
   @override
-  Future<bool> stopBluetoothScan() async {
+  Future<bool> stopScan() async {
     _lastError = null;
     return true;
   }
 
   @override
-  Future<bool> connectBluetooth(PrinterDeviceModel printer) async {
-    _setUnsupported('connectBluetooth');
+  Future<bool> connectPrinter(PrinterDeviceModel printer) async {
+    _setUnsupported('connectPrinter');
     return false;
   }
 
   @override
-  Future<bool> disconnectBluetooth() async {
+  Future<bool> disconnectPrinter() async {
     _lastError = null;
     return true;
   }
@@ -135,10 +163,19 @@ class PrinterServiceWeb implements PrinterService {
   }) async {
     _lastError = const PrinterError(
       code: PrinterErrorCodes.bluetoothNotAvailable,
-      message: 'Bluetooth printing is not supported on web',
+      message: 'Thermal printing is not supported on web',
       userMessage: Strings.printerFallbackPreview,
     );
     logPrinterError('printReceipt', _lastError!);
+    return false;
+  }
+
+  @override
+  Future<bool> printDemoReceipt({
+    required PrinterPaperSize paperSize,
+    required String storeName,
+  }) async {
+    _setUnsupported('printDemoReceipt');
     return false;
   }
 }

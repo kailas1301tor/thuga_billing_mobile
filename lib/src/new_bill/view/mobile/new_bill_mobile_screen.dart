@@ -60,10 +60,7 @@ class NewBillMobileScreen extends ConsumerWidget {
               onPaymentMethodChanged: (val) => notifier.setPaymentMethod(val),
               onPaymentStatusChanged: (status) =>
                   handleNewBillPaymentStatusChange(context, ref, status),
-              onSubmitPressed: () => notifier.saveAndMaybePrint(
-                context,
-                printWhenPossible: isPrinterConnected,
-              ),
+              onSubmitPressed: () => notifier.saveAndMaybePrint(context),
             ),
           ],
         ),

@@ -1,5 +1,6 @@
 // lib/src/settings/view/widget/settings_content_widget.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:thuga/res/constants/string_constants.dart';
@@ -7,6 +8,7 @@ import 'package:thuga/res/styles/color_palette.dart';
 import 'package:thuga/res/styles/font_palette.dart';
 import 'package:thuga/res/styles/theme_provider.dart';
 import 'package:thuga/src/auth/notifier/auth_notifier.dart';
+import 'package:thuga/src/printer/model/printer_connection_type.dart';
 import 'package:thuga/src/printer/model/printer_paper_size.dart';
 import 'package:thuga/src/printer/notifier/printer_notifier.dart';
 import 'package:thuga/utils/common_widgets/common_container.dart';
@@ -14,6 +16,8 @@ import 'package:thuga/utils/common_widgets/common_bottom_sheet.dart';
 import 'package:thuga/utils/common_widgets/common_dialog_box.dart';
 import 'package:thuga/utils/common_widgets/common_text_form_field.dart';
 import 'package:thuga/utils/common_widgets/primary_button.dart';
+import 'package:thuga/utils/common_widgets/printer_state_sync_host.dart';
+import 'package:thuga/utils/helpers/toast_helper.dart';
 import 'package:thuga/utils/helpers/working_hour_helper.dart';
 import '../../notifier/settings_notifier.dart';
 import '../../model/settings_model.dart';
@@ -332,12 +336,121 @@ class SettingsContentWidget extends ConsumerWidget {
     );
   }
 
+  String _connectionTypeLabel(PrinterConnectionType type) {
+    return switch (type) {
+      PrinterConnectionType.bluetooth => Strings.printerConnectionBluetooth,
+      PrinterConnectionType.usb => Strings.printerConnectionUsb,
+    };
+  }
+
+  String _printerHintForType(PrinterConnectionType type) {
+    return switch (type) {
+      PrinterConnectionType.bluetooth => Strings.bluetoothPrinterHint,
+      PrinterConnectionType.usb => Strings.usbPrinterHint,
+    };
+  }
+
+  String _scanHintForType(PrinterConnectionType type) {
+    return switch (type) {
+      PrinterConnectionType.bluetooth => Strings.pairedPrinterHint,
+      PrinterConnectionType.usb => Strings.usbPrinterHint,
+    };
+  }
+
+  Widget _buildConnectionTypeChip({
+    required BuildContext context,
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    final colors = context.appColors;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          HapticFeedback.lightImpact();
+          onTap();
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          padding: EdgeInsets.symmetric(vertical: 10.h),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? colors.primary.withValues(alpha: 0.1)
+                : colors.inputBackground,
+            borderRadius: BorderRadius.circular(10.r),
+            border: Border.all(
+              color: isSelected ? colors.primary : colors.inputBorder,
+              width: 1.w,
+            ),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            label,
+            style: FontPalette.base700(
+              12,
+              color: isSelected ? colors.primary : colors.secondaryText,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildConnectionTypeSelector(
+    BuildContext context,
+    WidgetRef ref,
+  ) {
+    final isUsbSupported = ref.watch(
+      printerProvider.select((state) => state.isUsbSupported),
+    );
+    if (!isUsbSupported) {
+      return const SizedBox.shrink();
+    }
+
+    final selectedType = ref.watch(
+      printerProvider.select((state) => state.selectedConnectionType),
+    );
+    final notifier = ref.read(printerProvider.notifier);
+
+    return Row(
+      children: [
+        _buildConnectionTypeChip(
+          context: context,
+          label: Strings.printerConnectionBluetooth,
+          isSelected: selectedType == PrinterConnectionType.bluetooth,
+          onTap: () => notifier.setConnectionType(PrinterConnectionType.bluetooth),
+        ),
+        8.horizontalSpace,
+        _buildConnectionTypeChip(
+          context: context,
+          label: Strings.printerConnectionUsb,
+          isSelected: selectedType == PrinterConnectionType.usb,
+          onTap: () => notifier.setConnectionType(PrinterConnectionType.usb),
+        ),
+      ],
+    );
+  }
+
   Widget _buildPrinterSection(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final printerState = ref.watch(printerProvider);
+    final selectedConnectionType = ref.watch(
+      printerProvider.select((state) => state.selectedConnectionType),
+    );
+    final isPrinting = ref.watch(
+      printerProvider.select((state) => state.isPrinting),
+    );
     final notifier = ref.read(printerProvider.notifier);
+    final storeName = ref.watch(
+      settingsProvider.select((s) => s.settings.storeName),
+    );
+    final displayName =
+        storeName.trim().isNotEmpty ? storeName : Strings.appName;
 
-    return CommonContainer(
+    return PrinterStateSyncHost(
+      child: CommonContainer(
       padding: EdgeInsets.all(16.r),
       borderRadius: 16.r,
       child: Column(
@@ -364,12 +477,24 @@ class SettingsContentWidget extends ConsumerWidget {
                     4.verticalSpace,
                     Text(
                       printerState.connectedPrinter?.displayName ??
-                          Strings.bluetoothPrinterHint,
+                          _printerHintForType(selectedConnectionType),
                       style: FontPalette.base400(
                         12,
                         color: colors.secondaryText,
                       ),
                     ),
+                    if (printerState.connectedPrinter != null) ...[
+                      2.verticalSpace,
+                      Text(
+                        _connectionTypeLabel(
+                          printerState.connectedPrinter!.connectionType,
+                        ),
+                        style: FontPalette.base500(
+                          11,
+                          color: colors.secondaryText,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -386,7 +511,7 @@ class SettingsContentWidget extends ConsumerWidget {
                   onPressed: () => _showPrinterSheet(context, ref),
                 ),
               ),
-              if (printerState.isConnected) ...[
+              if (printerState.connectedPrinter != null) ...[
                 10.horizontalSpace,
                 Expanded(
                   child: PrimaryButton(
@@ -404,6 +529,42 @@ class SettingsContentWidget extends ConsumerWidget {
               ],
             ],
           ),
+          if (printerState.connectedPrinter != null) ...[
+            10.verticalSpace,
+            PrimaryButton(
+              text: Strings.testPrint,
+              radius: 12,
+              height: 46,
+              isLoading: isPrinting,
+              backgroundColor: colors.inputBackground,
+              fontStyle: FontPalette.base700(14, color: colors.primaryText),
+              onPressed:
+                  isPrinting
+                      ? () {}
+                      : () async {
+                        final success = await notifier.printDemoReceipt(
+                          storeName: displayName,
+                          source: 'settings_test_print',
+                        );
+                        if (!context.mounted) {
+                          return;
+                        }
+                        if (success) {
+                          showCustomToast(
+                            message: Strings.printerTestSuccess,
+                          );
+                          return;
+                        }
+                        final errorMessage = ref
+                            .read(printerProvider)
+                            .errorMessage;
+                        showCustomErrorToast(
+                          message:
+                              errorMessage ?? Strings.printerPrintFailed,
+                        );
+                      },
+            ),
+          ],
           if (printerState.errorMessage?.isNotEmpty == true) ...[
             10.verticalSpace,
             Text(
@@ -413,6 +574,7 @@ class SettingsContentWidget extends ConsumerWidget {
           ],
         ],
       ),
+    ),
     );
   }
 
@@ -475,6 +637,9 @@ class SettingsContentWidget extends ConsumerWidget {
       child: Consumer(
         builder: (context, ref, _) {
           final printerState = ref.watch(printerProvider);
+          final selectedConnectionType = ref.watch(
+            printerProvider.select((state) => state.selectedConnectionType),
+          );
           final printerNotifier = ref.read(printerProvider.notifier);
           final colors = context.appColors;
 
@@ -484,6 +649,8 @@ class SettingsContentWidget extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                _buildConnectionTypeSelector(context, ref),
+                if (printerState.isUsbSupported) 12.verticalSpace,
                 _buildPaperWidthSelector(context, ref),
                 12.verticalSpace,
                 PrimaryButton(
@@ -499,7 +666,7 @@ class SettingsContentWidget extends ConsumerWidget {
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 12.h),
                     child: Text(
-                      Strings.pairedPrinterHint,
+                      _scanHintForType(selectedConnectionType),
                       style: FontPalette.base500(
                         13,
                         color: colors.secondaryText,
@@ -512,7 +679,7 @@ class SettingsContentWidget extends ConsumerWidget {
                     child: ListView.separated(
                       shrinkWrap: true,
                       itemCount: printerState.availablePrinters.length,
-                      separatorBuilder: (_, __) => 10.verticalSpace,
+                      separatorBuilder: (_, _) => 10.verticalSpace,
                       itemBuilder: (context, index) {
                         final printer = printerState.availablePrinters[index];
                         final isSelected =
@@ -542,6 +709,14 @@ class SettingsContentWidget extends ConsumerWidget {
                                       printer.address,
                                       style: FontPalette.base400(
                                         11,
+                                        color: colors.secondaryText,
+                                      ),
+                                    ),
+                                    2.verticalSpace,
+                                    Text(
+                                      _connectionTypeLabel(printer.connectionType),
+                                      style: FontPalette.base500(
+                                        10,
                                         color: colors.secondaryText,
                                       ),
                                     ),

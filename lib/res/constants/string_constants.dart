@@ -208,6 +208,7 @@ class Strings {
   static const String appMenuSubtitle = "Manage business inventory";
   static const String manageSectionTitle = "MANAGE";
   static const String billedViaApp = "Billed via Thuka App";
+  static const String receiptStorePhoneLabel = "Ph";
   static const String appBrandFooter = "Thuka App";
   static const String notifications = "Notifications";
 
@@ -289,8 +290,19 @@ class Strings {
   static const String printerConnected = "Printer connected";
   static const String bluetoothPrinterHint =
       "Connect a Bluetooth receipt printer to enable direct bill printing.";
+  static const String usbPrinterHint =
+      "Connect a USB thermal printer to enable direct bill printing on desktop.";
+  static const String printerConnectionBluetooth = "Bluetooth";
+  static const String printerConnectionUsb = "USB";
+  static const String printerUsbNotSupported =
+      "USB printing requires the Windows desktop app.";
+  static const String printerUsbPermissionDenied =
+      "USB printer access was denied. Check Windows permissions and try again.";
   static const String scanPrinters = "Scan Printers";
   static const String disconnectPrinter = "Disconnect Printer";
+  static const String testPrint = "Test Print";
+  static const String printerTestLabel = "TEST PRINT";
+  static const String printerTestSuccess = "Test print sent successfully";
   static const String printerSavedSuccess = "Receipt sent to printer";
   static const String printerFallbackPreview =
       "Printer unavailable. Showing bill preview instead.";

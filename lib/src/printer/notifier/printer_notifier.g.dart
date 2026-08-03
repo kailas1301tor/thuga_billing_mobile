@@ -41,7 +41,7 @@ final class PrinterNotifierProvider
   }
 }
 
-String _$printerNotifierHash() => r'498044388fc3434e36dcd85280b4a355c7dc4794';
+String _$printerNotifierHash() => r'8750d580d804215e85e0bcfb45db0deb007e3345';
 
 abstract class _$PrinterNotifier extends $Notifier<PrinterState> {
   PrinterState build();

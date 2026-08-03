@@ -9,7 +9,6 @@ import 'package:thuga/res/styles/font_palette.dart';
 import 'package:thuga/res/styles/web_spacing.dart';
 import 'package:thuga/src/main/model/dropdown_model.dart';
 import 'package:thuga/src/main/notifier/dropdowns_notifier.dart';
-import 'package:thuga/src/printer/notifier/printer_notifier.dart';
 import 'package:thuga/utils/common_widgets/bottomsheet_content.dart';
 import 'package:thuga/utils/common_widgets/common_search_bar.dart';
 import 'package:thuga/utils/common_widgets/common_switch_state.dart';
@@ -35,9 +34,6 @@ class NewBillWebScreen extends ConsumerWidget {
     );
     final billNumber = ref.watch(newBillProvider.select((s) => s.billNumber));
     final notifier = ref.read(newBillProvider.notifier);
-    final isPrinterConnected = ref.watch(
-      printerProvider.select((value) => value.isConnected),
-    );
 
     return Scaffold(
       backgroundColor: colors.background,
@@ -49,10 +45,7 @@ class NewBillWebScreen extends ConsumerWidget {
           children: [
             Expanded(child: _CatalogPane(billNumber: billNumber)),
             NewBillWebCartPanel(
-              onSubmit: () => notifier.saveAndMaybePrint(
-                context,
-                printWhenPossible: isPrinterConnected,
-              ),
+              onSubmit: () => notifier.saveAndMaybePrint(context),
               onApplyDiscount: () => _showDiscountDialog(context, ref),
             ),
           ],

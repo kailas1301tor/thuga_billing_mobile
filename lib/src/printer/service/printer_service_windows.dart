@@ -1,9 +1,6 @@
-// lib/src/printer/service/printer_service_mobile.dart
+// lib/src/printer/service/printer_service_windows.dart
 import 'dart:async';
-import 'dart:io';
 
-import 'package:permission_handler/permission_handler.dart';
-import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:thuga/res/constants/string_constants.dart';
 import 'package:thuga/src/printer/model/printer_connection_type.dart';
@@ -15,13 +12,14 @@ import 'package:thuga/src/printer/service/printer_write_helper.dart';
 import 'package:thuga/utils/helpers/date_formatter.dart';
 import 'package:thuga/utils/helpers/printer_error_helper.dart';
 import 'package:thuga/utils/helpers/receipt_print_helper.dart';
+import 'package:unified_esc_pos_printer/unified_esc_pos_printer.dart' as esc;
 
-PrinterService createMobilePrinterService(PrinterCrashlyticsService crashlytics) {
-  return PrinterServiceMobileImpl(crashlytics);
+PrinterService createWindowsPrinterService(PrinterCrashlyticsService crashlytics) {
+  return PrinterServiceWindowsImpl(crashlytics);
 }
 
-class PrinterServiceMobileImpl implements PrinterService {
-  PrinterServiceMobileImpl(this._crashlytics);
+class PrinterServiceWindowsImpl implements PrinterService {
+  PrinterServiceWindowsImpl(this._crashlytics);
 
   static const _kPrinterNameKey = 'pref_printer_name';
   static const _kPrinterAddressKey = 'pref_printer_address';
@@ -29,6 +27,7 @@ class PrinterServiceMobileImpl implements PrinterService {
   static const _kConnectionTypeKey = 'pref_printer_connection_type';
 
   final PrinterCrashlyticsService _crashlytics;
+  final esc.PrinterManager _manager = esc.PrinterManager();
 
   PrinterError? _lastError;
 
@@ -72,25 +71,42 @@ class PrinterServiceMobileImpl implements PrinterService {
     );
   }
 
-  Future<bool> _writeBytesInChunks(
+  esc.UsbPrinterDevice _toUsbDevice(PrinterDeviceModel printer) {
+    return esc.UsbPrinterDevice(
+      name: printer.displayName,
+      identifier: printer.usbIdentifier,
+      usbPlatform: esc.UsbPlatform.desktop,
+    );
+  }
+
+  PrinterDeviceModel _fromUsbDevice(esc.UsbPrinterDevice device) {
+    return PrinterDeviceModel(
+      name: device.name,
+      address: PrinterDeviceModel.usbAddressFor(device.identifier),
+      connectionType: PrinterConnectionType.usb,
+    );
+  }
+
+  Future<bool> _writeBytes(
     List<int> bytes, {
     required String action,
     Map<String, Object?>? context,
-  }) {
+  }) async {
     return writeBytesInChunks(
       bytes: bytes,
       action: action,
       context: context,
-      writeChunk: PrintBluetoothThermal.writeBytes,
+      writeChunk: (chunk) async {
+        try {
+          await _manager.printBytes(chunk);
+          return true;
+        } catch (error) {
+          _recordError(action, error, context: context);
+          return false;
+        }
+      },
       onChunkError: (error) {
-        _recordPrinterError(
-          action,
-          error,
-          context: {
-            ...?context,
-            'byteCount': bytes.length,
-          },
-        );
+        _recordPrinterError(action, error, context: context);
       },
     );
   }
@@ -98,84 +114,25 @@ class PrinterServiceMobileImpl implements PrinterService {
   @override
   Future<bool> isBluetoothSupported() async {
     _clearLastError();
-    return Platform.isAndroid || Platform.isIOS;
+    return false;
   }
 
   @override
   Future<bool> isUsbSupported() async {
     _clearLastError();
-    return false;
+    return true;
   }
 
   @override
   Future<bool> isBluetoothEnabled() async {
     _clearLastError();
-    try {
-      logPrinterAction('isBluetoothEnabled');
-      final enabled = await PrintBluetoothThermal.bluetoothEnabled;
-      logPrinterSuccess('isBluetoothEnabled', context: {'enabled': enabled});
-      return enabled;
-    } catch (error) {
-      _recordError('isBluetoothEnabled', error);
-      return false;
-    }
+    return false;
   }
 
   @override
   Future<bool> requestPermissions() async {
     _clearLastError();
-    try {
-      if (Platform.isAndroid) {
-        final statuses = await [
-          Permission.bluetoothScan,
-          Permission.bluetoothConnect,
-        ].request();
-
-        final granted = statuses.values.every((status) => status.isGranted);
-        if (!granted) {
-          _recordPrinterError(
-            'requestPermissions',
-            const PrinterError(
-              code: PrinterErrorCodes.permissionDenied,
-              message: 'One or more Bluetooth permissions were denied',
-              userMessage: Strings.printerPermissionDenied,
-            ),
-          );
-          return false;
-        }
-      } else if (Platform.isIOS) {
-        final bluetooth = await Permission.bluetooth.request();
-        final granted = bluetooth.isGranted || bluetooth.isLimited;
-        if (!granted) {
-          _recordPrinterError(
-            'requestPermissions',
-            const PrinterError(
-              code: PrinterErrorCodes.permissionDenied,
-              message: 'Bluetooth permission was denied',
-              userMessage: Strings.printerPermissionDenied,
-            ),
-          );
-          return false;
-        }
-      }
-
-      final pluginGranted =
-          await PrintBluetoothThermal.isPermissionBluetoothGranted;
-      if (!pluginGranted) {
-        _recordPrinterError(
-          'requestPermissions',
-          const PrinterError(
-            code: PrinterErrorCodes.permissionDenied,
-            message: 'Bluetooth permission was denied by the system',
-            userMessage: Strings.printerPermissionDenied,
-          ),
-        );
-      }
-      return pluginGranted;
-    } catch (error) {
-      _recordError('requestPermissions', error);
-      return false;
-    }
+    return true;
   }
 
   @override
@@ -183,7 +140,7 @@ class PrinterServiceMobileImpl implements PrinterService {
     _clearLastError();
     try {
       logPrinterAction('isConnected');
-      final connected = await PrintBluetoothThermal.connectionStatus;
+      final connected = _manager.isConnected;
       logPrinterSuccess('isConnected', context: {'connected': connected});
       return connected;
     } catch (error) {
@@ -201,7 +158,7 @@ class PrinterServiceMobileImpl implements PrinterService {
       );
     } catch (error) {
       _recordError('getConnectionType', error);
-      return PrinterConnectionType.bluetooth;
+      return PrinterConnectionType.usb;
     }
   }
 
@@ -210,7 +167,7 @@ class PrinterServiceMobileImpl implements PrinterService {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_kConnectionTypeKey, type.storageValue);
-      if (type != PrinterConnectionType.bluetooth) {
+      if (type != PrinterConnectionType.usb) {
         await disconnectPrinter();
         await clearSavedPrinter();
       }
@@ -224,27 +181,24 @@ class PrinterServiceMobileImpl implements PrinterService {
     PrinterConnectionType type,
   ) async {
     _clearLastError();
-    if (type != PrinterConnectionType.bluetooth) {
+    if (type != PrinterConnectionType.usb) {
       return const [];
     }
 
     try {
       logPrinterAction('scanPrinters', context: {'type': type.storageValue});
-      final printers = await PrintBluetoothThermal.pairedBluetooths;
-      final devices = printers
-          .map(
-            (printer) => PrinterDeviceModel(
-              name: printer.name,
-              address: printer.macAdress,
-              connectionType: PrinterConnectionType.bluetooth,
-            ),
-          )
+      final devices = await _manager.scanPrinters(
+        types: {esc.PrinterConnectionType.usb},
+      );
+      final printers = devices
+          .whereType<esc.UsbPrinterDevice>()
+          .map(_fromUsbDevice)
           .toList();
       logPrinterSuccess(
         'scanPrinters',
-        context: {'count': devices.length, 'type': type.storageValue},
+        context: {'count': printers.length, 'type': type.storageValue},
       );
-      return devices;
+      return printers;
     } catch (error) {
       _recordError(
         'scanPrinters',
@@ -272,16 +226,14 @@ class PrinterServiceMobileImpl implements PrinterService {
     };
     try {
       logPrinterAction('connectPrinter', context: context);
-      final isConnected = await PrintBluetoothThermal.connect(
-        macPrinterAddress: printer.address,
-      );
-      if (isConnected) {
+      await _manager.connect(_toUsbDevice(printer));
+      if (_manager.isConnected) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString(_kPrinterNameKey, printer.name);
         await prefs.setString(_kPrinterAddressKey, printer.address);
         await prefs.setString(
           _kConnectionTypeKey,
-          PrinterConnectionType.bluetooth.storageValue,
+          PrinterConnectionType.usb.storageValue,
         );
         logPrinterSuccess('connectPrinter', context: context);
         return true;
@@ -291,7 +243,7 @@ class PrinterServiceMobileImpl implements PrinterService {
         'connectPrinter',
         const PrinterError(
           code: PrinterErrorCodes.connectionFailed,
-          message: 'connect returned false',
+          message: 'USB connect did not reach connected state',
           userMessage: Strings.printerConnectionFailed,
         ),
         context: context,
@@ -308,21 +260,10 @@ class PrinterServiceMobileImpl implements PrinterService {
     _clearLastError();
     try {
       logPrinterAction('disconnectPrinter');
-      final result = await PrintBluetoothThermal.disconnect;
-      if (result) {
-        await clearSavedPrinter();
-        logPrinterSuccess('disconnectPrinter');
-      } else {
-        _recordPrinterError(
-          'disconnectPrinter',
-          const PrinterError(
-            code: PrinterErrorCodes.disconnectFailed,
-            message: 'disconnect returned false',
-            userMessage: Strings.printerUnknownError,
-          ),
-        );
-      }
-      return result;
+      await _manager.disconnect();
+      await clearSavedPrinter();
+      logPrinterSuccess('disconnectPrinter');
+      return true;
     } catch (error) {
       _recordError('disconnectPrinter', error);
       return false;
@@ -404,7 +345,7 @@ class PrinterServiceMobileImpl implements PrinterService {
         data,
         paperSize: paperSize.toEscPosPaperSize,
       );
-      final success = await _writeBytesInChunks(
+      final success = await _writeBytes(
         bytes,
         action: 'printReceipt',
         context: context,
@@ -412,21 +353,6 @@ class PrinterServiceMobileImpl implements PrinterService {
       if (success) {
         logPrinterSuccess('printReceipt', context: context);
         return true;
-      }
-
-      if (_lastError == null) {
-        _recordPrinterError(
-          'printReceipt',
-          const PrinterError(
-            code: PrinterErrorCodes.printFailed,
-            message: 'writeBytes returned false',
-            userMessage: Strings.printerPrintFailed,
-          ),
-          context: {
-            ...context,
-            'byteCount': bytes.length,
-          },
-        );
       }
       return false;
     } catch (error) {
@@ -455,7 +381,7 @@ class PrinterServiceMobileImpl implements PrinterService {
         dateTimeText: formatDate(DateTime.now()),
         paperWidthLabel: _paperWidthLabel(paperSize),
       );
-      final success = await _writeBytesInChunks(
+      final success = await _writeBytes(
         bytes,
         action: 'printDemoReceipt',
         context: context,
@@ -463,21 +389,6 @@ class PrinterServiceMobileImpl implements PrinterService {
       if (success) {
         logPrinterSuccess('printDemoReceipt', context: context);
         return true;
-      }
-
-      if (_lastError == null) {
-        _recordPrinterError(
-          'printDemoReceipt',
-          const PrinterError(
-            code: PrinterErrorCodes.printFailed,
-            message: 'writeBytes returned false',
-            userMessage: Strings.printerPrintFailed,
-          ),
-          context: {
-            ...context,
-            'byteCount': bytes.length,
-          },
-        );
       }
       return false;
     } catch (error) {
