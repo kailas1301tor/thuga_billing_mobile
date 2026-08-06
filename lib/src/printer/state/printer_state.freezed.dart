@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$PrinterState {
 
- bool get isBluetoothSupported; bool get isUsbSupported; bool get isBluetoothEnabled; bool get hasPermissions; bool get isScanning; bool get isConnecting; bool get isConnected; bool get isPrinting; PrinterPaperSize get paperSize; PrinterConnectionType get selectedConnectionType; PrinterDeviceModel? get connectedPrinter; List<PrinterDeviceModel> get availablePrinters; String? get errorMessage;
+ bool get isBluetoothSupported; bool get isBluetoothEnabled; bool get hasPermissions; bool get isScanning; bool get isConnecting; bool get isConnected; bool get isPrinting; PrinterPaperSize get paperSize; PrinterDeviceModel? get connectedPrinter; List<PrinterDeviceModel> get availablePrinters; String? get errorMessage;
 /// Create a copy of PrinterState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $PrinterStateCopyWith<PrinterState> get copyWith => _$PrinterStateCopyWithImpl<P
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PrinterState&&(identical(other.isBluetoothSupported, isBluetoothSupported) || other.isBluetoothSupported == isBluetoothSupported)&&(identical(other.isUsbSupported, isUsbSupported) || other.isUsbSupported == isUsbSupported)&&(identical(other.isBluetoothEnabled, isBluetoothEnabled) || other.isBluetoothEnabled == isBluetoothEnabled)&&(identical(other.hasPermissions, hasPermissions) || other.hasPermissions == hasPermissions)&&(identical(other.isScanning, isScanning) || other.isScanning == isScanning)&&(identical(other.isConnecting, isConnecting) || other.isConnecting == isConnecting)&&(identical(other.isConnected, isConnected) || other.isConnected == isConnected)&&(identical(other.isPrinting, isPrinting) || other.isPrinting == isPrinting)&&(identical(other.paperSize, paperSize) || other.paperSize == paperSize)&&(identical(other.selectedConnectionType, selectedConnectionType) || other.selectedConnectionType == selectedConnectionType)&&(identical(other.connectedPrinter, connectedPrinter) || other.connectedPrinter == connectedPrinter)&&const DeepCollectionEquality().equals(other.availablePrinters, availablePrinters)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PrinterState&&(identical(other.isBluetoothSupported, isBluetoothSupported) || other.isBluetoothSupported == isBluetoothSupported)&&(identical(other.isBluetoothEnabled, isBluetoothEnabled) || other.isBluetoothEnabled == isBluetoothEnabled)&&(identical(other.hasPermissions, hasPermissions) || other.hasPermissions == hasPermissions)&&(identical(other.isScanning, isScanning) || other.isScanning == isScanning)&&(identical(other.isConnecting, isConnecting) || other.isConnecting == isConnecting)&&(identical(other.isConnected, isConnected) || other.isConnected == isConnected)&&(identical(other.isPrinting, isPrinting) || other.isPrinting == isPrinting)&&(identical(other.paperSize, paperSize) || other.paperSize == paperSize)&&(identical(other.connectedPrinter, connectedPrinter) || other.connectedPrinter == connectedPrinter)&&const DeepCollectionEquality().equals(other.availablePrinters, availablePrinters)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,isBluetoothSupported,isUsbSupported,isBluetoothEnabled,hasPermissions,isScanning,isConnecting,isConnected,isPrinting,paperSize,selectedConnectionType,connectedPrinter,const DeepCollectionEquality().hash(availablePrinters),errorMessage);
+int get hashCode => Object.hash(runtimeType,isBluetoothSupported,isBluetoothEnabled,hasPermissions,isScanning,isConnecting,isConnected,isPrinting,paperSize,connectedPrinter,const DeepCollectionEquality().hash(availablePrinters),errorMessage);
 
 @override
 String toString() {
-  return 'PrinterState(isBluetoothSupported: $isBluetoothSupported, isUsbSupported: $isUsbSupported, isBluetoothEnabled: $isBluetoothEnabled, hasPermissions: $hasPermissions, isScanning: $isScanning, isConnecting: $isConnecting, isConnected: $isConnected, isPrinting: $isPrinting, paperSize: $paperSize, selectedConnectionType: $selectedConnectionType, connectedPrinter: $connectedPrinter, availablePrinters: $availablePrinters, errorMessage: $errorMessage)';
+  return 'PrinterState(isBluetoothSupported: $isBluetoothSupported, isBluetoothEnabled: $isBluetoothEnabled, hasPermissions: $hasPermissions, isScanning: $isScanning, isConnecting: $isConnecting, isConnected: $isConnected, isPrinting: $isPrinting, paperSize: $paperSize, connectedPrinter: $connectedPrinter, availablePrinters: $availablePrinters, errorMessage: $errorMessage)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $PrinterStateCopyWith<$Res>  {
   factory $PrinterStateCopyWith(PrinterState value, $Res Function(PrinterState) _then) = _$PrinterStateCopyWithImpl;
 @useResult
 $Res call({
- bool isBluetoothSupported, bool isUsbSupported, bool isBluetoothEnabled, bool hasPermissions, bool isScanning, bool isConnecting, bool isConnected, bool isPrinting, PrinterPaperSize paperSize, PrinterConnectionType selectedConnectionType, PrinterDeviceModel? connectedPrinter, List<PrinterDeviceModel> availablePrinters, String? errorMessage
+ bool isBluetoothSupported, bool isBluetoothEnabled, bool hasPermissions, bool isScanning, bool isConnecting, bool isConnected, bool isPrinting, PrinterPaperSize paperSize, PrinterDeviceModel? connectedPrinter, List<PrinterDeviceModel> availablePrinters, String? errorMessage
 });
 
 
@@ -62,10 +62,9 @@ class _$PrinterStateCopyWithImpl<$Res>
 
 /// Create a copy of PrinterState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? isBluetoothSupported = null,Object? isUsbSupported = null,Object? isBluetoothEnabled = null,Object? hasPermissions = null,Object? isScanning = null,Object? isConnecting = null,Object? isConnected = null,Object? isPrinting = null,Object? paperSize = null,Object? selectedConnectionType = null,Object? connectedPrinter = freezed,Object? availablePrinters = null,Object? errorMessage = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? isBluetoothSupported = null,Object? isBluetoothEnabled = null,Object? hasPermissions = null,Object? isScanning = null,Object? isConnecting = null,Object? isConnected = null,Object? isPrinting = null,Object? paperSize = null,Object? connectedPrinter = freezed,Object? availablePrinters = null,Object? errorMessage = freezed,}) {
   return _then(_self.copyWith(
 isBluetoothSupported: null == isBluetoothSupported ? _self.isBluetoothSupported : isBluetoothSupported // ignore: cast_nullable_to_non_nullable
-as bool,isUsbSupported: null == isUsbSupported ? _self.isUsbSupported : isUsbSupported // ignore: cast_nullable_to_non_nullable
 as bool,isBluetoothEnabled: null == isBluetoothEnabled ? _self.isBluetoothEnabled : isBluetoothEnabled // ignore: cast_nullable_to_non_nullable
 as bool,hasPermissions: null == hasPermissions ? _self.hasPermissions : hasPermissions // ignore: cast_nullable_to_non_nullable
 as bool,isScanning: null == isScanning ? _self.isScanning : isScanning // ignore: cast_nullable_to_non_nullable
@@ -73,8 +72,7 @@ as bool,isConnecting: null == isConnecting ? _self.isConnecting : isConnecting /
 as bool,isConnected: null == isConnected ? _self.isConnected : isConnected // ignore: cast_nullable_to_non_nullable
 as bool,isPrinting: null == isPrinting ? _self.isPrinting : isPrinting // ignore: cast_nullable_to_non_nullable
 as bool,paperSize: null == paperSize ? _self.paperSize : paperSize // ignore: cast_nullable_to_non_nullable
-as PrinterPaperSize,selectedConnectionType: null == selectedConnectionType ? _self.selectedConnectionType : selectedConnectionType // ignore: cast_nullable_to_non_nullable
-as PrinterConnectionType,connectedPrinter: freezed == connectedPrinter ? _self.connectedPrinter : connectedPrinter // ignore: cast_nullable_to_non_nullable
+as PrinterPaperSize,connectedPrinter: freezed == connectedPrinter ? _self.connectedPrinter : connectedPrinter // ignore: cast_nullable_to_non_nullable
 as PrinterDeviceModel?,availablePrinters: null == availablePrinters ? _self.availablePrinters : availablePrinters // ignore: cast_nullable_to_non_nullable
 as List<PrinterDeviceModel>,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,
@@ -159,10 +157,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool isBluetoothSupported,  bool isUsbSupported,  bool isBluetoothEnabled,  bool hasPermissions,  bool isScanning,  bool isConnecting,  bool isConnected,  bool isPrinting,  PrinterPaperSize paperSize,  PrinterConnectionType selectedConnectionType,  PrinterDeviceModel? connectedPrinter,  List<PrinterDeviceModel> availablePrinters,  String? errorMessage)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool isBluetoothSupported,  bool isBluetoothEnabled,  bool hasPermissions,  bool isScanning,  bool isConnecting,  bool isConnected,  bool isPrinting,  PrinterPaperSize paperSize,  PrinterDeviceModel? connectedPrinter,  List<PrinterDeviceModel> availablePrinters,  String? errorMessage)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PrinterState() when $default != null:
-return $default(_that.isBluetoothSupported,_that.isUsbSupported,_that.isBluetoothEnabled,_that.hasPermissions,_that.isScanning,_that.isConnecting,_that.isConnected,_that.isPrinting,_that.paperSize,_that.selectedConnectionType,_that.connectedPrinter,_that.availablePrinters,_that.errorMessage);case _:
+return $default(_that.isBluetoothSupported,_that.isBluetoothEnabled,_that.hasPermissions,_that.isScanning,_that.isConnecting,_that.isConnected,_that.isPrinting,_that.paperSize,_that.connectedPrinter,_that.availablePrinters,_that.errorMessage);case _:
   return orElse();
 
 }
@@ -180,10 +178,10 @@ return $default(_that.isBluetoothSupported,_that.isUsbSupported,_that.isBluetoot
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool isBluetoothSupported,  bool isUsbSupported,  bool isBluetoothEnabled,  bool hasPermissions,  bool isScanning,  bool isConnecting,  bool isConnected,  bool isPrinting,  PrinterPaperSize paperSize,  PrinterConnectionType selectedConnectionType,  PrinterDeviceModel? connectedPrinter,  List<PrinterDeviceModel> availablePrinters,  String? errorMessage)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool isBluetoothSupported,  bool isBluetoothEnabled,  bool hasPermissions,  bool isScanning,  bool isConnecting,  bool isConnected,  bool isPrinting,  PrinterPaperSize paperSize,  PrinterDeviceModel? connectedPrinter,  List<PrinterDeviceModel> availablePrinters,  String? errorMessage)  $default,) {final _that = this;
 switch (_that) {
 case _PrinterState():
-return $default(_that.isBluetoothSupported,_that.isUsbSupported,_that.isBluetoothEnabled,_that.hasPermissions,_that.isScanning,_that.isConnecting,_that.isConnected,_that.isPrinting,_that.paperSize,_that.selectedConnectionType,_that.connectedPrinter,_that.availablePrinters,_that.errorMessage);}
+return $default(_that.isBluetoothSupported,_that.isBluetoothEnabled,_that.hasPermissions,_that.isScanning,_that.isConnecting,_that.isConnected,_that.isPrinting,_that.paperSize,_that.connectedPrinter,_that.availablePrinters,_that.errorMessage);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -197,10 +195,10 @@ return $default(_that.isBluetoothSupported,_that.isUsbSupported,_that.isBluetoot
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool isBluetoothSupported,  bool isUsbSupported,  bool isBluetoothEnabled,  bool hasPermissions,  bool isScanning,  bool isConnecting,  bool isConnected,  bool isPrinting,  PrinterPaperSize paperSize,  PrinterConnectionType selectedConnectionType,  PrinterDeviceModel? connectedPrinter,  List<PrinterDeviceModel> availablePrinters,  String? errorMessage)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool isBluetoothSupported,  bool isBluetoothEnabled,  bool hasPermissions,  bool isScanning,  bool isConnecting,  bool isConnected,  bool isPrinting,  PrinterPaperSize paperSize,  PrinterDeviceModel? connectedPrinter,  List<PrinterDeviceModel> availablePrinters,  String? errorMessage)?  $default,) {final _that = this;
 switch (_that) {
 case _PrinterState() when $default != null:
-return $default(_that.isBluetoothSupported,_that.isUsbSupported,_that.isBluetoothEnabled,_that.hasPermissions,_that.isScanning,_that.isConnecting,_that.isConnected,_that.isPrinting,_that.paperSize,_that.selectedConnectionType,_that.connectedPrinter,_that.availablePrinters,_that.errorMessage);case _:
+return $default(_that.isBluetoothSupported,_that.isBluetoothEnabled,_that.hasPermissions,_that.isScanning,_that.isConnecting,_that.isConnected,_that.isPrinting,_that.paperSize,_that.connectedPrinter,_that.availablePrinters,_that.errorMessage);case _:
   return null;
 
 }
@@ -212,11 +210,10 @@ return $default(_that.isBluetoothSupported,_that.isUsbSupported,_that.isBluetoot
 
 
 class _PrinterState implements PrinterState {
-  const _PrinterState({this.isBluetoothSupported = false, this.isUsbSupported = false, this.isBluetoothEnabled = false, this.hasPermissions = false, this.isScanning = false, this.isConnecting = false, this.isConnected = false, this.isPrinting = false, this.paperSize = PrinterPaperSize.mm80, this.selectedConnectionType = PrinterConnectionType.bluetooth, this.connectedPrinter, final  List<PrinterDeviceModel> availablePrinters = const <PrinterDeviceModel>[], this.errorMessage}): _availablePrinters = availablePrinters;
+  const _PrinterState({this.isBluetoothSupported = false, this.isBluetoothEnabled = false, this.hasPermissions = false, this.isScanning = false, this.isConnecting = false, this.isConnected = false, this.isPrinting = false, this.paperSize = PrinterPaperSize.mm80, this.connectedPrinter, final  List<PrinterDeviceModel> availablePrinters = const <PrinterDeviceModel>[], this.errorMessage}): _availablePrinters = availablePrinters;
   
 
 @override@JsonKey() final  bool isBluetoothSupported;
-@override@JsonKey() final  bool isUsbSupported;
 @override@JsonKey() final  bool isBluetoothEnabled;
 @override@JsonKey() final  bool hasPermissions;
 @override@JsonKey() final  bool isScanning;
@@ -224,7 +221,6 @@ class _PrinterState implements PrinterState {
 @override@JsonKey() final  bool isConnected;
 @override@JsonKey() final  bool isPrinting;
 @override@JsonKey() final  PrinterPaperSize paperSize;
-@override@JsonKey() final  PrinterConnectionType selectedConnectionType;
 @override final  PrinterDeviceModel? connectedPrinter;
  final  List<PrinterDeviceModel> _availablePrinters;
 @override@JsonKey() List<PrinterDeviceModel> get availablePrinters {
@@ -245,16 +241,16 @@ _$PrinterStateCopyWith<_PrinterState> get copyWith => __$PrinterStateCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PrinterState&&(identical(other.isBluetoothSupported, isBluetoothSupported) || other.isBluetoothSupported == isBluetoothSupported)&&(identical(other.isUsbSupported, isUsbSupported) || other.isUsbSupported == isUsbSupported)&&(identical(other.isBluetoothEnabled, isBluetoothEnabled) || other.isBluetoothEnabled == isBluetoothEnabled)&&(identical(other.hasPermissions, hasPermissions) || other.hasPermissions == hasPermissions)&&(identical(other.isScanning, isScanning) || other.isScanning == isScanning)&&(identical(other.isConnecting, isConnecting) || other.isConnecting == isConnecting)&&(identical(other.isConnected, isConnected) || other.isConnected == isConnected)&&(identical(other.isPrinting, isPrinting) || other.isPrinting == isPrinting)&&(identical(other.paperSize, paperSize) || other.paperSize == paperSize)&&(identical(other.selectedConnectionType, selectedConnectionType) || other.selectedConnectionType == selectedConnectionType)&&(identical(other.connectedPrinter, connectedPrinter) || other.connectedPrinter == connectedPrinter)&&const DeepCollectionEquality().equals(other._availablePrinters, _availablePrinters)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PrinterState&&(identical(other.isBluetoothSupported, isBluetoothSupported) || other.isBluetoothSupported == isBluetoothSupported)&&(identical(other.isBluetoothEnabled, isBluetoothEnabled) || other.isBluetoothEnabled == isBluetoothEnabled)&&(identical(other.hasPermissions, hasPermissions) || other.hasPermissions == hasPermissions)&&(identical(other.isScanning, isScanning) || other.isScanning == isScanning)&&(identical(other.isConnecting, isConnecting) || other.isConnecting == isConnecting)&&(identical(other.isConnected, isConnected) || other.isConnected == isConnected)&&(identical(other.isPrinting, isPrinting) || other.isPrinting == isPrinting)&&(identical(other.paperSize, paperSize) || other.paperSize == paperSize)&&(identical(other.connectedPrinter, connectedPrinter) || other.connectedPrinter == connectedPrinter)&&const DeepCollectionEquality().equals(other._availablePrinters, _availablePrinters)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,isBluetoothSupported,isUsbSupported,isBluetoothEnabled,hasPermissions,isScanning,isConnecting,isConnected,isPrinting,paperSize,selectedConnectionType,connectedPrinter,const DeepCollectionEquality().hash(_availablePrinters),errorMessage);
+int get hashCode => Object.hash(runtimeType,isBluetoothSupported,isBluetoothEnabled,hasPermissions,isScanning,isConnecting,isConnected,isPrinting,paperSize,connectedPrinter,const DeepCollectionEquality().hash(_availablePrinters),errorMessage);
 
 @override
 String toString() {
-  return 'PrinterState(isBluetoothSupported: $isBluetoothSupported, isUsbSupported: $isUsbSupported, isBluetoothEnabled: $isBluetoothEnabled, hasPermissions: $hasPermissions, isScanning: $isScanning, isConnecting: $isConnecting, isConnected: $isConnected, isPrinting: $isPrinting, paperSize: $paperSize, selectedConnectionType: $selectedConnectionType, connectedPrinter: $connectedPrinter, availablePrinters: $availablePrinters, errorMessage: $errorMessage)';
+  return 'PrinterState(isBluetoothSupported: $isBluetoothSupported, isBluetoothEnabled: $isBluetoothEnabled, hasPermissions: $hasPermissions, isScanning: $isScanning, isConnecting: $isConnecting, isConnected: $isConnected, isPrinting: $isPrinting, paperSize: $paperSize, connectedPrinter: $connectedPrinter, availablePrinters: $availablePrinters, errorMessage: $errorMessage)';
 }
 
 
@@ -265,7 +261,7 @@ abstract mixin class _$PrinterStateCopyWith<$Res> implements $PrinterStateCopyWi
   factory _$PrinterStateCopyWith(_PrinterState value, $Res Function(_PrinterState) _then) = __$PrinterStateCopyWithImpl;
 @override @useResult
 $Res call({
- bool isBluetoothSupported, bool isUsbSupported, bool isBluetoothEnabled, bool hasPermissions, bool isScanning, bool isConnecting, bool isConnected, bool isPrinting, PrinterPaperSize paperSize, PrinterConnectionType selectedConnectionType, PrinterDeviceModel? connectedPrinter, List<PrinterDeviceModel> availablePrinters, String? errorMessage
+ bool isBluetoothSupported, bool isBluetoothEnabled, bool hasPermissions, bool isScanning, bool isConnecting, bool isConnected, bool isPrinting, PrinterPaperSize paperSize, PrinterDeviceModel? connectedPrinter, List<PrinterDeviceModel> availablePrinters, String? errorMessage
 });
 
 
@@ -282,10 +278,9 @@ class __$PrinterStateCopyWithImpl<$Res>
 
 /// Create a copy of PrinterState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? isBluetoothSupported = null,Object? isUsbSupported = null,Object? isBluetoothEnabled = null,Object? hasPermissions = null,Object? isScanning = null,Object? isConnecting = null,Object? isConnected = null,Object? isPrinting = null,Object? paperSize = null,Object? selectedConnectionType = null,Object? connectedPrinter = freezed,Object? availablePrinters = null,Object? errorMessage = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? isBluetoothSupported = null,Object? isBluetoothEnabled = null,Object? hasPermissions = null,Object? isScanning = null,Object? isConnecting = null,Object? isConnected = null,Object? isPrinting = null,Object? paperSize = null,Object? connectedPrinter = freezed,Object? availablePrinters = null,Object? errorMessage = freezed,}) {
   return _then(_PrinterState(
 isBluetoothSupported: null == isBluetoothSupported ? _self.isBluetoothSupported : isBluetoothSupported // ignore: cast_nullable_to_non_nullable
-as bool,isUsbSupported: null == isUsbSupported ? _self.isUsbSupported : isUsbSupported // ignore: cast_nullable_to_non_nullable
 as bool,isBluetoothEnabled: null == isBluetoothEnabled ? _self.isBluetoothEnabled : isBluetoothEnabled // ignore: cast_nullable_to_non_nullable
 as bool,hasPermissions: null == hasPermissions ? _self.hasPermissions : hasPermissions // ignore: cast_nullable_to_non_nullable
 as bool,isScanning: null == isScanning ? _self.isScanning : isScanning // ignore: cast_nullable_to_non_nullable
@@ -293,8 +288,7 @@ as bool,isConnecting: null == isConnecting ? _self.isConnecting : isConnecting /
 as bool,isConnected: null == isConnected ? _self.isConnected : isConnected // ignore: cast_nullable_to_non_nullable
 as bool,isPrinting: null == isPrinting ? _self.isPrinting : isPrinting // ignore: cast_nullable_to_non_nullable
 as bool,paperSize: null == paperSize ? _self.paperSize : paperSize // ignore: cast_nullable_to_non_nullable
-as PrinterPaperSize,selectedConnectionType: null == selectedConnectionType ? _self.selectedConnectionType : selectedConnectionType // ignore: cast_nullable_to_non_nullable
-as PrinterConnectionType,connectedPrinter: freezed == connectedPrinter ? _self.connectedPrinter : connectedPrinter // ignore: cast_nullable_to_non_nullable
+as PrinterPaperSize,connectedPrinter: freezed == connectedPrinter ? _self.connectedPrinter : connectedPrinter // ignore: cast_nullable_to_non_nullable
 as PrinterDeviceModel?,availablePrinters: null == availablePrinters ? _self._availablePrinters : availablePrinters // ignore: cast_nullable_to_non_nullable
 as List<PrinterDeviceModel>,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,

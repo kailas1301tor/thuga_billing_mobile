@@ -6,27 +6,25 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:thuga/res/constants/string_constants.dart';
-import 'package:thuga/src/printer/model/printer_connection_type.dart';
 import 'package:thuga/src/printer/model/printer_device_model.dart';
 import 'package:thuga/src/printer/model/printer_paper_size.dart';
 import 'package:thuga/src/printer/service/printer_crashlytics_service.dart';
 import 'package:thuga/src/printer/service/printer_service.dart';
-import 'package:thuga/src/printer/service/printer_write_helper.dart';
 import 'package:thuga/utils/helpers/date_formatter.dart';
+import 'package:thuga/utils/helpers/extensions.dart';
 import 'package:thuga/utils/helpers/printer_error_helper.dart';
 import 'package:thuga/utils/helpers/receipt_print_helper.dart';
 
-PrinterService createMobilePrinterService(PrinterCrashlyticsService crashlytics) {
-  return PrinterServiceMobileImpl(crashlytics);
+PrinterService createPrinterService(PrinterCrashlyticsService crashlytics) {
+  return PrinterServiceImpl(crashlytics);
 }
 
-class PrinterServiceMobileImpl implements PrinterService {
-  PrinterServiceMobileImpl(this._crashlytics);
+class PrinterServiceImpl implements PrinterService {
+  PrinterServiceImpl(this._crashlytics);
 
   static const _kPrinterNameKey = 'pref_printer_name';
   static const _kPrinterAddressKey = 'pref_printer_address';
   static const _kPaperSizeKey = 'pref_printer_paper_size';
-  static const _kConnectionTypeKey = 'pref_printer_connection_type';
 
   final PrinterCrashlyticsService _crashlytics;
 
@@ -74,37 +72,49 @@ class PrinterServiceMobileImpl implements PrinterService {
 
   Future<bool> _writeBytesInChunks(
     List<int> bytes, {
+    int chunkSize = 512,
     required String action,
     Map<String, Object?>? context,
-  }) {
-    return writeBytesInChunks(
-      bytes: bytes,
-      action: action,
-      context: context,
-      writeChunk: PrintBluetoothThermal.writeBytes,
-      onChunkError: (error) {
+  }) async {
+    if (bytes.isEmpty) {
+      return true;
+    }
+
+    final chunks = bytes.chunk(chunkSize);
+    for (var index = 0; index < chunks.length; index++) {
+      final success = await PrintBluetoothThermal.writeBytes(chunks[index]);
+      if (!success) {
         _recordPrinterError(
           action,
-          error,
+          PrinterError(
+            code: PrinterErrorCodes.printFailed,
+            message:
+                'writeBytes returned false at chunk ${index + 1}/${chunks.length}',
+            userMessage: Strings.printerPrintFailed,
+          ),
           context: {
             ...?context,
             'byteCount': bytes.length,
+            'chunkIndex': index + 1,
+            'chunkCount': chunks.length,
+            'chunkSize': chunkSize,
           },
         );
-      },
-    );
+        return false;
+      }
+
+      if (chunks.length > 1 && index < chunks.length - 1) {
+        await Future<void>.delayed(const Duration(milliseconds: 75));
+      }
+    }
+
+    return true;
   }
 
   @override
   Future<bool> isBluetoothSupported() async {
     _clearLastError();
     return Platform.isAndroid || Platform.isIOS;
-  }
-
-  @override
-  Future<bool> isUsbSupported() async {
-    _clearLastError();
-    return false;
   }
 
   @override
@@ -193,85 +203,46 @@ class PrinterServiceMobileImpl implements PrinterService {
   }
 
   @override
-  Future<PrinterConnectionType> getConnectionType() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      return PrinterConnectionTypeX.fromStorageValue(
-        prefs.getString(_kConnectionTypeKey),
-      );
-    } catch (error) {
-      _recordError('getConnectionType', error);
-      return PrinterConnectionType.bluetooth;
-    }
-  }
-
-  @override
-  Future<void> setConnectionType(PrinterConnectionType type) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_kConnectionTypeKey, type.storageValue);
-      if (type != PrinterConnectionType.bluetooth) {
-        await disconnectPrinter();
-        await clearSavedPrinter();
-      }
-    } catch (error) {
-      _recordError('setConnectionType', error);
-    }
-  }
-
-  @override
-  Future<List<PrinterDeviceModel>> scanPrinters(
-    PrinterConnectionType type,
-  ) async {
+  Future<List<PrinterDeviceModel>> scanBluetoothPrinters() async {
     _clearLastError();
-    if (type != PrinterConnectionType.bluetooth) {
-      return const [];
-    }
-
     try {
-      logPrinterAction('scanPrinters', context: {'type': type.storageValue});
+      logPrinterAction('scanBluetoothPrinters');
       final printers = await PrintBluetoothThermal.pairedBluetooths;
       final devices = printers
           .map(
             (printer) => PrinterDeviceModel(
               name: printer.name,
               address: printer.macAdress,
-              connectionType: PrinterConnectionType.bluetooth,
             ),
           )
           .toList();
       logPrinterSuccess(
-        'scanPrinters',
-        context: {'count': devices.length, 'type': type.storageValue},
+        'scanBluetoothPrinters',
+        context: {'count': devices.length},
       );
       return devices;
     } catch (error) {
-      _recordError(
-        'scanPrinters',
-        error,
-        context: {'type': type.storageValue},
-      );
+      _recordError('scanBluetoothPrinters', error);
       return const [];
     }
   }
 
   @override
-  Future<bool> stopScan() async {
+  Future<bool> stopBluetoothScan() async {
     _clearLastError();
-    logPrinterAction('stopScan');
+    logPrinterAction('stopBluetoothScan');
     return true;
   }
 
   @override
-  Future<bool> connectPrinter(PrinterDeviceModel printer) async {
+  Future<bool> connectBluetooth(PrinterDeviceModel printer) async {
     _clearLastError();
     final context = {
       'name': printer.displayName,
       'address': printer.address,
-      'connectionType': printer.connectionType.storageValue,
     };
     try {
-      logPrinterAction('connectPrinter', context: context);
+      logPrinterAction('connectBluetooth', context: context);
       final isConnected = await PrintBluetoothThermal.connect(
         macPrinterAddress: printer.address,
       );
@@ -279,16 +250,12 @@ class PrinterServiceMobileImpl implements PrinterService {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString(_kPrinterNameKey, printer.name);
         await prefs.setString(_kPrinterAddressKey, printer.address);
-        await prefs.setString(
-          _kConnectionTypeKey,
-          PrinterConnectionType.bluetooth.storageValue,
-        );
-        logPrinterSuccess('connectPrinter', context: context);
+        logPrinterSuccess('connectBluetooth', context: context);
         return true;
       }
 
       _recordPrinterError(
-        'connectPrinter',
+        'connectBluetooth',
         const PrinterError(
           code: PrinterErrorCodes.connectionFailed,
           message: 'connect returned false',
@@ -298,23 +265,23 @@ class PrinterServiceMobileImpl implements PrinterService {
       );
       return false;
     } catch (error) {
-      _recordError('connectPrinter', error, context: context);
+      _recordError('connectBluetooth', error, context: context);
       return false;
     }
   }
 
   @override
-  Future<bool> disconnectPrinter() async {
+  Future<bool> disconnectBluetooth() async {
     _clearLastError();
     try {
-      logPrinterAction('disconnectPrinter');
+      logPrinterAction('disconnectBluetooth');
       final result = await PrintBluetoothThermal.disconnect;
       if (result) {
         await clearSavedPrinter();
-        logPrinterSuccess('disconnectPrinter');
+        logPrinterSuccess('disconnectBluetooth');
       } else {
         _recordPrinterError(
-          'disconnectPrinter',
+          'disconnectBluetooth',
           const PrinterError(
             code: PrinterErrorCodes.disconnectFailed,
             message: 'disconnect returned false',
@@ -324,7 +291,7 @@ class PrinterServiceMobileImpl implements PrinterService {
       }
       return result;
     } catch (error) {
-      _recordError('disconnectPrinter', error);
+      _recordError('disconnectBluetooth', error);
       return false;
     }
   }
@@ -342,9 +309,6 @@ class PrinterServiceMobileImpl implements PrinterService {
       return PrinterDeviceModel(
         name: prefs.getString(_kPrinterNameKey) ?? '',
         address: address,
-        connectionType: PrinterConnectionTypeX.fromStorageValue(
-          prefs.getString(_kConnectionTypeKey),
-        ),
       );
     } catch (error) {
       _recordError('getSavedPrinter', error);

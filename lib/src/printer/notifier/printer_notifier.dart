@@ -4,7 +4,6 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:thuga/res/constants/string_constants.dart';
-import 'package:thuga/src/printer/model/printer_connection_type.dart';
 import 'package:thuga/src/printer/model/printer_device_model.dart';
 import 'package:thuga/src/printer/model/printer_paper_size.dart';
 import 'package:thuga/src/printer/service/printer_crashlytics_service.dart';
@@ -109,7 +108,6 @@ class PrinterNotifier extends _$PrinterNotifier {
   Map<String, Object?> _printerContext(PrinterDeviceModel printer) => {
     'name': printer.displayName,
     'address': printer.address,
-    'connectionType': printer.connectionType.storageValue,
   };
 
   String? _serviceErrorMessage(PrinterService service) {
@@ -129,77 +127,38 @@ class PrinterNotifier extends _$PrinterNotifier {
     try {
       logPrinterAction('initialize');
       final service = ref.read(printerServiceProvider);
-      final isBluetoothSupported = await service.isBluetoothSupported();
-      final isUsbSupported = await service.isUsbSupported();
+      final isSupported = await service.isBluetoothSupported();
       final isBluetoothEnabled = await service.isBluetoothEnabled();
       final savedPrinter = await service.getSavedPrinter();
       final paperSize = await service.getPaperSize();
-      final storedConnectionType = await service.getConnectionType();
-      final selectedConnectionType = savedPrinter?.connectionType ??
-          (isUsbSupported && !isBluetoothSupported
-              ? PrinterConnectionType.usb
-              : storedConnectionType);
       var hasPermissions = false;
       var isConnected = false;
 
       if (savedPrinter != null) {
-        if (selectedConnectionType == PrinterConnectionType.bluetooth) {
-          hasPermissions = await service.requestPermissions();
-          if (hasPermissions) {
-            isConnected = await service.isConnected();
-          }
-        } else {
-          hasPermissions = true;
+        hasPermissions = await service.requestPermissions();
+        if (hasPermissions) {
           isConnected = await service.isConnected();
         }
       }
 
       state = state.copyWith(
-        isBluetoothSupported: isBluetoothSupported,
-        isUsbSupported: isUsbSupported,
+        isBluetoothSupported: isSupported,
         hasPermissions: hasPermissions,
         isBluetoothEnabled: isBluetoothEnabled,
         isConnected: isConnected,
         connectedPrinter: savedPrinter,
-        selectedConnectionType: selectedConnectionType,
         paperSize: paperSize,
         errorMessage: null,
       );
 
-      if (savedPrinter != null && !isConnected) {
-        if (selectedConnectionType == PrinterConnectionType.usb ||
-            hasPermissions) {
-          await connectPrinter(savedPrinter, silently: true);
-        }
+      if (savedPrinter != null && !isConnected && hasPermissions) {
+        await connectPrinter(savedPrinter, silently: true);
       }
     } catch (error) {
       _reportUnexpected('initialize', error);
       state = state.copyWith(
         errorMessage: Strings.printerUnknownError,
       );
-    }
-  }
-
-  Future<void> setConnectionType(PrinterConnectionType type) async {
-    if (state.selectedConnectionType == type) {
-      return;
-    }
-
-    final service = ref.read(printerServiceProvider);
-    try {
-      await service.disconnectPrinter();
-      await service.clearSavedPrinter();
-      await service.setConnectionType(type);
-      state = state.copyWith(
-        selectedConnectionType: type,
-        isConnected: false,
-        connectedPrinter: null,
-        availablePrinters: const [],
-        errorMessage: null,
-      );
-      await rescanPrinters();
-    } catch (error) {
-      _reportUnexpected('setConnectionType', error);
     }
   }
 
@@ -265,41 +224,39 @@ class PrinterNotifier extends _$PrinterNotifier {
 
     state = state.copyWith(connectedPrinter: savedPrinter);
 
-    if (savedPrinter.connectionType == PrinterConnectionType.bluetooth) {
-      final hasPermissions = await service.requestPermissions();
-      if (!hasPermissions) {
-        _reportServiceError('ensurePrinterConnected', service);
-        _logCrashlyticsAction(
-          'ensurePrinterConnected',
-          message: 'permission_denied',
-        );
-        state = state.copyWith(
-          hasPermissions: false,
-          errorMessage:
-              _serviceErrorMessage(service) ?? Strings.printerPermissionDenied,
-        );
-        return false;
-      }
+    final hasPermissions = await service.requestPermissions();
+    if (!hasPermissions) {
+      _reportServiceError('ensurePrinterConnected', service);
+      _logCrashlyticsAction(
+        'ensurePrinterConnected',
+        message: 'permission_denied',
+      );
+      state = state.copyWith(
+        hasPermissions: false,
+        errorMessage:
+            _serviceErrorMessage(service) ?? Strings.printerPermissionDenied,
+      );
+      return false;
+    }
 
-      final isBluetoothEnabled = await service.isBluetoothEnabled();
-      if (!isBluetoothEnabled) {
-        _logCrashlyticsAction(
-          'ensurePrinterConnected',
-          message: 'bluetooth_disabled',
-        );
-        _reportKnownFailure(
-          'ensurePrinterConnected',
-          PrinterErrorCodes.bluetoothDisabled,
-          'Bluetooth disabled during ensurePrinterConnected',
-          context: _printerContext(savedPrinter),
-        );
-        state = state.copyWith(
-          hasPermissions: true,
-          isBluetoothEnabled: false,
-          errorMessage: Strings.printerBluetoothDisabled,
-        );
-        return false;
-      }
+    final isBluetoothEnabled = await service.isBluetoothEnabled();
+    if (!isBluetoothEnabled) {
+      _logCrashlyticsAction(
+        'ensurePrinterConnected',
+        message: 'bluetooth_disabled',
+      );
+      _reportKnownFailure(
+        'ensurePrinterConnected',
+        PrinterErrorCodes.bluetoothDisabled,
+        'Bluetooth disabled during ensurePrinterConnected',
+        context: _printerContext(savedPrinter),
+      );
+      state = state.copyWith(
+        hasPermissions: true,
+        isBluetoothEnabled: false,
+        errorMessage: Strings.printerBluetoothDisabled,
+      );
+      return false;
     }
 
     const maxAttempts = 3;
@@ -360,61 +317,49 @@ class PrinterNotifier extends _$PrinterNotifier {
 
   Future<void> rescanPrinters() async {
     final service = ref.read(printerServiceProvider);
-    final connectionType = state.selectedConnectionType;
-    _logCrashlyticsAction(
-      'rescanPrinters',
-      message: 'started',
-      context: {'connectionType': connectionType.storageValue},
-    );
+    _logCrashlyticsAction('rescanPrinters', message: 'started');
     try {
-      if (connectionType == PrinterConnectionType.bluetooth) {
-        final hasPermissions = await service.requestPermissions();
-        if (!hasPermissions) {
-          _reportServiceError('rescanPrinters', service);
-          _logCrashlyticsAction(
-            'rescanPrinters',
-            message: 'permission_denied',
-          );
-          state = state.copyWith(
-            hasPermissions: false,
-            isScanning: false,
-            errorMessage:
-                _serviceErrorMessage(service) ?? Strings.printerPermissionDenied,
-          );
-          return;
-        }
-
-        final isBluetoothEnabled = await service.isBluetoothEnabled();
-        if (!isBluetoothEnabled) {
-          _reportServiceError('rescanPrinters', service);
-          _logCrashlyticsAction(
-            'rescanPrinters',
-            message: 'bluetooth_disabled',
-          );
-          state = state.copyWith(
-            hasPermissions: hasPermissions,
-            isBluetoothEnabled: false,
-            isScanning: false,
-            errorMessage: Strings.printerBluetoothDisabled,
-          );
-          return;
-        }
-
-        state = state.copyWith(
-          hasPermissions: true,
-          isBluetoothEnabled: true,
-          isScanning: true,
-          errorMessage: null,
+      final hasPermissions = await service.requestPermissions();
+      if (!hasPermissions) {
+        _reportServiceError('rescanPrinters', service);
+        _logCrashlyticsAction(
+          'rescanPrinters',
+          message: 'permission_denied',
         );
-      } else {
         state = state.copyWith(
-          isScanning: true,
-          errorMessage: null,
+          hasPermissions: false,
+          isScanning: false,
+          errorMessage:
+              _serviceErrorMessage(service) ?? Strings.printerPermissionDenied,
         );
+        return;
       }
 
-      await service.stopScan();
-      final printers = await service.scanPrinters(connectionType);
+      final isBluetoothEnabled = await service.isBluetoothEnabled();
+      if (!isBluetoothEnabled) {
+        _reportServiceError('rescanPrinters', service);
+        _logCrashlyticsAction(
+          'rescanPrinters',
+          message: 'bluetooth_disabled',
+        );
+        state = state.copyWith(
+          hasPermissions: hasPermissions,
+          isBluetoothEnabled: false,
+          isScanning: false,
+          errorMessage: Strings.printerBluetoothDisabled,
+        );
+        return;
+      }
+
+      state = state.copyWith(
+        hasPermissions: true,
+        isBluetoothEnabled: true,
+        isScanning: true,
+        errorMessage: null,
+      );
+
+      await service.stopBluetoothScan();
+      final printers = await service.scanBluetoothPrinters();
       final serviceError = _serviceErrorMessage(service);
       if (serviceError != null) {
         _reportServiceError('rescanPrinters', service);
@@ -460,7 +405,7 @@ class PrinterNotifier extends _$PrinterNotifier {
     try {
       state = state.copyWith(isConnecting: true, errorMessage: null);
 
-      final connected = await service.connectPrinter(printer);
+      final connected = await service.connectBluetooth(printer);
       final savedPrinter = await service.getSavedPrinter();
       final errorMessage = connected
           ? null
@@ -538,7 +483,7 @@ class PrinterNotifier extends _$PrinterNotifier {
     _logCrashlyticsAction('disconnectPrinter', message: 'started');
     try {
       state = state.copyWith(errorMessage: null);
-      await service.disconnectPrinter();
+      await service.disconnectBluetooth();
       final serviceError = _serviceErrorMessage(service);
       if (serviceError != null) {
         _reportServiceError('disconnectPrinter', service);

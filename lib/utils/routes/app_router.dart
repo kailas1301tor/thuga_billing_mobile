@@ -1,5 +1,4 @@
 // lib/utils/routes/app_router.dart
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:thuga/src/auth/view/login_screen.dart';
 import 'package:thuga/src/auth/view/register_screen.dart';

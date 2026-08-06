@@ -290,14 +290,6 @@ class Strings {
   static const String printerConnected = "Printer connected";
   static const String bluetoothPrinterHint =
       "Connect a Bluetooth receipt printer to enable direct bill printing.";
-  static const String usbPrinterHint =
-      "Connect a USB thermal printer to enable direct bill printing on desktop.";
-  static const String printerConnectionBluetooth = "Bluetooth";
-  static const String printerConnectionUsb = "USB";
-  static const String printerUsbNotSupported =
-      "USB printing requires the Windows desktop app.";
-  static const String printerUsbPermissionDenied =
-      "USB printer access was denied. Check Windows permissions and try again.";
   static const String scanPrinters = "Scan Printers";
   static const String disconnectPrinter = "Disconnect Printer";
   static const String testPrint = "Test Print";

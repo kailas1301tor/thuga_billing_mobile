@@ -29,7 +29,6 @@ class RouteGenerator {
         );
 
       case RouteConstants.routeHomeScreen:
-      case RouteConstants.routeHome:
         return MaterialPageRoute(
           builder: (_) => const Scaffold(
             body: Center(child: Text('Use go_router shell routes')),

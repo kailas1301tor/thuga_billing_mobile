@@ -10,7 +10,6 @@ list(APPEND FLUTTER_PLUGIN_LIST
   permission_handler_windows
   print_bluetooth_thermal
   share_plus
-  unified_esc_pos_printer
   url_launcher_windows
 )
 

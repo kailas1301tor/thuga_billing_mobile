@@ -1,5 +1,4 @@
 // lib/utils/routes/app_navigator.dart
-import 'package:go_router/go_router.dart';
 import 'package:thuga/utils/helpers/common_functions.dart';
 import 'package:thuga/utils/routes/app_router.dart';
 

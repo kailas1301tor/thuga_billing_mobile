@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:smooth_corner/smooth_corner.dart';
 import 'package:thuga/res/styles/color_palette.dart';
-import 'package:thuga/utils/common_widgets/common_container.dart';
 import 'package:thuga/utils/common_widgets/common_shimmer_box.dart';
 
 class CommonCachedNetworkImage extends StatelessWidget {
