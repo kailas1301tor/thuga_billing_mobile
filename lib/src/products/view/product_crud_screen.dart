@@ -25,6 +25,8 @@ import '../state/products_state.dart';
 import 'package:thuga/res/enums/enums.dart';
 import 'package:thuga/src/categories/notifier/categories_notifier.dart';
 import 'package:thuga/src/categories/model/category_model.dart';
+import 'package:thuga/src/main/model/dropdown_model.dart';
+import 'package:thuga/src/main/notifier/dropdowns_notifier.dart';
 import 'package:thuga/utils/common_widgets/bottomsheet_content.dart';
 import 'package:thuga/utils/helpers/extensions.dart';
 
@@ -271,6 +273,7 @@ class ProductCrudScreen extends ConsumerWidget {
       notifier.cgstController.text =
           product.cgst == null ? '' : product.cgst!.toString();
       notifier.selectCategory(product.categoryId);
+      notifier.selectUnit(product.unit);
       notifier.initializeEdit(isQuickProduct: product.isQuickProduct);
     } else {
       notifier.clearForm();
@@ -467,6 +470,111 @@ class ProductCrudScreen extends ConsumerWidget {
                                 style: FontPalette.base400(
                                   14,
                                   color: selectedCategory != null
+                                      ? context.appColors.primaryText
+                                      : context.appColors.secondaryText,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              color: context.appColors.secondaryText,
+                              size: 20.r,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              16.verticalSpace,
+              Consumer(
+                builder: (context, ref, _) {
+                  final selectedUnitId = ref.watch(
+                    productsProvider.select((s) => s.selectedUnitId),
+                  );
+                  final dropdowns = ref.watch(
+                    dropdownsProvider.select((s) => s.data),
+                  );
+                  final selectableUnits = dropdowns.selectableProductUnits;
+                  final selectedUnit = dropdowns.unitById(selectedUnitId);
+
+                  if (isEditing) {
+                    return _buildLabeledField(
+                      context: context,
+                      label: Strings.unit,
+                      child: Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16.w,
+                          vertical: 16.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: context.appColors.inputBackground,
+                          borderRadius: BorderRadius.circular(14.r),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              selectedUnit?.name ??
+                                  (product.unit != null && product.unit!.isNotEmpty
+                                      ? dropdowns.displayNameForUnit(product.unit)
+                                      : Strings.notAvailable),
+                              style: FontPalette.base400(
+                                14,
+                                color: context.appColors.primaryText,
+                              ),
+                            ),
+                            4.verticalSpace,
+                            Text(
+                              Strings.unitLockedHint,
+                              style: FontPalette.base400(
+                                12,
+                                color: context.appColors.secondaryText,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+
+                  return _buildLabeledField(
+                    context: context,
+                    label: Strings.unitRequired,
+                    child: GestureDetector(
+                      onTap: () {
+                        showSingleSelectBottomSheet<DropdownUnitItemModel>(
+                          context: context,
+                          ref: ref,
+                          title: Strings.selectUnit,
+                          options: selectableUnits,
+                          currentValue: selectedUnit,
+                          onSelected: (unit) => notifier.selectUnit(unit.id),
+                          displayText: (unit) => unit.name,
+                          height: 0.6.sh,
+                        );
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16.w,
+                          vertical: 16.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: context.appColors.inputBackground,
+                          borderRadius: BorderRadius.circular(14.r),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                selectedUnit?.name ?? Strings.selectUnit,
+                                style: FontPalette.base400(
+                                  14,
+                                  color: selectedUnit != null
                                       ? context.appColors.primaryText
                                       : context.appColors.secondaryText,
                                 ),

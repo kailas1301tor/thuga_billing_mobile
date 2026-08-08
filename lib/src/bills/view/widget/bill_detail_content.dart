@@ -20,6 +20,7 @@ import 'package:thuga/src/settings/notifier/settings_notifier.dart';
 import 'package:thuga/utils/common_widgets/printer_state_sync_host.dart';
 import 'package:thuga/utils/common_widgets/primary_button.dart';
 import 'package:thuga/utils/helpers/extensions.dart';
+import 'package:thuga/utils/helpers/unit_conversion_helper.dart';
 import 'package:thuga/utils/helpers/receipt_print_helper.dart';
 import 'package:thuga/utils/helpers/toast_helper.dart';
 
@@ -67,7 +68,9 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
             (item) => ReceiptPrintLineItem(
               name: item.productName,
               unitPriceText: item.price.toCurrency(),
-              quantityText: item.quantity.toString(),
+              quantityText: item.unit != null && item.unit!.isNotEmpty
+                  ? '${formatQuantityDisplay(item.quantity)} ${item.unit}'
+                  : formatQuantityDisplay(item.quantity),
               lineTotalText: item.totalPrice.toCurrency(),
               discountLabel: item.hasDiscount ? item.discountLabel : null,
             ),
@@ -114,7 +117,7 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
       0.0, (sum, item) => sum + item.discountAmount,
     );
     final subtotal = widget.billDetail.items.fold<double>(
-      0.0, (sum, item) => sum + (item.price * item.quantity),
+      0.0, (sum, item) => sum + item.totalPrice + item.discountAmount,
     );
     final billDiscountAmount = (widget.billDetail.discountAmount - itemDiscountAmount)
         .clamp(0.0, double.infinity);
@@ -207,7 +210,7 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
       0.0, (sum, item) => sum + item.discountAmount,
     );
     final subtotal = widget.billDetail.items.fold<double>(
-      0.0, (sum, item) => sum + (item.price * item.quantity),
+      0.0, (sum, item) => sum + item.totalPrice + item.discountAmount,
     );
     final billDiscountAmount = (widget.billDetail.discountAmount - itemDiscountAmount).clamp(0.0, double.infinity);
 
@@ -348,7 +351,9 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
                                   ),
                                 ),
                                 Text(
-                                  'x${item.quantity}',
+                                  item.unit != null && item.unit!.isNotEmpty
+                                      ? 'x${formatQuantityDisplay(item.quantity)} ${item.unit}'
+                                      : 'x${formatQuantityDisplay(item.quantity)}',
                                   style: FontPalette.base600(14, color: colors.primaryText),
                                 ),
                                 SizedBox(

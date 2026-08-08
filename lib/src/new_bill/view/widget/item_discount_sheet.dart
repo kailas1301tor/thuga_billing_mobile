@@ -12,6 +12,7 @@ import 'package:thuga/utils/common_widgets/primary_button.dart';
 import 'package:thuga/utils/helpers/extensions.dart';
 import 'package:thuga/utils/helpers/toast_helper.dart';
 import 'package:thuga/utils/common_widgets/common_cached_network_image.dart';
+import 'package:thuga/utils/helpers/unit_conversion_helper.dart';
 import '../../../main/notifier/dropdowns_notifier.dart';
 import '../../model/new_bill_model.dart';
 
@@ -69,7 +70,7 @@ class _ItemDiscountSheetState extends ConsumerState<ItemDiscountSheet> {
 
   bool _validate() {
     final value = double.tryParse(_valueController.text) ?? 0.0;
-    final rawTotal = widget.item.price * widget.item.quantity;
+    final rawTotal = widget.item.lineTotal;
 
     switch (_selectedType) {
       case 'None':
@@ -303,7 +304,7 @@ class _ItemDiscountSheetState extends ConsumerState<ItemDiscountSheet> {
                 ),
                 4.verticalSpace,
                 Text(
-                  '${widget.item.price.toCurrency()} × ${widget.item.quantity} = ${widget.item.lineTotal.toCurrency()}',
+                  '${widget.item.price.toCurrency()} × ${formatQuantityWithUnit(quantity: widget.item.quantity, unitId: widget.item.billingUnit)} = ${widget.item.lineTotal.toCurrency()}',
                   style: FontPalette.base400(12, color: colors.secondaryText),
                 ),
               ],

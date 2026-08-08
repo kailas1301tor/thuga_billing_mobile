@@ -80,6 +80,7 @@ class ProductCrudModel {
   final String? categoryName;
   final String name;
   final String? barcode;
+  final String? unit;
   final double? quantity;
   final double price;
   final double? sgst;
@@ -98,6 +99,7 @@ class ProductCrudModel {
     this.categoryName,
     required this.name,
     this.barcode,
+    this.unit,
     this.quantity,
     required this.price,
     this.sgst,
@@ -117,6 +119,7 @@ class ProductCrudModel {
         categoryName: convertToString(json['category_name']),
         name: convertToString(json['name']),
         barcode: json['barcode'] != null ? convertToString(json['barcode']) : null,
+        unit: json['unit'] != null ? convertToString(json['unit']) : null,
         quantity: json['qty'] == null ? null : convertToDouble(json['qty']),
         price: convertToDouble(json['price']),
         sgst: json['sgst'] == null ? null : convertToDouble(json['sgst']),

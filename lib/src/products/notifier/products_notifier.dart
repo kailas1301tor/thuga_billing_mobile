@@ -5,6 +5,7 @@ import 'package:either_dart/either.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:thuga/res/enums/enums.dart';
 import 'package:thuga/services/repo_di.dart';
+import 'package:thuga/res/constants/string_constants.dart';
 import 'package:thuga/utils/helpers/api_error_handler.dart';
 import 'package:thuga/utils/helpers/toast_helper.dart';
 import 'package:thuga/utils/helpers/debounce_helper.dart';
@@ -174,6 +175,10 @@ class ProductsNotifier extends _$ProductsNotifier {
     state = state.copyWith(selectedCategoryId: id);
   }
 
+  void selectUnit(String? unitId) {
+    state = state.copyWith(selectedUnitId: unitId);
+  }
+
   void clearForm() {
     nameController.clear();
     priceController.clear();
@@ -183,6 +188,7 @@ class ProductsNotifier extends _$ProductsNotifier {
     cgstController.clear();
     state = state.copyWith(
       selectedCategoryId: null,
+      selectedUnitId: null,
       isQuickProduct: true,
       selectedImagePath: null,
     );
@@ -255,7 +261,13 @@ class ProductsNotifier extends _$ProductsNotifier {
     final categoryId = state.selectedCategoryId;
 
     if (name.isEmpty || priceStr.isEmpty || categoryId == null) {
-      showCustomErrorToast(message: 'Please fill all required fields');
+      showCustomErrorToast(message: Strings.fillAllRequiredFields);
+      return false;
+    }
+
+    final unitId = state.selectedUnitId;
+    if (unitId == null || unitId.isEmpty) {
+      showCustomErrorToast(message: Strings.selectUnitRequired);
       return false;
     }
 
@@ -269,6 +281,7 @@ class ProductsNotifier extends _$ProductsNotifier {
       'name': name,
       'category': categoryId,
       'price': priceStr,
+      'unit': unitId,
       'is_quick_product': state.isQuickProduct,
     };
 
@@ -316,7 +329,7 @@ class ProductsNotifier extends _$ProductsNotifier {
     final categoryId = state.selectedCategoryId;
 
     if (name.isEmpty || priceStr.isEmpty || categoryId == null) {
-      showCustomErrorToast(message: 'Please fill all required fields');
+      showCustomErrorToast(message: Strings.fillAllRequiredFields);
       return false;
     }
 
@@ -408,6 +421,7 @@ class ProductsNotifier extends _$ProductsNotifier {
             categoryName: product.categoryName,
             name: product.name,
             barcode: product.barcode,
+            unit: product.unit,
             quantity: product.quantity,
             price: product.price,
             sgst: product.sgst,

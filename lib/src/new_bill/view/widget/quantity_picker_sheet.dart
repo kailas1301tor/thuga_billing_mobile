@@ -6,12 +6,16 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:thuga/res/constants/string_constants.dart';
 import 'package:thuga/res/styles/color_palette.dart';
 import 'package:thuga/res/styles/font_palette.dart';
+import 'package:thuga/src/main/model/dropdown_model.dart';
+import 'package:thuga/src/main/notifier/dropdowns_notifier.dart';
+import 'package:thuga/utils/common_widgets/bottomsheet_content.dart';
 import 'package:thuga/utils/common_widgets/common_text_form_field.dart';
 import 'package:thuga/utils/common_widgets/primary_button.dart';
 import 'package:thuga/utils/common_widgets/common_cached_network_image.dart';
 import 'package:thuga/utils/helpers/extensions.dart';
 import 'package:thuga/utils/helpers/product_stock_helper.dart';
 import 'package:thuga/utils/helpers/toast_helper.dart';
+import 'package:thuga/utils/helpers/unit_conversion_helper.dart';
 import '../../model/new_bill_model.dart';
 import '../../notifier/new_bill_notifier.dart';
 
@@ -20,27 +24,58 @@ class QuantityPickerSheet extends ConsumerWidget {
     super.key,
     required this.product,
     required this.initialQuantity,
+    required this.initialUnit,
     required this.onConfirm,
   });
 
   final ProductModel product;
-  final int initialQuantity;
-  final void Function(int qty) onConfirm;
+  final double initialQuantity;
+  final String initialUnit;
+  final void Function(double qty, String unit) onConfirm;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final notifier = ref.read(newBillProvider.notifier);
-    final maxQty = maxPurchasableQuantity(product.quantity);
+    final productUnit = resolveProductUnit(product.unit);
+    final pickerUnit = ref.watch(
+      newBillProvider.select((s) => s.quantityPickerUnit ?? initialUnit),
+    );
+    final allowsUnitSwitch = allowsBillingUnitSwitch(productUnit);
+    final allowsDecimal = allowsDecimalQuantity(productUnit);
+    final dropdowns = ref.watch(
+      dropdownsProvider.select((s) => s.data),
+    );
+    final unitOptions = allowsUnitSwitch
+        ? dropdowns.unitsInSameCategory(productUnit)
+        : const <DropdownUnitItemModel>[];
+    final selectedUnitItem = unitOptions.isEmpty
+        ? null
+        : unitOptions.firstWhere(
+            (item) => item.id == pickerUnit,
+            orElse: () => unitOptions.first,
+          );
+
+    final maxQtyInProductUnit = maxPurchasableQuantity(product.quantity);
+    final maxQtyDisplay = maxQtyInProductUnit == null
+        ? null
+        : convertQuantity(
+              qty: maxQtyInProductUnit,
+              fromUnit: productUnit,
+              toUnit: pickerUnit,
+            ) ??
+            maxQtyInProductUnit;
     final isTracked = isStockTracked(product.quantity);
 
-    final initialText = initialQuantity > 0 ? '$initialQuantity' : '1';
+    final initialText = initialQuantity > 0
+        ? formatQuantityDisplay(initialQuantity)
+        : '1';
     if (notifier.quantityController.text != initialText) {
       notifier.quantityController.text = initialText;
     }
 
-    final quickPicks = const [1, 2, 3, 5, 10]
-        .where((pick) => maxQty == null || pick <= maxQty)
+    final quickPicks = const [1.0, 2.0, 3.0, 5.0, 10.0]
+        .where((pick) => maxQtyDisplay == null || pick <= maxQtyDisplay)
         .toList();
 
     return SingleChildScrollView(
@@ -67,13 +102,13 @@ class QuantityPickerSheet extends ConsumerWidget {
                       style: FontPalette.base700(16, color: colors.primaryText),
                     ),
                     Text(
-                      'Unit Price: ${product.price.toCurrency()}',
+                      '${Strings.unitPriceLabel}: ${product.price.toCurrency()} / ${dropdowns.displayNameForUnit(productUnit)}',
                       style: FontPalette.base500(12, color: colors.secondaryText),
                     ),
-                    if (isTracked && maxQty != null && maxQty > 0) ...[
+                    if (isTracked && maxQtyDisplay != null && maxQtyDisplay > 0) ...[
                       4.verticalSpace,
                       Text(
-                        Strings.productAvailableStock(maxQty),
+                        Strings.productAvailableStockQty(maxQtyDisplay),
                         style: FontPalette.base500(12, color: colors.primary),
                       ),
                     ],
@@ -82,9 +117,60 @@ class QuantityPickerSheet extends ConsumerWidget {
               ),
             ],
           ),
+          if (allowsUnitSwitch) ...[
+            20.verticalSpace,
+            _buildLabeledField(
+              context: context,
+              label: Strings.unit,
+              child: GestureDetector(
+                onTap: unitOptions.isEmpty
+                    ? null
+                    : () {
+                        showSingleSelectBottomSheet<DropdownUnitItemModel>(
+                          context: context,
+                          ref: ref,
+                          title: Strings.selectUnit,
+                          options: unitOptions,
+                          currentValue: selectedUnitItem,
+                          onSelected: (selected) {
+                            notifier.setQuantityPickerUnit(selected.id);
+                          },
+                          displayText: (item) => item.name,
+                        );
+                      },
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+                  decoration: BoxDecoration(
+                    color: colors.inputBackground,
+                    borderRadius: BorderRadius.circular(14.r),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          dropdowns.displayNameForUnit(pickerUnit),
+                          style: FontPalette.base400(
+                            14,
+                            color: colors.primaryText,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        color: colors.secondaryText,
+                        size: 20.r,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
           20.verticalSpace,
           Text(
-            'Quick Select',
+            Strings.quickSelect,
             style: FontPalette.base600(13, color: colors.secondaryText),
           ),
           8.verticalSpace,
@@ -103,11 +189,12 @@ class QuantityPickerSheet extends ConsumerWidget {
                     child: ValueListenableBuilder<TextEditingValue>(
                       valueListenable: notifier.quantityController,
                       builder: (context, val, _) {
-                        final currentQty = int.tryParse(val.text) ?? 0;
+                        final currentQty = double.tryParse(val.text) ?? 0;
                         final isSelected = currentQty == pick;
                         return GestureDetector(
                           onTap: () {
-                            notifier.quantityController.text = '$pick';
+                            notifier.quantityController.text =
+                                formatQuantityDisplay(pick);
                           },
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 150),
@@ -126,11 +213,11 @@ class QuantityPickerSheet extends ConsumerWidget {
                               ),
                             ),
                             child: Text(
-                              '$pick',
+                              formatQuantityDisplay(pick),
                               style: FontPalette.base700(
                                 14,
                                 color: isSelected
-                                    ? Colors.white
+                                    ? ColorPalette.white
                                     : colors.primaryText,
                               ),
                             ),
@@ -144,30 +231,38 @@ class QuantityPickerSheet extends ConsumerWidget {
             ),
           20.verticalSpace,
           CommonTextFormField(
-            title: 'Custom Quantity',
-            hintText: 'Enter quantity...',
+            title: Strings.customQuantity,
+            hintText: Strings.customQuantityHint,
             controller: notifier.quantityController,
-            inputType: TextInputType.number,
-            inputFormatters: [
-              FilteringTextInputFormatter.digitsOnly,
-            ],
+            inputType: TextInputType.numberWithOptions(decimal: allowsDecimal),
+            inputFormatters: allowsDecimal
+                ? [
+                    FilteringTextInputFormatter.allow(
+                      RegExp(r'^\d*\.?\d*'),
+                    ),
+                  ]
+                : [FilteringTextInputFormatter.digitsOnly],
           ),
           24.verticalSpace,
           PrimaryButton(
-            text: 'Set Quantity',
+            text: Strings.setQuantity,
             radius: 12,
             onPressed: quickPicks.isEmpty && isOutOfStock(product.quantity)
                 ? null
                 : () {
-                    final qty =
-                        int.tryParse(notifier.quantityController.text) ?? 1;
+                    final qty = allowsDecimal
+                        ? double.tryParse(notifier.quantityController.text) ?? 1
+                        : (double.tryParse(notifier.quantityController.text) ??
+                            1);
                     if (isOutOfStock(product.quantity)) {
                       showCustomErrorToast(message: Strings.productOutOfStock);
                       return;
                     }
-                    final cappedQty = clampCartQuantity(
+                    final cappedQty = clampBillingQuantity(
                       stockQuantity: product.quantity,
-                      requestedQty: qty,
+                      requestedBillingQty: qty,
+                      billingUnit: pickerUnit,
+                      productUnit: productUnit,
                     );
                     if (cappedQty <= 0) {
                       showCustomErrorToast(message: Strings.productOutOfStock);
@@ -175,10 +270,13 @@ class QuantityPickerSheet extends ConsumerWidget {
                     }
                     if (cappedQty < qty) {
                       showCustomErrorToast(
-                        message: Strings.productInsufficientStock(cappedQty),
+                        message: Strings.productInsufficientStockQty(
+                          maxQtyDisplay ?? cappedQty,
+                        ),
                       );
                     }
-                    onConfirm(cappedQty);
+                    onConfirm(cappedQty, pickerUnit);
+                    notifier.clearQuantityPickerUnit();
                     Navigator.pop(context);
                   },
           ),
@@ -189,13 +287,14 @@ class QuantityPickerSheet extends ConsumerWidget {
               child: OutlinedButton(
                 style: OutlinedButton.styleFrom(
                   padding: EdgeInsets.symmetric(vertical: 14.h),
-                  side: BorderSide(color: Colors.red.shade200, width: 1.w),
+                  side: BorderSide(color: colors.errorText.withValues(alpha: 0.4), width: 1.w),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12.r),
                   ),
                 ),
                 onPressed: () {
-                  onConfirm(0);
+                  onConfirm(0, pickerUnit);
+                  notifier.clearQuantityPickerUnit();
                   Navigator.pop(context);
                 },
                 child: Row(
@@ -203,13 +302,13 @@ class QuantityPickerSheet extends ConsumerWidget {
                   children: [
                     Icon(
                       Icons.delete_outline_rounded,
-                      color: Colors.red.shade600,
+                      color: colors.errorText,
                       size: 20.r,
                     ),
                     6.horizontalSpace,
                     Text(
-                      'Remove Product',
-                      style: FontPalette.base600(14, color: Colors.red.shade600),
+                      Strings.removeProduct,
+                      style: FontPalette.base600(14, color: colors.errorText),
                     ),
                   ],
                 ),
@@ -218,6 +317,24 @@ class QuantityPickerSheet extends ConsumerWidget {
           ],
         ],
       ),
+    );
+  }
+
+  Widget _buildLabeledField({
+    required BuildContext context,
+    required String label,
+    required Widget child,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: FontPalette.base600(13, color: context.appColors.secondaryText),
+        ),
+        8.verticalSpace,
+        child,
+      ],
     );
   }
 }

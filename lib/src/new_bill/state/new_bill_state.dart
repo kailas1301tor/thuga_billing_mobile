@@ -29,6 +29,7 @@ sealed class NewBillState with _$NewBillState {
     @Default('Paid') String paymentStatus,
     @Default(0.0) double receivedAmount,
     DropdownCustomerModel? selectedCustomer,
+    String? quantityPickerUnit,
     String? errorMessage,
   }) = _NewBillState;
 }

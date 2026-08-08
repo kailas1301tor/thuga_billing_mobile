@@ -16,6 +16,7 @@ import 'package:thuga/utils/helpers/extensions.dart';
 import 'package:thuga/utils/helpers/product_stock_helper.dart';
 import 'package:thuga/utils/helpers/receipt_print_helper.dart';
 import 'package:thuga/utils/helpers/toast_helper.dart';
+import 'package:thuga/utils/helpers/unit_conversion_helper.dart';
 import 'package:thuga/res/constants/string_constants.dart';
 import 'package:thuga/utils/common_widgets/common_bottom_sheet.dart';
 import 'package:thuga/src/new_bill/view/widget/bill_preview_sheet.dart';
@@ -260,8 +261,48 @@ class NewBillNotifier extends _$NewBillNotifier {
   void _showInsufficientStockToast(double? stockQuantity) {
     final maxQty = maxPurchasableQuantity(stockQuantity);
     if (maxQty != null) {
-      showCustomErrorToast(message: Strings.productInsufficientStock(maxQty));
+      showCustomErrorToast(
+        message: Strings.productInsufficientStockQty(maxQty),
+      );
     }
+  }
+
+  String _resolvedProductUnit(ProductModel product) =>
+      resolveProductUnit(product.unit);
+
+  CartItemModel _newCartItemFromProduct(
+    ProductModel product, {
+    double quantity = 1,
+    String? billingUnit,
+  }) {
+    final productUnit = _resolvedProductUnit(product);
+    return CartItemModel(
+      productId: product.id,
+      name: product.name,
+      price: product.price,
+      quantity: quantity,
+      productUnit: productUnit,
+      unit: billingUnit ?? productUnit,
+      emoji: '📦',
+      imageUrl: product.imageUrl,
+      sgst: product.sgst,
+      cgst: product.cgst,
+    );
+  }
+
+  void initQuantityPicker(ProductModel product, {String? currentBillingUnit}) {
+    final productUnit = _resolvedProductUnit(product);
+    state = state.copyWith(
+      quantityPickerUnit: currentBillingUnit ?? productUnit,
+    );
+  }
+
+  void setQuantityPickerUnit(String unitId) {
+    state = state.copyWith(quantityPickerUnit: unitId);
+  }
+
+  void clearQuantityPickerUnit() {
+    state = state.copyWith(quantityPickerUnit: null);
   }
 
   void addToCart(ProductModel prod) {
@@ -272,42 +313,51 @@ class NewBillNotifier extends _$NewBillNotifier {
 
     HapticFeedback.lightImpact();
     final index = state.cart.indexWhere((item) => item.productId == prod.id);
-    final currentQty = index >= 0 ? state.cart[index].quantity : 0;
+    final productUnit = _resolvedProductUnit(prod);
 
+    if (index >= 0) {
+      final current = state.cart[index];
+      final step = incrementStepForUnit(current.billingUnit);
+      final newQty = current.quantity + step;
+      final newEffective = effectiveQuantityInProductUnit(
+        quantity: newQty,
+        billingUnit: current.billingUnit,
+        productUnit: productUnit,
+      );
+
+      if (!canIncreaseCartQuantity(
+        stockQuantity: prod.quantity,
+        cartQuantityInProductUnit: newEffective,
+        incrementInProductUnit: 0,
+      )) {
+        _showInsufficientStockToast(prod.quantity);
+        return;
+      }
+
+      final updated = List<CartItemModel>.from(state.cart);
+      updated[index] = current.copyWith(quantity: newQty);
+      state = state.copyWith(cart: updated);
+      return;
+    }
+
+    final initialItem = _newCartItemFromProduct(prod);
     if (!canIncreaseCartQuantity(
       stockQuantity: prod.quantity,
-      cartQuantity: currentQty,
+      cartQuantityInProductUnit: initialItem.effectiveQuantity,
+      incrementInProductUnit: 0,
     )) {
       _showInsufficientStockToast(prod.quantity);
       return;
     }
 
-    if (index >= 0) {
-      final updated = List<CartItemModel>.from(state.cart);
-      updated[index] = updated[index].copyWith(
-        quantity: updated[index].quantity + 1,
-      );
-      state = state.copyWith(cart: updated);
-    } else {
-      state = state.copyWith(
-        cart: [
-          ...state.cart,
-          CartItemModel(
-            productId: prod.id,
-            name: prod.name,
-            price: prod.price,
-            quantity: 1,
-            emoji: '📦',
-            imageUrl: prod.imageUrl,
-            sgst: prod.sgst,
-            cgst: prod.cgst,
-          ),
-        ],
-      );
-    }
+    state = state.copyWith(cart: [...state.cart, initialItem]);
   }
 
-  void setProductQuantity(ProductModel prod, int qty) {
+  void setProductQuantity(
+    ProductModel prod,
+    double qty, {
+    String? unit,
+  }) {
     if (qty <= 0) {
       HapticFeedback.lightImpact();
       state = state.copyWith(
@@ -321,9 +371,13 @@ class NewBillNotifier extends _$NewBillNotifier {
       return;
     }
 
-    final cappedQty = clampCartQuantity(
+    final productUnit = _resolvedProductUnit(prod);
+    final billingUnit = unit ?? productUnit;
+    final cappedQty = clampBillingQuantity(
       stockQuantity: prod.quantity,
-      requestedQty: qty,
+      requestedBillingQty: qty,
+      billingUnit: billingUnit,
+      productUnit: productUnit,
     );
 
     if (cappedQty <= 0) {
@@ -339,21 +393,20 @@ class NewBillNotifier extends _$NewBillNotifier {
     final index = state.cart.indexWhere((item) => item.productId == prod.id);
     if (index >= 0) {
       final updated = List<CartItemModel>.from(state.cart);
-      updated[index] = updated[index].copyWith(quantity: cappedQty);
+      updated[index] = updated[index].copyWith(
+        quantity: cappedQty,
+        unit: billingUnit,
+        productUnit: productUnit,
+      );
       state = state.copyWith(cart: updated);
     } else {
       state = state.copyWith(
         cart: [
           ...state.cart,
-          CartItemModel(
-            productId: prod.id,
-            name: prod.name,
-            price: prod.price,
+          _newCartItemFromProduct(
+            prod,
             quantity: cappedQty,
-            emoji: '📦',
-            imageUrl: prod.imageUrl,
-            sgst: prod.sgst,
-            cgst: prod.cgst,
+            billingUnit: billingUnit,
           ),
         ],
       );
@@ -370,6 +423,15 @@ class NewBillNotifier extends _$NewBillNotifier {
     }
 
     final product = _productById(item.productId!);
+    final step = incrementStepForUnit(item.billingUnit);
+    final newQty = item.quantity + step;
+    final productUnit = item.resolvedProductUnit;
+    final newEffective = effectiveQuantityInProductUnit(
+      quantity: newQty,
+      billingUnit: item.billingUnit,
+      productUnit: productUnit,
+    );
+
     if (product != null) {
       if (isOutOfStock(product.quantity)) {
         showCustomErrorToast(message: Strings.productOutOfStock);
@@ -377,7 +439,8 @@ class NewBillNotifier extends _$NewBillNotifier {
       }
       if (!canIncreaseCartQuantity(
         stockQuantity: product.quantity,
-        cartQuantity: item.quantity,
+        cartQuantityInProductUnit: newEffective,
+        incrementInProductUnit: 0,
       )) {
         _showInsufficientStockToast(product.quantity);
         return;
@@ -385,17 +448,18 @@ class NewBillNotifier extends _$NewBillNotifier {
     }
 
     final updated = state.cart
-        .map((i) => i == item ? i.copyWith(quantity: i.quantity + 1) : i)
+        .map((i) => i == item ? i.copyWith(quantity: newQty) : i)
         .toList();
     state = state.copyWith(cart: updated);
   }
 
   void decrementQuantity(CartItemModel item) {
-    if (item.quantity <= 1) {
+    final step = incrementStepForUnit(item.billingUnit);
+    if (item.quantity <= step) {
       removeCartItem(item);
     } else {
       final updated = state.cart
-          .map((i) => i == item ? i.copyWith(quantity: i.quantity - 1) : i)
+          .map((i) => i == item ? i.copyWith(quantity: i.quantity - step) : i)
           .toList();
       state = state.copyWith(cart: updated);
     }
@@ -472,7 +536,7 @@ class NewBillNotifier extends _$NewBillNotifier {
   // ── Custom Item ────────────────────────────────────────────────
   void addCustomItem() {
     final name = customNameController.text.trim();
-    final qty = int.tryParse(customQtyController.text) ?? 0;
+    final qty = double.tryParse(customQtyController.text) ?? 0;
     final price = double.tryParse(customPriceController.text) ?? 0.0;
     if (name.isEmpty || qty <= 0 || price <= 0.0) {
       showCustomErrorToast(message: 'Please fill all item fields correctly');
@@ -532,7 +596,10 @@ class NewBillNotifier extends _$NewBillNotifier {
             (item) => ReceiptPrintLineItem(
               name: item.name,
               unitPriceText: item.price.toCurrency(),
-              quantityText: item.quantity.toString(),
+              quantityText: formatQuantityWithUnit(
+                quantity: item.quantity,
+                unitId: item.billingUnit,
+              ),
               lineTotalText: item.totalPrice.toCurrency(),
               discountLabel: item.hasDiscount ? item.discountLabel : null,
             ),
@@ -644,6 +711,7 @@ class NewBillNotifier extends _$NewBillNotifier {
             (item) => {
               'product': item.productId,
               'qty': item.quantity,
+              'unit': item.billingUnit,
               'price': item.price.toStringAsFixed(2),
               'discount_type': item.discountType,
               'discount_value': item.discountValue.toStringAsFixed(2),

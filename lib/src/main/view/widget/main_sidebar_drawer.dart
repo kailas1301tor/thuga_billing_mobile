@@ -1,6 +1,7 @@
 // lib/src/main/view/widget/main_sidebar_drawer.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:thuga/res/constants/assets.dart';
 import 'package:thuga/res/constants/string_constants.dart';
 import 'package:thuga/res/styles/color_palette.dart';
 import 'package:thuga/res/styles/font_palette.dart';
@@ -28,17 +29,13 @@ class MainSidebarDrawer extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
               child: Row(
                 children: [
-                  Container(
-                    width: 48.r,
-                    height: 48.r,
-                    decoration: BoxDecoration(
-                      color: colors.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(14.r),
-                    ),
-                    child: Icon(
-                      Icons.storefront_rounded,
-                      color: colors.primary,
-                      size: 24.r,
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(14.r),
+                    child: Image.asset(
+                      Assets.appIcon,
+                      width: 48.r,
+                      height: 48.r,
+                      fit: BoxFit.cover,
                     ),
                   ),
                   16.horizontalSpace,
@@ -54,7 +51,7 @@ class MainSidebarDrawer extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          'Manage business inventory',
+                          Strings.appMenuSubtitle,
                           style: FontPalette.base400(
                             11,
                             color: colors.secondaryText,

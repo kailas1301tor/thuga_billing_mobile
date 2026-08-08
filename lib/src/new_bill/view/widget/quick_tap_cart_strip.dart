@@ -25,7 +25,7 @@ class QuickTapCartStrip extends ConsumerWidget {
       return const SizedBox.shrink();
     }
 
-    final totalItems = cart.fold<int>(0, (sum, item) => sum + item.quantity);
+    final totalItems = cart.length;
 
     return GestureDetector(
       onTap: () {

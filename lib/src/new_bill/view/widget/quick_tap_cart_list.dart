@@ -5,6 +5,7 @@ import 'package:thuga/res/styles/color_palette.dart';
 import 'package:thuga/res/styles/font_palette.dart';
 import 'package:thuga/utils/common_widgets/common_cached_network_image.dart';
 import 'package:thuga/utils/helpers/extensions.dart';
+import 'package:thuga/utils/helpers/unit_conversion_helper.dart';
 import '../../model/new_bill_model.dart';
 
 class QuickTapCartList extends StatelessWidget {
@@ -28,8 +29,7 @@ class QuickTapCartList extends StatelessWidget {
     final colors = context.appColors;
 
     return ListView.separated(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
+      physics: const ClampingScrollPhysics(),
       itemCount: cartItems.length,
       separatorBuilder: (_, _) => Divider(color: colors.inputBorder, height: 1.h),
       itemBuilder: (context, index) {
@@ -69,7 +69,7 @@ class QuickTapCartList extends StatelessWidget {
             onTap: () => onTapDiscount(item),
             behavior: HitTestBehavior.opaque,
             child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 12.h),
+              padding: EdgeInsets.symmetric(vertical: 8.h),
               child: Row(
                 children: [
                   // Image or Emoji prefix
@@ -134,7 +134,7 @@ class QuickTapCartList extends StatelessWidget {
 
                   // Qty Multiplier Label (e.g. x3)
                   Text(
-                    'x${item.quantity}',
+                    'x${formatQuantityWithUnit(quantity: item.quantity, unitId: item.billingUnit)}',
                     style: FontPalette.base500(13, color: colors.secondaryText),
                   ),
                   16.horizontalSpace,
@@ -166,7 +166,7 @@ class QuickTapCartList extends StatelessWidget {
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 8.w),
                           child: Text(
-                            '${item.quantity}',
+                            formatQuantityDisplay(item.quantity),
                             style: FontPalette.base700(13, color: colors.primaryText),
                           ),
                         ),

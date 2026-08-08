@@ -18,6 +18,7 @@ import 'package:thuga/utils/common_widgets/primary_button.dart';
 import 'package:thuga/utils/helpers/extensions.dart';
 import 'package:thuga/utils/helpers/receipt_print_helper.dart';
 import 'package:thuga/utils/helpers/toast_helper.dart';
+import 'package:thuga/utils/helpers/unit_conversion_helper.dart';
 
 class BillPreviewSheet extends ConsumerStatefulWidget {
   const BillPreviewSheet({
@@ -88,7 +89,10 @@ class _BillPreviewSheetState extends ConsumerState<BillPreviewSheet> {
             (item) => ReceiptPrintLineItem(
               name: item.name,
               unitPriceText: item.price.toCurrency(),
-              quantityText: item.quantity.toString(),
+              quantityText: formatQuantityWithUnit(
+                quantity: item.quantity,
+                unitId: item.billingUnit,
+              ),
               lineTotalText: item.totalPrice.toCurrency(),
               discountLabel: item.hasDiscount ? item.discountLabel : null,
             ),
@@ -353,7 +357,7 @@ class _BillPreviewSheetState extends ConsumerState<BillPreviewSheet> {
                             ),
                           ),
                           Text(
-                            'x${item.quantity}',
+                            'x${formatQuantityWithUnit(quantity: item.quantity, unitId: item.billingUnit)}',
                             style: FontPalette.base600(
                               14,
                               color: colors.primaryText,

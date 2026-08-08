@@ -6,6 +6,7 @@ import 'package:thuga/res/styles/color_palette.dart';
 import 'package:thuga/res/styles/font_palette.dart';
 import 'package:thuga/utils/common_widgets/common_cached_network_image.dart';
 import 'package:thuga/utils/helpers/extensions.dart';
+import 'package:thuga/utils/helpers/unit_conversion_helper.dart';
 import '../../model/new_bill_model.dart';
 
 class QuickTapProductCard extends StatefulWidget {
@@ -20,7 +21,7 @@ class QuickTapProductCard extends StatefulWidget {
   });
 
   final ProductModel product;
-  final int quantity;
+  final double quantity;
   final VoidCallback onTap;
   final VoidCallback onReduce;
   final VoidCallback? onLongPress;
@@ -135,29 +136,39 @@ class _QuickTapProductCardState extends State<QuickTapProductCard>
                   scale: isSelected ? 1.0 : 0.0,
                   duration: const Duration(milliseconds: 150),
                   curve: Curves.easeOutBack,
-                  child: Container(
-                    padding: EdgeInsets.all(4.r),
+                  child: ConstrainedBox(
                     constraints: BoxConstraints(
                       minWidth: 18.r,
                       minHeight: 18.r,
+                      maxWidth: 46.w,
                     ),
-                    decoration: BoxDecoration(
-                      color: ColorPalette.primaryColor,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: colors.primary.withValues(alpha: 0.2),
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 5.w,
+                        vertical: 2.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: ColorPalette.primaryColor,
+                        borderRadius: BorderRadius.circular(100.r),
+                        boxShadow: [
+                          BoxShadow(
+                            color: colors.primary.withValues(alpha: 0.2),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      alignment: Alignment.center,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          formatQuantityDisplay(widget.quantity),
+                          style: FontPalette.base700(
+                            9,
+                            color: Colors.white,
+                          ),
+                          maxLines: 1,
                         ),
-                      ],
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      '${widget.quantity}',
-                      style: FontPalette.base700(
-                        8,
-                        color: Colors.white,
                       ),
                     ),
                   ),

@@ -1,4 +1,5 @@
 // lib/utils/helpers/product_stock_helper.dart
+import 'package:thuga/utils/helpers/unit_conversion_helper.dart';
 
 bool isStockTracked(double? stockQuantity) => stockQuantity != null;
 
@@ -7,28 +8,70 @@ bool isOutOfStock(double? stockQuantity) =>
 
 /// Returns null when stock is not tracked (unlimited).
 /// Returns 0 when out of stock.
-int? maxPurchasableQuantity(double? stockQuantity) {
+double? maxPurchasableQuantity(double? stockQuantity) {
   if (!isStockTracked(stockQuantity)) return null;
   if (stockQuantity! <= 0) return 0;
-  return stockQuantity.floor();
+  return stockQuantity;
 }
 
 bool canIncreaseCartQuantity({
   required double? stockQuantity,
-  required int cartQuantity,
+  required double cartQuantityInProductUnit,
+  double incrementInProductUnit = 1,
 }) {
   final maxQty = maxPurchasableQuantity(stockQuantity);
   if (maxQty == null) return true;
-  return cartQuantity < maxQty;
+  return cartQuantityInProductUnit + incrementInProductUnit <= maxQty + 1e-9;
 }
 
-int clampCartQuantity({
+double clampCartQuantityInProductUnit({
   required double? stockQuantity,
-  required int requestedQty,
+  required double requestedQtyInProductUnit,
 }) {
-  if (requestedQty <= 0) return 0;
+  if (requestedQtyInProductUnit <= 0) return 0;
   final maxQty = maxPurchasableQuantity(stockQuantity);
-  if (maxQty == null) return requestedQty;
+  if (maxQty == null) return requestedQtyInProductUnit;
   if (maxQty <= 0) return 0;
-  return requestedQty > maxQty ? maxQty : requestedQty;
+  return requestedQtyInProductUnit > maxQty ? maxQty : requestedQtyInProductUnit;
+}
+
+double clampBillingQuantity({
+  required double? stockQuantity,
+  required double requestedBillingQty,
+  required String billingUnit,
+  required String productUnit,
+}) {
+  if (requestedBillingQty <= 0) return 0;
+
+  final requestedInProductUnit = effectiveQuantityInProductUnit(
+    quantity: requestedBillingQty,
+    billingUnit: billingUnit,
+    productUnit: productUnit,
+  );
+
+  final cappedInProductUnit = clampCartQuantityInProductUnit(
+    stockQuantity: stockQuantity,
+    requestedQtyInProductUnit: requestedInProductUnit,
+  );
+
+  if (cappedInProductUnit <= 0) return 0;
+  if (billingUnit == productUnit) return cappedInProductUnit;
+
+  final convertedBack = convertQuantity(
+    qty: cappedInProductUnit,
+    fromUnit: productUnit,
+    toUnit: billingUnit,
+  );
+
+  return convertedBack ?? requestedBillingQty;
+}
+
+double incrementStepForUnit(String? unitId) {
+  final unit = resolveProductUnit(unitId);
+  return switch (unit) {
+    'kg' || 'litre' => 1,
+    'gram' || 'millilitre' => 100,
+    'milligram' => 100,
+    _ => 1,
+  };
 }

@@ -37,20 +37,10 @@ class HomeHeaderWidget extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  Strings.appName,
-                  style: FontPalette.base700(20, color: colors.primary),
-                ),
-                4.horizontalSpace,
-                Icon(
-                  Icons.auto_awesome,
-                  size: 14.r,
-                  color: colors.primary,
-                ),
-              ],
+            child: Text(
+              Strings.appName,
+              textAlign: TextAlign.center,
+              style: FontPalette.base700(20, color: colors.primary),
             ),
           ),
           SizedBox(width: 40.r),

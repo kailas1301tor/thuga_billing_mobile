@@ -17,6 +17,8 @@ class Assets {
       "assets/images/lottie/no_internet.json";
   static const String lottieSearching = "assets/images/lottie/searching.json";
 
+  static const String appIcon = "assets/images/png/thuga_app_icon.png";
+
   static const String svgToastSuccess = "assets/icons/success_toast_icon.svg";
   static const String svgToastError = "assets/icons/error_toast_icon.svg";
   static const String svgCloseButton = "assets/icons/close_button.svg";

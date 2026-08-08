@@ -189,6 +189,7 @@ class Strings {
   static const String ofSales = "of sales";
   static const String homeMenu = "Menu";
   static const String appMenuTitle = "Thuka Menu";
+  static const String appMenuSubtitle = "Manage business inventory";
   static const String billedViaApp = "Billed via Thuka App";
   static const String receiptStorePhoneLabel = "Ph";
   static const String appBrandFooter = "Thuka App";
@@ -212,6 +213,35 @@ class Strings {
   static const String categoryName = "Category Name";
   static const String productName = "Product Name";
   static const String quantity = "Quantity";
+  static const String unit = "Unit";
+  static const String unitRequired = "Unit *";
+  static const String selectUnit = "Select Unit";
+  static const String selectUnitRequired = "Please select a unit";
+  static const String fillAllRequiredFields = "Please fill all required fields";
+  static const String unitLockedHint =
+      "Unit cannot be changed after the product is created";
+  static const String pricePerUnit = "Price per unit";
+  static const String quickSelect = "Quick Select";
+  static const String customQuantity = "Custom Quantity";
+  static const String customQuantityHint = "Enter quantity...";
+  static const String setQuantity = "Set Quantity";
+  static const String selectQuantity = "Select Quantity";
+  static const String removeProduct = "Remove Product";
+  static const String unitPriceLabel = "Unit Price";
+  static String productAvailableStockQty(double count) =>
+      "Available: ${_formatQty(count)}";
+  static String productInsufficientStockQty(double count) =>
+      "Only ${_formatQty(count)} units available";
+
+  static String _formatQty(double count) {
+    if (count == count.truncateToDouble()) {
+      return count.toInt().toString();
+    }
+    return count
+        .toStringAsFixed(3)
+        .replaceAll(RegExp(r'0+$'), '')
+        .replaceAll(RegExp(r'\.$'), '');
+  }
   static const String barcode = "Barcode";
   static const String sgst = "SGST";
   static const String cgst = "CGST";
@@ -219,6 +249,7 @@ class Strings {
   static const String cgstPercentHint = "CGST (%) — optional";
   static const String sgstTotal = "SGST Total";
   static const String cgstTotal = "CGST Total";
+  static const String gstTotal = "GST Total";
   static const String notAvailable = "—";
   static const String price = "Price";
   static const String selectCategory = "Select Category";

@@ -4,7 +4,7 @@ import 'package:thuga/utils/helpers/bill_tax_helper.dart';
 
 CartItemModel _item({
   required double price,
-  int quantity = 1,
+  double quantity = 1,
   double sgst = 0,
   double cgst = 0,
 }) {
