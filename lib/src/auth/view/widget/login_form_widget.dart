@@ -11,7 +11,6 @@ import 'package:thuga/utils/common_widgets/common_password_field.dart';
 import 'package:thuga/utils/common_widgets/common_text_form_field.dart';
 import 'package:thuga/utils/common_widgets/primary_button.dart';
 import '../../notifier/auth_notifier.dart';
-import 'login_footer_widget.dart';
 
 class LoginFormWidget extends ConsumerWidget {
   const LoginFormWidget({super.key});
@@ -101,8 +100,6 @@ class LoginFormWidget extends ConsumerWidget {
             );
           },
         ),
-        24.verticalSpace,
-        const LoginFooterWidget(),
       ],
     );
   }
