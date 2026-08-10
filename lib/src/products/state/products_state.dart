@@ -11,6 +11,7 @@ sealed class ProductsState with _$ProductsState {
     ProductResponse? response,
     String? errorMessage,
     int? selectedCategoryId,
+    String? selectedCategoryName,
     @Default('') String searchQuery,
     @Default(false) bool saveProductLoader,
     @Default(false) bool updateProductLoader,

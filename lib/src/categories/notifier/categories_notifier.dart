@@ -144,6 +144,27 @@ class CategoriesNotifier extends _$CategoriesNotifier {
     searchController.clear();
   }
 
+  void searchCategories(String query) {
+    state = state.copyWith(searchQuery: query.trim(), currentPage: 1);
+    debounce(const Duration(milliseconds: 900), () {
+      fetchCategories();
+    });
+  }
+
+  void prepareCategoryPicker() {
+    state = state.copyWith(searchQuery: '', currentPage: 1);
+    fetchCategories();
+  }
+
+  void resetAfterCategoryPicker() {
+    state = state.copyWith(searchQuery: '', currentPage: 1);
+    if (searchController.text.isNotEmpty) {
+      searchController.clear();
+      return;
+    }
+    fetchCategories(showLoader: false);
+  }
+
   Future<bool> createCategory() async {
     state = state.copyWith(saveCategoryLoader: true);
     final name = nameController.text.trim();

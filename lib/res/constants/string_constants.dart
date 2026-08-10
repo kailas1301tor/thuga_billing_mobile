@@ -252,6 +252,7 @@ class Strings {
   static const String gstTotal = "GST Total";
   static const String notAvailable = "—";
   static const String price = "Price";
+  static const String purchasePrice = "Purchase Price";
   static const String selectCategory = "Select Category";
   static const String customerName = "Customer Name";
   static const String phoneNumber = "Phone Number";

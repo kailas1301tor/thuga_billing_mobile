@@ -262,6 +262,9 @@ class ProductCrudScreen extends ConsumerWidget {
     if (isEditing) {
       notifier.nameController.text = product.name;
       notifier.priceController.text = product.price.toString();
+      notifier.purchasePriceController.text = product.purchasePrice == null
+          ? ''
+          : product.purchasePrice!.toString();
       notifier.barcodeController.text = product.barcode ?? '';
       notifier.qtyController.text = product.quantity == null
           ? ''
@@ -272,7 +275,7 @@ class ProductCrudScreen extends ConsumerWidget {
           product.sgst == null ? '' : product.sgst!.toString();
       notifier.cgstController.text =
           product.cgst == null ? '' : product.cgst!.toString();
-      notifier.selectCategory(product.categoryId);
+      notifier.selectCategory(product.categoryId, name: product.categoryName);
       notifier.selectUnit(product.unit);
       notifier.initializeEdit(isQuickProduct: product.isQuickProduct);
     } else {
@@ -424,7 +427,13 @@ class ProductCrudScreen extends ConsumerWidget {
               16.verticalSpace,
               Consumer(
                 builder: (context, ref, child) {
-                  final state = ref.watch(productsProvider);
+                  final categorySelection = ref.watch(
+                    productsProvider.select(
+                      (s) => Tuple2(s.selectedCategoryId, s.selectedCategoryName),
+                    ),
+                  );
+                  final selectedCategoryId = categorySelection.item1;
+                  final selectedCategoryName = categorySelection.item2;
                   final categories =
                       ref
                           .watch(categoriesProvider)
@@ -434,22 +443,53 @@ class ProductCrudScreen extends ConsumerWidget {
                       [];
 
                   final selectedCategory = categories.firstWhereOrNull(
-                    (c) => c.id == state.selectedCategoryId,
+                    (c) => c.id == selectedCategoryId,
                   );
+                  final hasCategorySelection = selectedCategoryId != null;
+                  final categoryDisplayName =
+                      selectedCategoryName ??
+                      selectedCategory?.name ??
+                      Strings.selectCategory;
 
                   return _buildLabeledField(
                     context: context,
                     label: Strings.categoryName,
                     child: GestureDetector(
                       onTap: () {
+                        final categoriesNotifier =
+                            ref.read(categoriesProvider.notifier);
                         showSingleSelectBottomSheet<CategoryModel>(
                           context: context,
                           ref: ref,
                           title: Strings.selectCategory,
                           options: categories,
-                          currentValue: selectedCategory,
-                          onSelected: (cat) => notifier.selectCategory(cat.id),
+                          currentValue: selectedCategoryId != null
+                              ? (selectedCategory ??
+                                  CategoryModel(
+                                    id: selectedCategoryId,
+                                    name: selectedCategoryName ?? '',
+                                  ))
+                              : null,
+                          onSelected: (cat) =>
+                              notifier.selectCategory(cat.id, name: cat.name),
                           displayText: (cat) => cat.name,
+                          useRemoteSearch: true,
+                          onOpen: categoriesNotifier.prepareCategoryPicker,
+                          onDismiss: categoriesNotifier.resetAfterCategoryPicker,
+                          onSearchChanged: categoriesNotifier.searchCategories,
+                          onLoadMore: categoriesNotifier.loadMoreCategories,
+                          watchOptions: (sheetRef) => sheetRef.watch(
+                            categoriesProvider.select(
+                              (s) => s.response?.results.data ?? [],
+                            ),
+                          ),
+                          watchLoaderState: (sheetRef) => sheetRef.watch(
+                            categoriesProvider.select((s) => s.loaderState),
+                          ),
+                          watchIsLoadingMore: (sheetRef) => sheetRef.watch(
+                            categoriesProvider.select((s) => s.isLoadingMore),
+                          ),
+                          optionEquals: (a, b) => a.id == b.id,
                         );
                       },
                       child: Container(
@@ -466,10 +506,10 @@ class ProductCrudScreen extends ConsumerWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                selectedCategory?.name ?? Strings.selectCategory,
+                                categoryDisplayName,
                                 style: FontPalette.base400(
                                   14,
-                                  color: selectedCategory != null
+                                  color: hasCategorySelection
                                       ? context.appColors.primaryText
                                       : context.appColors.secondaryText,
                                 ),
@@ -555,6 +595,7 @@ class ProductCrudScreen extends ConsumerWidget {
                           onSelected: (unit) => notifier.selectUnit(unit.id),
                           displayText: (unit) => unit.name,
                           height: 0.6.sh,
+                          optionEquals: (a, b) => a.id == b.id,
                         );
                       },
                       child: Container(
@@ -600,6 +641,17 @@ class ProductCrudScreen extends ConsumerWidget {
                 child: CommonTextFormField(
                   controller: notifier.priceController,
                   hintText: Strings.price,
+                  inputType: const TextInputType.numberWithOptions(decimal: true),
+                  inputAction: TextInputAction.next,
+                ),
+              ),
+              16.verticalSpace,
+              _buildLabeledField(
+                context: context,
+                label: Strings.purchasePrice,
+                child: CommonTextFormField(
+                  controller: notifier.purchasePriceController,
+                  hintText: Strings.purchasePrice,
                   inputType: const TextInputType.numberWithOptions(decimal: true),
                   inputAction: TextInputAction.next,
                 ),

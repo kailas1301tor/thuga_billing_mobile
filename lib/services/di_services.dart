@@ -13,14 +13,14 @@ import 'package:thuga/src/splash/notifier/splash_notifier.dart';
 ///
 /// Add new keepAlive providers here when created.
 /// Call after clearing tokens on logout so the next session starts fresh.
-void disposeProviders(Ref ref) {
-  ref.invalidate(splashProvider);
-  ref.invalidate(dropdownsProvider);
-  ref.invalidate(printerProvider);
-  ref.invalidate(printerServiceProvider);
-  ref.invalidate(printerCrashlyticsServiceProvider);
-  ref.invalidate(networkServicesProvider);
-  ref.invalidate(sembastServicesProvider);
-  ref.invalidate(tokenServiceProvider);
-  ref.invalidate(accessTokenProvider);
+void disposeProviders(ProviderContainer container) {
+  container.invalidate(splashProvider);
+  container.invalidate(dropdownsProvider);
+  container.invalidate(printerProvider);
+  container.invalidate(printerServiceProvider);
+  container.invalidate(printerCrashlyticsServiceProvider);
+  container.invalidate(networkServicesProvider);
+  container.invalidate(sembastServicesProvider);
+  container.invalidate(tokenServiceProvider);
+  container.invalidate(accessTokenProvider);
 }

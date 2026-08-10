@@ -156,19 +156,30 @@ class SettingsContentWidget extends ConsumerWidget {
           20.verticalSpace,
 
           // 5. Logout Button
-          TextButton(
-            onPressed: () => _showLogoutConfirmation(context, ref),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.logout_rounded, color: colors.errorText, size: 18.r),
-                8.horizontalSpace,
-                Text(
-                  'Logout',
-                  style: FontPalette.base600(15, color: colors.errorText),
+          Consumer(
+            builder: (context, ref, _) {
+              final isLoggingOut = ref.watch(
+                authProvider.select((s) => s.logoutLoader),
+              );
+
+              return PrimaryButton(
+                text: 'Logout',
+                height: 50,
+                radius: 12,
+                isLoading: isLoggingOut,
+                onPressed: isLoggingOut
+                    ? null
+                    : () => _showLogoutConfirmation(context, ref),
+                backgroundColor: colors.errorText,
+                textColor: ColorPalette.white,
+                progressColor: ColorPalette.white,
+                prefixIcon: Icon(
+                  Icons.logout_rounded,
+                  color: ColorPalette.white,
+                  size: 18.r,
                 ),
-              ],
-            ),
+              );
+            },
           ),
           20.verticalSpace,
         ],
@@ -621,16 +632,32 @@ class SettingsContentWidget extends ConsumerWidget {
   }
 
   void _showLogoutConfirmation(BuildContext context, WidgetRef ref) {
-    CommonDialogBox.show(
+    showDialog<void>(
       context: context,
-      title: 'Confirm Logout',
-      message:
-          'Are you sure you want to log out? All local session data will be cleared.',
-      primaryLabel: 'Logout',
-      secondaryLabel: 'Cancel',
-      onPrimary: () {
-        ref.read(authProvider.notifier).logout();
-      },
+      barrierDismissible: false,
+      builder: (dialogContext) => Consumer(
+        builder: (context, ref, _) {
+          final isLoggingOut = ref.watch(
+            authProvider.select((s) => s.logoutLoader),
+          );
+
+          return CommonDialogBox(
+            title: 'Confirm Logout',
+            message:
+                'Are you sure you want to log out? All local session data will be cleared.',
+            primaryLabel: 'Logout',
+            secondaryLabel: 'Cancel',
+            isLoadingPrimary: isLoggingOut,
+            autoPop: false,
+            primaryButtonColor: context.appColors.errorText,
+            primaryButtonTextColor: ColorPalette.white,
+            onPrimary: () {
+              if (isLoggingOut) return;
+              ref.read(authProvider.notifier).logout();
+            },
+          );
+        },
+      ),
     );
   }
 }

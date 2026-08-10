@@ -113,6 +113,9 @@ class _ProductCardHeader extends StatelessWidget {
 
   String get _priceText => product.price.toCurrency();
 
+  String get _purchasePriceText =>
+      product.purchasePrice?.toCurrency() ?? Strings.notAvailable;
+
   @override
   Widget build(BuildContext context) {
     final hasCategory =
@@ -215,20 +218,37 @@ class _ProductCardHeader extends StatelessWidget {
               10.verticalSpace,
               Row(
                 children: [
-                  _StatColumn(
-                    label: Strings.price.toUpperCase(),
-                    value: _priceText,
-                    valueColor: colors.primary,
-                    colors: colors,
+                  Expanded(
+                    child: _StatColumn(
+                      label: Strings.price.toUpperCase(),
+                      value: _priceText,
+                      valueColor: colors.primary,
+                      colors: colors,
+                    ),
                   ),
-                  10.horizontalSpace,
+                  8.horizontalSpace,
                   Container(
                     width: 1.w,
                     height: 30.h,
                     color: colors.inputBorder,
                   ),
-                  10.horizontalSpace,
-                  Flexible(
+                  8.horizontalSpace,
+                  Expanded(
+                    child: _StatColumn(
+                      label: Strings.purchasePrice.toUpperCase(),
+                      value: _purchasePriceText,
+                      valueColor: colors.primaryText,
+                      colors: colors,
+                    ),
+                  ),
+                  8.horizontalSpace,
+                  Container(
+                    width: 1.w,
+                    height: 30.h,
+                    color: colors.inputBorder,
+                  ),
+                  8.horizontalSpace,
+                  Expanded(
                     child: _StatColumn(
                       label: Strings.quantity.toUpperCase(),
                       value: _quantityText,

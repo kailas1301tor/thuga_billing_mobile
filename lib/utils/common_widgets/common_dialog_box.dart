@@ -17,6 +17,8 @@ class CommonDialogBox extends StatelessWidget {
     this.onSecondary, 
     this.isLoadingPrimary = false,
     this.autoPop = true,
+    this.primaryButtonColor,
+    this.primaryButtonTextColor,
   });
 
   final String title;
@@ -27,6 +29,8 @@ class CommonDialogBox extends StatelessWidget {
   final VoidCallback? onSecondary;
   final bool isLoadingPrimary;
   final bool autoPop;
+  final Color? primaryButtonColor;
+  final Color? primaryButtonTextColor;
 
   static Future<T?> show<T>({
     required BuildContext context,
@@ -36,10 +40,15 @@ class CommonDialogBox extends StatelessWidget {
     required VoidCallback onPrimary,
     String? secondaryLabel,
     VoidCallback? onSecondary,
+    bool isLoadingPrimary = false,
     bool autoPop = true,
+    bool barrierDismissible = true,
+    Color? primaryButtonColor,
+    Color? primaryButtonTextColor,
   }) {
     return showDialog<T>(
       context: context,
+      barrierDismissible: barrierDismissible && !isLoadingPrimary,
       builder: (_) => CommonDialogBox(
         title: title,
         message: message,
@@ -47,7 +56,10 @@ class CommonDialogBox extends StatelessWidget {
         onPrimary: onPrimary,
         secondaryLabel: secondaryLabel,
         onSecondary: onSecondary,
+        isLoadingPrimary: isLoadingPrimary,
         autoPop: autoPop,
+        primaryButtonColor: primaryButtonColor,
+        primaryButtonTextColor: primaryButtonTextColor,
       ),
     );
   }
@@ -81,19 +93,26 @@ class CommonDialogBox extends StatelessWidget {
               child: PrimaryButton(
                 text: primaryLabel,
                 isLoading: isLoadingPrimary,
-                onPressed: () {
-                  if (autoPop) Navigator.of(context).pop();
-                  onPrimary();
-                },
+                backgroundColor: primaryButtonColor,
+                textColor: primaryButtonTextColor ?? ColorPalette.white,
+                progressColor: primaryButtonTextColor ?? ColorPalette.white,
+                onPressed: isLoadingPrimary
+                    ? null
+                    : () {
+                        if (autoPop) Navigator.of(context).pop();
+                        onPrimary();
+                      },
               ),
             ),
             if (secondaryLabel != null) ...[
               8.verticalSpace,
               TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  onSecondary?.call();
-                },
+                onPressed: isLoadingPrimary
+                    ? null
+                    : () {
+                        Navigator.of(context).pop();
+                        onSecondary?.call();
+                      },
                 child: Text(
                   secondaryLabel ?? Strings.cancel,
                   style: FontPalette.base600(14, color: colors.secondaryText),

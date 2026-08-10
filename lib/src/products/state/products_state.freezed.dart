@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ProductsState {
 
- LoaderState get loaderState; ProductResponse? get response; String? get errorMessage; int? get selectedCategoryId; String get searchQuery; bool get saveProductLoader; bool get updateProductLoader; bool get deleteProductLoader; int get currentPage; int get totalPages; int get pageSize; bool get isLoadingMore; String get sort; int? get filterCategoryId; bool get isQuickProduct; String? get selectedImagePath; String? get selectedUnitId; List<int> get togglingProductIds;
+ LoaderState get loaderState; ProductResponse? get response; String? get errorMessage; int? get selectedCategoryId; String? get selectedCategoryName; String get searchQuery; bool get saveProductLoader; bool get updateProductLoader; bool get deleteProductLoader; int get currentPage; int get totalPages; int get pageSize; bool get isLoadingMore; String get sort; int? get filterCategoryId; bool get isQuickProduct; String? get selectedImagePath; String? get selectedUnitId; List<int> get togglingProductIds;
 /// Create a copy of ProductsState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $ProductsStateCopyWith<ProductsState> get copyWith => _$ProductsStateCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProductsState&&(identical(other.loaderState, loaderState) || other.loaderState == loaderState)&&(identical(other.response, response) || other.response == response)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.selectedCategoryId, selectedCategoryId) || other.selectedCategoryId == selectedCategoryId)&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery)&&(identical(other.saveProductLoader, saveProductLoader) || other.saveProductLoader == saveProductLoader)&&(identical(other.updateProductLoader, updateProductLoader) || other.updateProductLoader == updateProductLoader)&&(identical(other.deleteProductLoader, deleteProductLoader) || other.deleteProductLoader == deleteProductLoader)&&(identical(other.currentPage, currentPage) || other.currentPage == currentPage)&&(identical(other.totalPages, totalPages) || other.totalPages == totalPages)&&(identical(other.pageSize, pageSize) || other.pageSize == pageSize)&&(identical(other.isLoadingMore, isLoadingMore) || other.isLoadingMore == isLoadingMore)&&(identical(other.sort, sort) || other.sort == sort)&&(identical(other.filterCategoryId, filterCategoryId) || other.filterCategoryId == filterCategoryId)&&(identical(other.isQuickProduct, isQuickProduct) || other.isQuickProduct == isQuickProduct)&&(identical(other.selectedImagePath, selectedImagePath) || other.selectedImagePath == selectedImagePath)&&(identical(other.selectedUnitId, selectedUnitId) || other.selectedUnitId == selectedUnitId)&&const DeepCollectionEquality().equals(other.togglingProductIds, togglingProductIds));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProductsState&&(identical(other.loaderState, loaderState) || other.loaderState == loaderState)&&(identical(other.response, response) || other.response == response)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.selectedCategoryId, selectedCategoryId) || other.selectedCategoryId == selectedCategoryId)&&(identical(other.selectedCategoryName, selectedCategoryName) || other.selectedCategoryName == selectedCategoryName)&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery)&&(identical(other.saveProductLoader, saveProductLoader) || other.saveProductLoader == saveProductLoader)&&(identical(other.updateProductLoader, updateProductLoader) || other.updateProductLoader == updateProductLoader)&&(identical(other.deleteProductLoader, deleteProductLoader) || other.deleteProductLoader == deleteProductLoader)&&(identical(other.currentPage, currentPage) || other.currentPage == currentPage)&&(identical(other.totalPages, totalPages) || other.totalPages == totalPages)&&(identical(other.pageSize, pageSize) || other.pageSize == pageSize)&&(identical(other.isLoadingMore, isLoadingMore) || other.isLoadingMore == isLoadingMore)&&(identical(other.sort, sort) || other.sort == sort)&&(identical(other.filterCategoryId, filterCategoryId) || other.filterCategoryId == filterCategoryId)&&(identical(other.isQuickProduct, isQuickProduct) || other.isQuickProduct == isQuickProduct)&&(identical(other.selectedImagePath, selectedImagePath) || other.selectedImagePath == selectedImagePath)&&(identical(other.selectedUnitId, selectedUnitId) || other.selectedUnitId == selectedUnitId)&&const DeepCollectionEquality().equals(other.togglingProductIds, togglingProductIds));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,loaderState,response,errorMessage,selectedCategoryId,searchQuery,saveProductLoader,updateProductLoader,deleteProductLoader,currentPage,totalPages,pageSize,isLoadingMore,sort,filterCategoryId,isQuickProduct,selectedImagePath,selectedUnitId,const DeepCollectionEquality().hash(togglingProductIds));
+int get hashCode => Object.hashAll([runtimeType,loaderState,response,errorMessage,selectedCategoryId,selectedCategoryName,searchQuery,saveProductLoader,updateProductLoader,deleteProductLoader,currentPage,totalPages,pageSize,isLoadingMore,sort,filterCategoryId,isQuickProduct,selectedImagePath,selectedUnitId,const DeepCollectionEquality().hash(togglingProductIds)]);
 
 @override
 String toString() {
-  return 'ProductsState(loaderState: $loaderState, response: $response, errorMessage: $errorMessage, selectedCategoryId: $selectedCategoryId, searchQuery: $searchQuery, saveProductLoader: $saveProductLoader, updateProductLoader: $updateProductLoader, deleteProductLoader: $deleteProductLoader, currentPage: $currentPage, totalPages: $totalPages, pageSize: $pageSize, isLoadingMore: $isLoadingMore, sort: $sort, filterCategoryId: $filterCategoryId, isQuickProduct: $isQuickProduct, selectedImagePath: $selectedImagePath, selectedUnitId: $selectedUnitId, togglingProductIds: $togglingProductIds)';
+  return 'ProductsState(loaderState: $loaderState, response: $response, errorMessage: $errorMessage, selectedCategoryId: $selectedCategoryId, selectedCategoryName: $selectedCategoryName, searchQuery: $searchQuery, saveProductLoader: $saveProductLoader, updateProductLoader: $updateProductLoader, deleteProductLoader: $deleteProductLoader, currentPage: $currentPage, totalPages: $totalPages, pageSize: $pageSize, isLoadingMore: $isLoadingMore, sort: $sort, filterCategoryId: $filterCategoryId, isQuickProduct: $isQuickProduct, selectedImagePath: $selectedImagePath, selectedUnitId: $selectedUnitId, togglingProductIds: $togglingProductIds)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $ProductsStateCopyWith<$Res>  {
   factory $ProductsStateCopyWith(ProductsState value, $Res Function(ProductsState) _then) = _$ProductsStateCopyWithImpl;
 @useResult
 $Res call({
- LoaderState loaderState, ProductResponse? response, String? errorMessage, int? selectedCategoryId, String searchQuery, bool saveProductLoader, bool updateProductLoader, bool deleteProductLoader, int currentPage, int totalPages, int pageSize, bool isLoadingMore, String sort, int? filterCategoryId, bool isQuickProduct, String? selectedImagePath, String? selectedUnitId, List<int> togglingProductIds
+ LoaderState loaderState, ProductResponse? response, String? errorMessage, int? selectedCategoryId, String? selectedCategoryName, String searchQuery, bool saveProductLoader, bool updateProductLoader, bool deleteProductLoader, int currentPage, int totalPages, int pageSize, bool isLoadingMore, String sort, int? filterCategoryId, bool isQuickProduct, String? selectedImagePath, String? selectedUnitId, List<int> togglingProductIds
 });
 
 
@@ -62,13 +62,14 @@ class _$ProductsStateCopyWithImpl<$Res>
 
 /// Create a copy of ProductsState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? loaderState = null,Object? response = freezed,Object? errorMessage = freezed,Object? selectedCategoryId = freezed,Object? searchQuery = null,Object? saveProductLoader = null,Object? updateProductLoader = null,Object? deleteProductLoader = null,Object? currentPage = null,Object? totalPages = null,Object? pageSize = null,Object? isLoadingMore = null,Object? sort = null,Object? filterCategoryId = freezed,Object? isQuickProduct = null,Object? selectedImagePath = freezed,Object? selectedUnitId = freezed,Object? togglingProductIds = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? loaderState = null,Object? response = freezed,Object? errorMessage = freezed,Object? selectedCategoryId = freezed,Object? selectedCategoryName = freezed,Object? searchQuery = null,Object? saveProductLoader = null,Object? updateProductLoader = null,Object? deleteProductLoader = null,Object? currentPage = null,Object? totalPages = null,Object? pageSize = null,Object? isLoadingMore = null,Object? sort = null,Object? filterCategoryId = freezed,Object? isQuickProduct = null,Object? selectedImagePath = freezed,Object? selectedUnitId = freezed,Object? togglingProductIds = null,}) {
   return _then(_self.copyWith(
 loaderState: null == loaderState ? _self.loaderState : loaderState // ignore: cast_nullable_to_non_nullable
 as LoaderState,response: freezed == response ? _self.response : response // ignore: cast_nullable_to_non_nullable
 as ProductResponse?,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,selectedCategoryId: freezed == selectedCategoryId ? _self.selectedCategoryId : selectedCategoryId // ignore: cast_nullable_to_non_nullable
-as int?,searchQuery: null == searchQuery ? _self.searchQuery : searchQuery // ignore: cast_nullable_to_non_nullable
+as int?,selectedCategoryName: freezed == selectedCategoryName ? _self.selectedCategoryName : selectedCategoryName // ignore: cast_nullable_to_non_nullable
+as String?,searchQuery: null == searchQuery ? _self.searchQuery : searchQuery // ignore: cast_nullable_to_non_nullable
 as String,saveProductLoader: null == saveProductLoader ? _self.saveProductLoader : saveProductLoader // ignore: cast_nullable_to_non_nullable
 as bool,updateProductLoader: null == updateProductLoader ? _self.updateProductLoader : updateProductLoader // ignore: cast_nullable_to_non_nullable
 as bool,deleteProductLoader: null == deleteProductLoader ? _self.deleteProductLoader : deleteProductLoader // ignore: cast_nullable_to_non_nullable
@@ -164,10 +165,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( LoaderState loaderState,  ProductResponse? response,  String? errorMessage,  int? selectedCategoryId,  String searchQuery,  bool saveProductLoader,  bool updateProductLoader,  bool deleteProductLoader,  int currentPage,  int totalPages,  int pageSize,  bool isLoadingMore,  String sort,  int? filterCategoryId,  bool isQuickProduct,  String? selectedImagePath,  String? selectedUnitId,  List<int> togglingProductIds)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( LoaderState loaderState,  ProductResponse? response,  String? errorMessage,  int? selectedCategoryId,  String? selectedCategoryName,  String searchQuery,  bool saveProductLoader,  bool updateProductLoader,  bool deleteProductLoader,  int currentPage,  int totalPages,  int pageSize,  bool isLoadingMore,  String sort,  int? filterCategoryId,  bool isQuickProduct,  String? selectedImagePath,  String? selectedUnitId,  List<int> togglingProductIds)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ProductsState() when $default != null:
-return $default(_that.loaderState,_that.response,_that.errorMessage,_that.selectedCategoryId,_that.searchQuery,_that.saveProductLoader,_that.updateProductLoader,_that.deleteProductLoader,_that.currentPage,_that.totalPages,_that.pageSize,_that.isLoadingMore,_that.sort,_that.filterCategoryId,_that.isQuickProduct,_that.selectedImagePath,_that.selectedUnitId,_that.togglingProductIds);case _:
+return $default(_that.loaderState,_that.response,_that.errorMessage,_that.selectedCategoryId,_that.selectedCategoryName,_that.searchQuery,_that.saveProductLoader,_that.updateProductLoader,_that.deleteProductLoader,_that.currentPage,_that.totalPages,_that.pageSize,_that.isLoadingMore,_that.sort,_that.filterCategoryId,_that.isQuickProduct,_that.selectedImagePath,_that.selectedUnitId,_that.togglingProductIds);case _:
   return orElse();
 
 }
@@ -185,10 +186,10 @@ return $default(_that.loaderState,_that.response,_that.errorMessage,_that.select
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( LoaderState loaderState,  ProductResponse? response,  String? errorMessage,  int? selectedCategoryId,  String searchQuery,  bool saveProductLoader,  bool updateProductLoader,  bool deleteProductLoader,  int currentPage,  int totalPages,  int pageSize,  bool isLoadingMore,  String sort,  int? filterCategoryId,  bool isQuickProduct,  String? selectedImagePath,  String? selectedUnitId,  List<int> togglingProductIds)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( LoaderState loaderState,  ProductResponse? response,  String? errorMessage,  int? selectedCategoryId,  String? selectedCategoryName,  String searchQuery,  bool saveProductLoader,  bool updateProductLoader,  bool deleteProductLoader,  int currentPage,  int totalPages,  int pageSize,  bool isLoadingMore,  String sort,  int? filterCategoryId,  bool isQuickProduct,  String? selectedImagePath,  String? selectedUnitId,  List<int> togglingProductIds)  $default,) {final _that = this;
 switch (_that) {
 case _ProductsState():
-return $default(_that.loaderState,_that.response,_that.errorMessage,_that.selectedCategoryId,_that.searchQuery,_that.saveProductLoader,_that.updateProductLoader,_that.deleteProductLoader,_that.currentPage,_that.totalPages,_that.pageSize,_that.isLoadingMore,_that.sort,_that.filterCategoryId,_that.isQuickProduct,_that.selectedImagePath,_that.selectedUnitId,_that.togglingProductIds);}
+return $default(_that.loaderState,_that.response,_that.errorMessage,_that.selectedCategoryId,_that.selectedCategoryName,_that.searchQuery,_that.saveProductLoader,_that.updateProductLoader,_that.deleteProductLoader,_that.currentPage,_that.totalPages,_that.pageSize,_that.isLoadingMore,_that.sort,_that.filterCategoryId,_that.isQuickProduct,_that.selectedImagePath,_that.selectedUnitId,_that.togglingProductIds);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -202,10 +203,10 @@ return $default(_that.loaderState,_that.response,_that.errorMessage,_that.select
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( LoaderState loaderState,  ProductResponse? response,  String? errorMessage,  int? selectedCategoryId,  String searchQuery,  bool saveProductLoader,  bool updateProductLoader,  bool deleteProductLoader,  int currentPage,  int totalPages,  int pageSize,  bool isLoadingMore,  String sort,  int? filterCategoryId,  bool isQuickProduct,  String? selectedImagePath,  String? selectedUnitId,  List<int> togglingProductIds)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( LoaderState loaderState,  ProductResponse? response,  String? errorMessage,  int? selectedCategoryId,  String? selectedCategoryName,  String searchQuery,  bool saveProductLoader,  bool updateProductLoader,  bool deleteProductLoader,  int currentPage,  int totalPages,  int pageSize,  bool isLoadingMore,  String sort,  int? filterCategoryId,  bool isQuickProduct,  String? selectedImagePath,  String? selectedUnitId,  List<int> togglingProductIds)?  $default,) {final _that = this;
 switch (_that) {
 case _ProductsState() when $default != null:
-return $default(_that.loaderState,_that.response,_that.errorMessage,_that.selectedCategoryId,_that.searchQuery,_that.saveProductLoader,_that.updateProductLoader,_that.deleteProductLoader,_that.currentPage,_that.totalPages,_that.pageSize,_that.isLoadingMore,_that.sort,_that.filterCategoryId,_that.isQuickProduct,_that.selectedImagePath,_that.selectedUnitId,_that.togglingProductIds);case _:
+return $default(_that.loaderState,_that.response,_that.errorMessage,_that.selectedCategoryId,_that.selectedCategoryName,_that.searchQuery,_that.saveProductLoader,_that.updateProductLoader,_that.deleteProductLoader,_that.currentPage,_that.totalPages,_that.pageSize,_that.isLoadingMore,_that.sort,_that.filterCategoryId,_that.isQuickProduct,_that.selectedImagePath,_that.selectedUnitId,_that.togglingProductIds);case _:
   return null;
 
 }
@@ -217,13 +218,14 @@ return $default(_that.loaderState,_that.response,_that.errorMessage,_that.select
 
 
 class _ProductsState implements ProductsState {
-  const _ProductsState({this.loaderState = LoaderState.loading, this.response, this.errorMessage, this.selectedCategoryId, this.searchQuery = '', this.saveProductLoader = false, this.updateProductLoader = false, this.deleteProductLoader = false, this.currentPage = 1, this.totalPages = 1, this.pageSize = 10, this.isLoadingMore = false, this.sort = 'lowest', this.filterCategoryId, this.isQuickProduct = true, this.selectedImagePath, this.selectedUnitId, final  List<int> togglingProductIds = const []}): _togglingProductIds = togglingProductIds;
+  const _ProductsState({this.loaderState = LoaderState.loading, this.response, this.errorMessage, this.selectedCategoryId, this.selectedCategoryName, this.searchQuery = '', this.saveProductLoader = false, this.updateProductLoader = false, this.deleteProductLoader = false, this.currentPage = 1, this.totalPages = 1, this.pageSize = 10, this.isLoadingMore = false, this.sort = 'lowest', this.filterCategoryId, this.isQuickProduct = true, this.selectedImagePath, this.selectedUnitId, final  List<int> togglingProductIds = const []}): _togglingProductIds = togglingProductIds;
   
 
 @override@JsonKey() final  LoaderState loaderState;
 @override final  ProductResponse? response;
 @override final  String? errorMessage;
 @override final  int? selectedCategoryId;
+@override final  String? selectedCategoryName;
 @override@JsonKey() final  String searchQuery;
 @override@JsonKey() final  bool saveProductLoader;
 @override@JsonKey() final  bool updateProductLoader;
@@ -255,16 +257,16 @@ _$ProductsStateCopyWith<_ProductsState> get copyWith => __$ProductsStateCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProductsState&&(identical(other.loaderState, loaderState) || other.loaderState == loaderState)&&(identical(other.response, response) || other.response == response)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.selectedCategoryId, selectedCategoryId) || other.selectedCategoryId == selectedCategoryId)&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery)&&(identical(other.saveProductLoader, saveProductLoader) || other.saveProductLoader == saveProductLoader)&&(identical(other.updateProductLoader, updateProductLoader) || other.updateProductLoader == updateProductLoader)&&(identical(other.deleteProductLoader, deleteProductLoader) || other.deleteProductLoader == deleteProductLoader)&&(identical(other.currentPage, currentPage) || other.currentPage == currentPage)&&(identical(other.totalPages, totalPages) || other.totalPages == totalPages)&&(identical(other.pageSize, pageSize) || other.pageSize == pageSize)&&(identical(other.isLoadingMore, isLoadingMore) || other.isLoadingMore == isLoadingMore)&&(identical(other.sort, sort) || other.sort == sort)&&(identical(other.filterCategoryId, filterCategoryId) || other.filterCategoryId == filterCategoryId)&&(identical(other.isQuickProduct, isQuickProduct) || other.isQuickProduct == isQuickProduct)&&(identical(other.selectedImagePath, selectedImagePath) || other.selectedImagePath == selectedImagePath)&&(identical(other.selectedUnitId, selectedUnitId) || other.selectedUnitId == selectedUnitId)&&const DeepCollectionEquality().equals(other._togglingProductIds, _togglingProductIds));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProductsState&&(identical(other.loaderState, loaderState) || other.loaderState == loaderState)&&(identical(other.response, response) || other.response == response)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.selectedCategoryId, selectedCategoryId) || other.selectedCategoryId == selectedCategoryId)&&(identical(other.selectedCategoryName, selectedCategoryName) || other.selectedCategoryName == selectedCategoryName)&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery)&&(identical(other.saveProductLoader, saveProductLoader) || other.saveProductLoader == saveProductLoader)&&(identical(other.updateProductLoader, updateProductLoader) || other.updateProductLoader == updateProductLoader)&&(identical(other.deleteProductLoader, deleteProductLoader) || other.deleteProductLoader == deleteProductLoader)&&(identical(other.currentPage, currentPage) || other.currentPage == currentPage)&&(identical(other.totalPages, totalPages) || other.totalPages == totalPages)&&(identical(other.pageSize, pageSize) || other.pageSize == pageSize)&&(identical(other.isLoadingMore, isLoadingMore) || other.isLoadingMore == isLoadingMore)&&(identical(other.sort, sort) || other.sort == sort)&&(identical(other.filterCategoryId, filterCategoryId) || other.filterCategoryId == filterCategoryId)&&(identical(other.isQuickProduct, isQuickProduct) || other.isQuickProduct == isQuickProduct)&&(identical(other.selectedImagePath, selectedImagePath) || other.selectedImagePath == selectedImagePath)&&(identical(other.selectedUnitId, selectedUnitId) || other.selectedUnitId == selectedUnitId)&&const DeepCollectionEquality().equals(other._togglingProductIds, _togglingProductIds));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,loaderState,response,errorMessage,selectedCategoryId,searchQuery,saveProductLoader,updateProductLoader,deleteProductLoader,currentPage,totalPages,pageSize,isLoadingMore,sort,filterCategoryId,isQuickProduct,selectedImagePath,selectedUnitId,const DeepCollectionEquality().hash(_togglingProductIds));
+int get hashCode => Object.hashAll([runtimeType,loaderState,response,errorMessage,selectedCategoryId,selectedCategoryName,searchQuery,saveProductLoader,updateProductLoader,deleteProductLoader,currentPage,totalPages,pageSize,isLoadingMore,sort,filterCategoryId,isQuickProduct,selectedImagePath,selectedUnitId,const DeepCollectionEquality().hash(_togglingProductIds)]);
 
 @override
 String toString() {
-  return 'ProductsState(loaderState: $loaderState, response: $response, errorMessage: $errorMessage, selectedCategoryId: $selectedCategoryId, searchQuery: $searchQuery, saveProductLoader: $saveProductLoader, updateProductLoader: $updateProductLoader, deleteProductLoader: $deleteProductLoader, currentPage: $currentPage, totalPages: $totalPages, pageSize: $pageSize, isLoadingMore: $isLoadingMore, sort: $sort, filterCategoryId: $filterCategoryId, isQuickProduct: $isQuickProduct, selectedImagePath: $selectedImagePath, selectedUnitId: $selectedUnitId, togglingProductIds: $togglingProductIds)';
+  return 'ProductsState(loaderState: $loaderState, response: $response, errorMessage: $errorMessage, selectedCategoryId: $selectedCategoryId, selectedCategoryName: $selectedCategoryName, searchQuery: $searchQuery, saveProductLoader: $saveProductLoader, updateProductLoader: $updateProductLoader, deleteProductLoader: $deleteProductLoader, currentPage: $currentPage, totalPages: $totalPages, pageSize: $pageSize, isLoadingMore: $isLoadingMore, sort: $sort, filterCategoryId: $filterCategoryId, isQuickProduct: $isQuickProduct, selectedImagePath: $selectedImagePath, selectedUnitId: $selectedUnitId, togglingProductIds: $togglingProductIds)';
 }
 
 
@@ -275,7 +277,7 @@ abstract mixin class _$ProductsStateCopyWith<$Res> implements $ProductsStateCopy
   factory _$ProductsStateCopyWith(_ProductsState value, $Res Function(_ProductsState) _then) = __$ProductsStateCopyWithImpl;
 @override @useResult
 $Res call({
- LoaderState loaderState, ProductResponse? response, String? errorMessage, int? selectedCategoryId, String searchQuery, bool saveProductLoader, bool updateProductLoader, bool deleteProductLoader, int currentPage, int totalPages, int pageSize, bool isLoadingMore, String sort, int? filterCategoryId, bool isQuickProduct, String? selectedImagePath, String? selectedUnitId, List<int> togglingProductIds
+ LoaderState loaderState, ProductResponse? response, String? errorMessage, int? selectedCategoryId, String? selectedCategoryName, String searchQuery, bool saveProductLoader, bool updateProductLoader, bool deleteProductLoader, int currentPage, int totalPages, int pageSize, bool isLoadingMore, String sort, int? filterCategoryId, bool isQuickProduct, String? selectedImagePath, String? selectedUnitId, List<int> togglingProductIds
 });
 
 
@@ -292,13 +294,14 @@ class __$ProductsStateCopyWithImpl<$Res>
 
 /// Create a copy of ProductsState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? loaderState = null,Object? response = freezed,Object? errorMessage = freezed,Object? selectedCategoryId = freezed,Object? searchQuery = null,Object? saveProductLoader = null,Object? updateProductLoader = null,Object? deleteProductLoader = null,Object? currentPage = null,Object? totalPages = null,Object? pageSize = null,Object? isLoadingMore = null,Object? sort = null,Object? filterCategoryId = freezed,Object? isQuickProduct = null,Object? selectedImagePath = freezed,Object? selectedUnitId = freezed,Object? togglingProductIds = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? loaderState = null,Object? response = freezed,Object? errorMessage = freezed,Object? selectedCategoryId = freezed,Object? selectedCategoryName = freezed,Object? searchQuery = null,Object? saveProductLoader = null,Object? updateProductLoader = null,Object? deleteProductLoader = null,Object? currentPage = null,Object? totalPages = null,Object? pageSize = null,Object? isLoadingMore = null,Object? sort = null,Object? filterCategoryId = freezed,Object? isQuickProduct = null,Object? selectedImagePath = freezed,Object? selectedUnitId = freezed,Object? togglingProductIds = null,}) {
   return _then(_ProductsState(
 loaderState: null == loaderState ? _self.loaderState : loaderState // ignore: cast_nullable_to_non_nullable
 as LoaderState,response: freezed == response ? _self.response : response // ignore: cast_nullable_to_non_nullable
 as ProductResponse?,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,selectedCategoryId: freezed == selectedCategoryId ? _self.selectedCategoryId : selectedCategoryId // ignore: cast_nullable_to_non_nullable
-as int?,searchQuery: null == searchQuery ? _self.searchQuery : searchQuery // ignore: cast_nullable_to_non_nullable
+as int?,selectedCategoryName: freezed == selectedCategoryName ? _self.selectedCategoryName : selectedCategoryName // ignore: cast_nullable_to_non_nullable
+as String?,searchQuery: null == searchQuery ? _self.searchQuery : searchQuery // ignore: cast_nullable_to_non_nullable
 as String,saveProductLoader: null == saveProductLoader ? _self.saveProductLoader : saveProductLoader // ignore: cast_nullable_to_non_nullable
 as bool,updateProductLoader: null == updateProductLoader ? _self.updateProductLoader : updateProductLoader // ignore: cast_nullable_to_non_nullable
 as bool,deleteProductLoader: null == deleteProductLoader ? _self.deleteProductLoader : deleteProductLoader // ignore: cast_nullable_to_non_nullable

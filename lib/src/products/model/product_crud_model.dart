@@ -83,6 +83,7 @@ class ProductCrudModel {
   final String? unit;
   final double? quantity;
   final double price;
+  final double? purchasePrice;
   final double? sgst;
   final double? cgst;
   final bool isQuickProduct;
@@ -102,6 +103,7 @@ class ProductCrudModel {
     this.unit,
     this.quantity,
     required this.price,
+    this.purchasePrice,
     this.sgst,
     this.cgst,
     this.isQuickProduct = false,
@@ -122,6 +124,9 @@ class ProductCrudModel {
         unit: json['unit'] != null ? convertToString(json['unit']) : null,
         quantity: json['qty'] == null ? null : convertToDouble(json['qty']),
         price: convertToDouble(json['price']),
+        purchasePrice: json['purchase_price'] == null
+            ? null
+            : convertToDouble(json['purchase_price']),
         sgst: json['sgst'] == null ? null : convertToDouble(json['sgst']),
         cgst: json['cgst'] == null ? null : convertToDouble(json['cgst']),
         isQuickProduct: convertToBool(json['is_quick_product']),

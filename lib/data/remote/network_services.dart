@@ -605,7 +605,7 @@ class NetworkServices extends NetWorkBaseServices {
   Future<void> _logout() async {
     debugPrint('🔴 Failed to refresh token — forcing logout');
     await _ref.read(tokenServiceProvider).clearTokens();
-    disposeProviders(_ref);
+    disposeProviders(_ref.container);
 
     if (appNavigatorKey.currentState != null) {
       executeAfterFrame(() {

@@ -12,7 +12,7 @@ class AppConstants {
   static String register = "$api/company-details";
   static String companyDetails = "$api/company-details";
   static String refreshTokenApi = "$prefix$user/token-refresh";
-  static String logout = "$prefix$user/logout";
+  static String logout = "$api/logout";
 
   // Profile endpoints
   static String getProfileData = "$prefix$user/profile";

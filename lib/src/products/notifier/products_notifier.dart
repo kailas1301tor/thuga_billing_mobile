@@ -20,6 +20,7 @@ part 'products_notifier.g.dart';
 class ProductsNotifier extends _$ProductsNotifier {
   late final TextEditingController nameController;
   late final TextEditingController priceController;
+  late final TextEditingController purchasePriceController;
   late final TextEditingController barcodeController;
   late final TextEditingController qtyController;
   late final TextEditingController sgstController;
@@ -32,6 +33,7 @@ class ProductsNotifier extends _$ProductsNotifier {
   ProductsState build() {
     nameController = TextEditingController();
     priceController = TextEditingController();
+    purchasePriceController = TextEditingController();
     barcodeController = TextEditingController();
     qtyController = TextEditingController();
     sgstController = TextEditingController();
@@ -46,6 +48,7 @@ class ProductsNotifier extends _$ProductsNotifier {
       scrollController.removeListener(_onScroll);
       nameController.dispose();
       priceController.dispose();
+      purchasePriceController.dispose();
       barcodeController.dispose();
       qtyController.dispose();
       sgstController.dispose();
@@ -171,8 +174,11 @@ class ProductsNotifier extends _$ProductsNotifier {
     fetchProducts();
   }
 
-  void selectCategory(int? id) {
-    state = state.copyWith(selectedCategoryId: id);
+  void selectCategory(int? id, {String? name}) {
+    state = state.copyWith(
+      selectedCategoryId: id,
+      selectedCategoryName: name,
+    );
   }
 
   void selectUnit(String? unitId) {
@@ -182,12 +188,14 @@ class ProductsNotifier extends _$ProductsNotifier {
   void clearForm() {
     nameController.clear();
     priceController.clear();
+    purchasePriceController.clear();
     barcodeController.clear();
     qtyController.clear();
     sgstController.clear();
     cgstController.clear();
     state = state.copyWith(
       selectedCategoryId: null,
+      selectedCategoryName: null,
       selectedUnitId: null,
       isQuickProduct: true,
       selectedImagePath: null,
@@ -243,6 +251,33 @@ class ProductsNotifier extends _$ProductsNotifier {
     return true;
   }
 
+  bool _validateOptionalPurchasePrice() {
+    final value = purchasePriceController.text.trim();
+    if (value.isEmpty) return true;
+
+    final parsed = double.tryParse(value);
+    if (parsed == null) {
+      showCustomErrorToast(
+        message: '${Strings.purchasePrice} must be a valid number',
+      );
+      return false;
+    }
+    if (parsed < 0) {
+      showCustomErrorToast(
+        message: '${Strings.purchasePrice} must be zero or greater',
+      );
+      return false;
+    }
+    return true;
+  }
+
+  void _appendOptionalPurchasePrice(Map<String, dynamic> map) {
+    final purchasePrice = purchasePriceController.text.trim();
+    if (purchasePrice.isNotEmpty) {
+      map['purchase_price'] = purchasePrice;
+    }
+  }
+
   void _appendOptionalTaxFields(Map<String, dynamic> map) {
     final sgst = sgstController.text.trim();
     if (sgst.isNotEmpty) {
@@ -271,7 +306,7 @@ class ProductsNotifier extends _$ProductsNotifier {
       return false;
     }
 
-    if (!_validateOptionalTaxFields()) {
+    if (!_validateOptionalTaxFields() || !_validateOptionalPurchasePrice()) {
       return false;
     }
 
@@ -293,6 +328,7 @@ class ProductsNotifier extends _$ProductsNotifier {
     if (qty.isNotEmpty) {
       map['qty'] = qty;
     }
+    _appendOptionalPurchasePrice(map);
     _appendOptionalTaxFields(map);
 
     if (state.selectedImagePath != null) {
@@ -333,7 +369,7 @@ class ProductsNotifier extends _$ProductsNotifier {
       return false;
     }
 
-    if (!_validateOptionalTaxFields()) {
+    if (!_validateOptionalTaxFields() || !_validateOptionalPurchasePrice()) {
       return false;
     }
 
@@ -354,6 +390,7 @@ class ProductsNotifier extends _$ProductsNotifier {
     if (qty.isNotEmpty) {
       map['qty'] = qty;
     }
+    _appendOptionalPurchasePrice(map);
     _appendOptionalTaxFields(map);
 
     if (state.selectedImagePath != null) {
@@ -424,6 +461,7 @@ class ProductsNotifier extends _$ProductsNotifier {
             unit: product.unit,
             quantity: product.quantity,
             price: product.price,
+            purchasePrice: product.purchasePrice,
             sgst: product.sgst,
             cgst: product.cgst,
             isQuickProduct: product.isQuickProduct,
