@@ -67,20 +67,47 @@ class NewBillNotifier extends _$NewBillNotifier {
       searchFocusNode.dispose();
     });
 
-    Future.microtask(() => fetchProducts());
+    Future.microtask(() {
+      if (!ref.mounted) return;
+      fetchProducts();
+    });
     return const NewBillState();
   }
 
   void _onSearchChanged() {
     _searchDebounce?.cancel();
-    _searchDebounce = Timer(const Duration(milliseconds: 400), () {
+    _searchDebounce = Timer(const Duration(milliseconds: 900), () {
+      if (!ref.mounted) return;
       final query = searchController.text.trim();
+      if (query == state.searchQuery) return;
+
       state = state.copyWith(searchQuery: query, currentPage: 1);
       fetchProducts(
         search: query.isNotEmpty ? query : null,
-        categoryId: state.selectedCategoryId,
+        categoryId: _resolvedCategoryId(),
+        showLoader: false,
+        trackSearchLoading: true,
       );
     });
+  }
+
+  void clearSearch() {
+    if (searchController.text.isEmpty) return;
+    searchController.clear();
+  }
+
+  int? _resolvedCategoryId([int? categoryId]) {
+    final id = categoryId ?? state.selectedCategoryId;
+    return id == 0 ? null : id;
+  }
+
+  LoaderState _resolveProductLoaderState({
+    required bool allProductsEmpty,
+    required String? search,
+  }) {
+    if (!allProductsEmpty) return LoaderState.loaded;
+    if (search != null && search.isNotEmpty) return LoaderState.noSearchData;
+    return LoaderState.noData;
   }
 
   void _onReceivedAmountChanged() {
@@ -94,8 +121,15 @@ class NewBillNotifier extends _$NewBillNotifier {
     int? categoryId,
     int page = 1,
     bool showLoader = true,
+    bool trackSearchLoading = false,
   }) async {
-    if (page == 1 && showLoader) {
+    if (!ref.mounted) return;
+
+    final apiCategoryId = _resolvedCategoryId(categoryId);
+
+    if (trackSearchLoading && page == 1) {
+      state = state.copyWith(isSearchingProducts: true);
+    } else if (page == 1 && showLoader) {
       state = state.copyWith(loaderState: LoaderState.loading);
     } else if (page > 1) {
       state = state.copyWith(isLoadingMore: true);
@@ -105,13 +139,18 @@ class NewBillNotifier extends _$NewBillNotifier {
         .read(newBillRepositoryProvider)
         .getCategoriesWithProducts(
           search: search,
-          categoryId: categoryId,
+          categoryId: apiCategoryId,
           page: page,
           pageSize: 9,
         )
         .fold(
           (left) {
-            if (showLoader || page > 1) {
+            if (!ref.mounted) return;
+            if (page > 1) {
+              state = state.copyWith(isLoadingMore: false);
+            } else if (trackSearchLoading) {
+              state = state.copyWith(isSearchingProducts: false);
+            } else if (showLoader) {
               state = state.copyWith(
                 loaderState: handleResponseError(left.key),
                 isLoadingMore: false,
@@ -124,6 +163,7 @@ class NewBillNotifier extends _$NewBillNotifier {
             }
           },
           (right) {
+            if (!ref.mounted) return;
             final categories = right.results.data;
 
             // Find the selected category's products
@@ -145,10 +185,12 @@ class NewBillNotifier extends _$NewBillNotifier {
                 : state.selectedCategory;
 
             state = state.copyWith(
-              loaderState: allProducts.isEmpty
-                  ? LoaderState.noData
-                  : LoaderState.loaded,
+              loaderState: _resolveProductLoaderState(
+                allProductsEmpty: allProducts.isEmpty,
+                search: search,
+              ),
               isLoadingMore: false,
+              isSearchingProducts: false,
               categories: categories,
               products: allProducts,
               selectedCategory: selectedName,
@@ -159,7 +201,10 @@ class NewBillNotifier extends _$NewBillNotifier {
         )
         .catchError((Object e) {
           debugPrint("🔴 Error fetching categories with products: $e");
-          if (showLoader) {
+          if (!ref.mounted) return;
+          if (trackSearchLoading) {
+            state = state.copyWith(isSearchingProducts: false);
+          } else if (showLoader) {
             state = state.copyWith(
               loaderState: LoaderState.error,
               isLoadingMore: false,
@@ -169,8 +214,9 @@ class NewBillNotifier extends _$NewBillNotifier {
   }
 
   Future<void> _refreshProductsAfterBill() {
+    if (!ref.mounted) return Future.value();
     return fetchProducts(
-      categoryId: state.selectedCategoryId,
+      categoryId: _resolvedCategoryId(),
       search: state.searchQuery.isNotEmpty ? state.searchQuery : null,
       showLoader: false,
     );
@@ -194,7 +240,7 @@ class NewBillNotifier extends _$NewBillNotifier {
     if (state.isLoadingMore || state.currentPage >= state.totalPages) return;
     fetchProducts(
       search: state.searchQuery.isNotEmpty ? state.searchQuery : null,
-      categoryId: state.selectedCategoryId,
+      categoryId: _resolvedCategoryId(),
       page: state.currentPage + 1,
     );
   }
@@ -641,6 +687,7 @@ class NewBillNotifier extends _$NewBillNotifier {
   }
 
   Future<void> _resetAfterBillSave() async {
+    if (!ref.mounted) return;
     state = state.copyWith(
       billNumber: state.billNumber + 1,
       cart: const [],
@@ -657,6 +704,7 @@ class NewBillNotifier extends _$NewBillNotifier {
 
   // ── Save / Print Bill ──────────────────────────────────────────
   Future<void> saveAndMaybePrint(BuildContext context) async {
+    if (!ref.mounted) return;
     if (state.cart.isEmpty) {
       showCustomErrorToast(message: 'Your bill cart is empty');
       return;
@@ -687,8 +735,10 @@ class NewBillNotifier extends _$NewBillNotifier {
 
     final savedPrinter =
         await ref.read(printerServiceProvider).getSavedPrinter();
+    if (!ref.mounted) return;
     if (savedPrinter != null) {
       await printerNotifier.warmUpConnection(source: printSource);
+      if (!ref.mounted) return;
     } else {
       printerNotifier.logPrintFlow(
         stage: 'warmup_skipped',
@@ -735,11 +785,13 @@ class NewBillNotifier extends _$NewBillNotifier {
             showCustomErrorToast(
               message: left.message ?? 'Failed to save bill',
             );
+            if (!ref.mounted) return;
             state = state.copyWith(isSavingBill: false);
           },
           (right) async {
             debugPrint("🟢 API SUCCESS: ${right.message}");
             showCustomToast(message: right.message);
+            if (!ref.mounted) return;
 
             // Construct preview data
             final previewOrderNumber =
@@ -782,6 +834,7 @@ class NewBillNotifier extends _$NewBillNotifier {
                 receiptData,
                 source: printSource,
               );
+              if (!ref.mounted) return;
               printerNotifier.logPrintFlow(
                 stage: printed ? 'print_success' : 'print_failed',
                 source: printSource,
@@ -819,12 +872,14 @@ class NewBillNotifier extends _$NewBillNotifier {
               );
             }
 
+            if (!ref.mounted) return;
             await _resetAfterBillSave();
           },
         )
         .catchError((Object e) {
           debugPrint("🔴 Error saving bill: $e");
           showCustomErrorToast(message: 'Unexpected error saving bill');
+          if (!ref.mounted) return;
           state = state.copyWith(isSavingBill: false);
         });
   }

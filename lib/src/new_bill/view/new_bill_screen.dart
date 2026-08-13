@@ -8,6 +8,7 @@ import 'package:thuga/src/printer/notifier/printer_notifier.dart';
 import 'package:thuga/utils/common_widgets/common_dialog_box.dart';
 import 'package:thuga/utils/common_widgets/printer_state_sync_host.dart';
 import 'package:thuga/utils/common_widgets/common_scaffold.dart';
+import 'package:thuga/res/enums/enums.dart';
 import 'package:thuga/utils/common_widgets/common_switch_state.dart';
 
 import '../notifier/new_bill_notifier.dart';
@@ -43,13 +44,35 @@ void _onPaymentStatusChanged(
   );
 }
 
+LoaderState _screenLoaderState({
+  required LoaderState loaderState,
+  required bool categoriesEmpty,
+}) {
+  if (!categoriesEmpty) {
+    return switch (loaderState) {
+      LoaderState.loading ||
+      LoaderState.noSearchData ||
+      LoaderState.noData =>
+        LoaderState.loaded,
+      _ => loaderState,
+    };
+  }
+  return loaderState;
+}
+
 class NewBillScreen extends ConsumerWidget {
   const NewBillScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
-    final state = ref.watch(newBillProvider);
+    final billState = ref.watch(newBillProvider);
+    final loaderState = ref.watch(
+      newBillProvider.select((s) => s.loaderState),
+    );
+    final categoriesEmpty = ref.watch(
+      newBillProvider.select((s) => s.categories.isEmpty),
+    );
     final notifier = ref.read(newBillProvider.notifier);
     final canAttemptPrint = ref.watch(
       printerProvider.select(selectCanAttemptPrint),
@@ -62,9 +85,12 @@ class NewBillScreen extends ConsumerWidget {
     return PrinterStateSyncHost(
       child: CommonScaffold(
       backgroundColor: colors.background,
-      appBar: NewBillHeader(billNumber: state.billNumber),
+      appBar: NewBillHeader(billNumber: billState.billNumber),
       body: CommonSwitchState(
-        loaderState: state.loaderState,
+        loaderState: _screenLoaderState(
+          loaderState: loaderState,
+          categoriesEmpty: categoriesEmpty,
+        ),
         reload: () => notifier.fetchProducts(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -78,13 +104,13 @@ class NewBillScreen extends ConsumerWidget {
             // 8.verticalSpace,
 
             // Active View based on selected billingMode
-            if (state.billingMode == 0)
+            if (billState.billingMode == 0)
               const QuickTapView()
             else
               AmountEntryView(
                 amountController: notifier.amountController,
                 descriptionController: notifier.descriptionController,
-                cartItems: state.cart,
+                cartItems: billState.cart,
                 onAddPressed: () => notifier.addAmountEntry(),
                 onRemoveItem: (item) => notifier.decrementQuantity(item),
               ),
@@ -93,10 +119,10 @@ class NewBillScreen extends ConsumerWidget {
             NewBillFooter(
               totalAmount: totalAmount,
               isPrinterConnected: canAttemptPrint,
-              paymentMethod: state.paymentMethod,
-              selectedCustomer: state.selectedCustomer,
-              paymentStatus: state.paymentStatus,
-              receivedAmount: state.receivedAmount,
+              paymentMethod: billState.paymentMethod,
+              selectedCustomer: billState.selectedCustomer,
+              paymentStatus: billState.paymentStatus,
+              receivedAmount: billState.receivedAmount,
               receivedAmountController: notifier.receivedAmountController,
               onPaymentMethodChanged: (val) => notifier.setPaymentMethod(val),
               onPaymentStatusChanged: (status) =>

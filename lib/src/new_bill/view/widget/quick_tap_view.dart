@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:thuga/res/constants/string_constants.dart';
 import 'package:thuga/res/styles/color_palette.dart';
 import 'package:thuga/res/styles/font_palette.dart';
+import 'package:thuga/res/enums/enums.dart';
 import 'package:thuga/utils/common_widgets/common_bottom_sheet.dart';
 import 'package:thuga/utils/common_widgets/common_search_bar.dart';
 import 'package:thuga/utils/common_widgets/common_text_form_field.dart';
@@ -49,6 +50,12 @@ class QuickTapView extends ConsumerWidget {
     final isLoadingMore = ref.watch(
       newBillProvider.select((s) => s.isLoadingMore),
     );
+    final isSearchingProducts = ref.watch(
+      newBillProvider.select((s) => s.isSearchingProducts),
+    );
+    final productsLoaderState = ref.watch(
+      newBillProvider.select((s) => s.loaderState),
+    );
     final cartItems = ref.watch(newBillProvider.select((s) => s.cart));
     final discountAmount = ref.watch(
       newBillProvider.select((s) => s.discountAmount),
@@ -89,6 +96,7 @@ class QuickTapView extends ConsumerWidget {
                           controller: notifier.searchController,
                           focusNode: notifier.searchFocusNode,
                           hintText: 'Search products...',
+                          onClear: notifier.clearSearch,
                         ),
                       ),
                       // 8.horizontalSpace,
@@ -220,105 +228,35 @@ class QuickTapView extends ConsumerWidget {
                 return Column(
                   children: [
                     Expanded(
-                      child: products.isEmpty
-                          ? Center(
-                              child: Text(
-                                'No products found',
-                                style: FontPalette.base400(
-                                  13,
-                                  color: colors.secondaryText,
-                                ),
-                              ),
-                            )
-                          : NotificationListener<ScrollNotification>(
-                              onNotification: (notification) {
-                                if (notification is ScrollEndNotification &&
-                                    notification.metrics.pixels >=
-                                        notification.metrics.maxScrollExtent -
-                                            200) {
-                                  notifier.loadMoreProducts();
-                                }
-                                return false;
-                              },
-                              child: GridView.builder(
-                                physics: const AlwaysScrollableScrollPhysics(),
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 20.w,
-                                  vertical: 6.h,
-                                ),
-                                gridDelegate:
-                                    SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 3,
-                                      mainAxisSpacing: 8.h,
-                                      crossAxisSpacing: 10.w,
-                                      childAspectRatio: 0.85,
+                      child: Stack(
+                        children: [
+                          _ProductGridContent(
+                            products: products,
+                            productsLoaderState: productsLoaderState,
+                            isLoadingMore: isLoadingMore,
+                            colors: colors,
+                            cartItems: cartItems,
+                            notifier: notifier,
+                            onLoadMore: notifier.loadMoreProducts,
+                          ),
+                          if (isSearchingProducts)
+                            Positioned.fill(
+                              child: ColoredBox(
+                                color: colors.surface.withValues(alpha: 0.6),
+                                child: Center(
+                                  child: SizedBox(
+                                    width: 28.r,
+                                    height: 28.r,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.w,
+                                      color: colors.primary,
                                     ),
-                                itemCount:
-                                    products.length + (isLoadingMore ? 1 : 0),
-                                itemBuilder: (context, index) {
-                                  if (index == products.length) {
-                                    return Center(
-                                      child: Padding(
-                                        padding: EdgeInsets.all(8.r),
-                                        child: SizedBox(
-                                          width: 24.r,
-                                          height: 24.r,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2.w,
-                                            color: colors.primary,
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                  final product = products[index];
-                                  final cartItemIndex = cartItems.indexWhere(
-                                    (item) => item.productId == product.id,
-                                  );
-                                  final qty = cartItemIndex >= 0
-                                      ? cartItems[cartItemIndex].quantity
-                                      : 0.0;
-                                  final billingUnit = cartItemIndex >= 0
-                                      ? cartItems[cartItemIndex].billingUnit
-                                      : resolveProductUnit(product.unit);
-                                  return QuickTapProductCard(
-                                    product: product,
-                                    quantity: qty,
-                                    isOutOfStock: isOutOfStock(product.quantity),
-                                    onTap: () => notifier.addToCart(product),
-                                    onReduce: () => notifier.setProductQuantity(
-                                      product,
-                                      qty -
-                                          incrementStepForUnit(billingUnit),
-                                      unit: billingUnit,
-                                    ),
-                                    onLongPress: () {
-                                      notifier.initQuantityPicker(
-                                        product,
-                                        currentBillingUnit: billingUnit,
-                                      );
-                                      CommonBottomSheet.show(
-                                        context: context,
-                                        title: Strings.selectQuantity,
-                                        isScrollControlled: true,
-                                        child: QuantityPickerSheet(
-                                          product: product,
-                                          initialQuantity: qty,
-                                          initialUnit: billingUnit,
-                                          onConfirm: (newQty, unit) {
-                                            notifier.setProductQuantity(
-                                              product,
-                                              newQty,
-                                              unit: unit,
-                                            );
-                                          },
-                                        ),
-                                      );
-                                    },
-                                  );
-                                },
+                                  ),
+                                ),
                               ),
                             ),
+                        ],
+                      ),
                     ),
                     if (showExpandedCart)
                       SizedBox(
@@ -753,6 +691,135 @@ class _QuickTapExpandedCartPanel extends StatelessWidget {
           ),
         ],
         ),
+      ),
+    );
+  }
+}
+
+class _ProductGridContent extends StatelessWidget {
+  const _ProductGridContent({
+    required this.products,
+    required this.productsLoaderState,
+    required this.isLoadingMore,
+    required this.colors,
+    required this.cartItems,
+    required this.notifier,
+    required this.onLoadMore,
+  });
+
+  final List<ProductModel> products;
+  final LoaderState productsLoaderState;
+  final bool isLoadingMore;
+  final AppColors colors;
+  final List<CartItemModel> cartItems;
+  final NewBillNotifier notifier;
+  final VoidCallback onLoadMore;
+
+  @override
+  Widget build(BuildContext context) {
+    if (productsLoaderState == LoaderState.noSearchData) {
+      return Center(
+        child: Text(
+          Strings.noResultsFound,
+          style: FontPalette.base400(13, color: colors.secondaryText),
+          textAlign: TextAlign.center,
+        ),
+      );
+    }
+
+    if (products.isEmpty) {
+      return Center(
+        child: Text(
+          Strings.noDataMessage,
+          style: FontPalette.base400(13, color: colors.secondaryText),
+        ),
+      );
+    }
+
+    return NotificationListener<ScrollNotification>(
+      onNotification: (notification) {
+        if (notification is ScrollEndNotification &&
+            notification.metrics.maxScrollExtent > 0 &&
+            notification.metrics.pixels >=
+                notification.metrics.maxScrollExtent - 200) {
+          onLoadMore();
+        }
+        return false;
+      },
+      child: GridView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: EdgeInsets.symmetric(
+          horizontal: 20.w,
+          vertical: 6.h,
+        ),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          mainAxisSpacing: 8.h,
+          crossAxisSpacing: 10.w,
+          childAspectRatio: 0.85,
+        ),
+        itemCount: products.length + (isLoadingMore ? 1 : 0),
+        itemBuilder: (context, index) {
+          if (index == products.length) {
+            return Center(
+              child: Padding(
+                padding: EdgeInsets.all(8.r),
+                child: SizedBox(
+                  width: 24.r,
+                  height: 24.r,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.w,
+                    color: colors.primary,
+                  ),
+                ),
+              ),
+            );
+          }
+          final product = products[index];
+          final cartItemIndex = cartItems.indexWhere(
+            (item) => item.productId == product.id,
+          );
+          final qty = cartItemIndex >= 0
+              ? cartItems[cartItemIndex].quantity
+              : 0.0;
+          final billingUnit = cartItemIndex >= 0
+              ? cartItems[cartItemIndex].billingUnit
+              : resolveProductUnit(product.unit);
+          return QuickTapProductCard(
+            product: product,
+            quantity: qty,
+            isOutOfStock: isOutOfStock(product.quantity),
+            onTap: () => notifier.addToCart(product),
+            onReduce: () => notifier.setProductQuantity(
+              product,
+              qty - incrementStepForUnit(billingUnit),
+              unit: billingUnit,
+            ),
+            onLongPress: () {
+              notifier.initQuantityPicker(
+                product,
+                currentBillingUnit: billingUnit,
+              );
+              CommonBottomSheet.show(
+                context: context,
+                title: Strings.selectQuantity,
+                isScrollControlled: true,
+                child: QuantityPickerSheet(
+                  product: product,
+                  initialQuantity: qty,
+                  initialUnit: billingUnit,
+                  onConfirm: (newQty, unit) {
+                    notifier.setProductQuantity(
+                      product,
+                      newQty,
+                      unit: unit,
+                    );
+                  },
+                ),
+              );
+            },
+          );
+        },
       ),
     );
   }
