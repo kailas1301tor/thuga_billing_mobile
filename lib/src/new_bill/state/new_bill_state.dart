@@ -9,7 +9,7 @@ part 'new_bill_state.freezed.dart';
 @freezed
 sealed class NewBillState with _$NewBillState {
   const factory NewBillState({
-    @Default(LoaderState.loaded) LoaderState loaderState,
+    @Default(LoaderState.loading) LoaderState loaderState,
     @Default(0) int billingMode, // 0: Quick Tap, 1: Amount Entry
     @Default('') String selectedCategory,
     @Default(0) int selectedCategoryId, // 0 = "All Categories"
@@ -25,6 +25,8 @@ sealed class NewBillState with _$NewBillState {
     @Default(0.0) double discountAmount,
     @Default(1) int currentPage,
     @Default(1) int totalPages,
+    @Default({}) Map<int, int> categoryPages,
+    @Default({}) Map<int, int> categoryTotalPages,
     @Default(false) bool isLoadingMore,
     @Default(false) bool isSearchingProducts,
     @Default('Paid') String paymentStatus,

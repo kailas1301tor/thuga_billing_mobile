@@ -16,6 +16,7 @@ Follow all rules in [AGENTS.md](../../AGENTS.md) at the repository root.
 | `CommonTextFormField` | `lib/utils/common_widgets/common_text_form_field.dart` |
 | Package imports | `package:thuga/...` |
 | Strings / colors | `Strings.` / `ColorPalette.` from `res/` |
+| Locale copy (EN/ML) | `assets/l10n/en.json` + `assets/l10n/ml.json` via `LocaleCatalog` / `localeProvider` |
 
 ## Non-negotiables
 
@@ -27,5 +28,7 @@ Follow all rules in [AGENTS.md](../../AGENTS.md) at the repository root.
 - Controllers (`TextEditingController`, etc.) live in notifiers
 - `ref.watch(...select(...))` for granular rebuilds
 - No hardcoded strings, colors, or inline `TextStyle` in UI
+- New copy: add to **both** `assets/l10n/en.json` and `ml.json`, then expose via `Strings.`
+- Language via `localeProvider` (`keepAlive: true`); watch only at `ThugaApp`
 - ScreenUtil suffixes: `.h`, `.w`, `.r`, `.verticalSpace`, `.horizontalSpace`
 - Shared widgets from `utils/common_widgets/` — never raw `Scaffold`, `AppBar`, etc.

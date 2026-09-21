@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:thuga/res/constants/string_constants.dart';
 import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/src/bar_code_scanner/view/barcode_scanner.dart';
 import 'package:thuga/src/printer/notifier/printer_notifier.dart';
 import 'package:thuga/utils/common_widgets/common_dialog_box.dart';
 import 'package:thuga/utils/common_widgets/printer_state_sync_host.dart';
@@ -25,7 +26,8 @@ void _onPaymentStatusChanged(
   final state = ref.read(newBillProvider);
   final notifier = ref.read(newBillProvider.notifier);
 
-  final needsConfirm = state.selectedCustomer == null &&
+  final needsConfirm =
+      state.selectedCustomer == null &&
       status != 'Paid' &&
       state.paymentStatus == 'Paid';
 
@@ -52,8 +54,7 @@ LoaderState _screenLoaderState({
     return switch (loaderState) {
       LoaderState.loading ||
       LoaderState.noSearchData ||
-      LoaderState.noData =>
-        LoaderState.loaded,
+      LoaderState.noData => LoaderState.loaded,
       _ => loaderState,
     };
   }
@@ -66,12 +67,27 @@ class NewBillScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
-    final billState = ref.watch(newBillProvider);
-    final loaderState = ref.watch(
-      newBillProvider.select((s) => s.loaderState),
-    );
+    final billNumber = ref.watch(newBillProvider.select((s) => s.billNumber));
+    final loaderState = ref.watch(newBillProvider.select((s) => s.loaderState));
     final categoriesEmpty = ref.watch(
       newBillProvider.select((s) => s.categories.isEmpty),
+    );
+    final billingMode = ref.watch(newBillProvider.select((s) => s.billingMode));
+    final cart = ref.watch(newBillProvider.select((s) => s.cart));
+    final paymentMethod = ref.watch(
+      newBillProvider.select((s) => s.paymentMethod),
+    );
+    final selectedCustomer = ref.watch(
+      newBillProvider.select((s) => s.selectedCustomer),
+    );
+    final paymentStatus = ref.watch(
+      newBillProvider.select((s) => s.paymentStatus),
+    );
+    final receivedAmount = ref.watch(
+      newBillProvider.select((s) => s.receivedAmount),
+    );
+    final isSavingBill = ref.watch(
+      newBillProvider.select((s) => s.isSavingBill),
     );
     final notifier = ref.read(newBillProvider.notifier);
     final canAttemptPrint = ref.watch(
@@ -84,54 +100,63 @@ class NewBillScreen extends ConsumerWidget {
 
     return PrinterStateSyncHost(
       child: CommonScaffold(
-      backgroundColor: colors.background,
-      appBar: NewBillHeader(billNumber: billState.billNumber),
-      body: CommonSwitchState(
-        loaderState: _screenLoaderState(
+        backgroundColor: colors.background,
+        appBar: NewBillHeader(
+          billNumber: billNumber,
+          onScanTap: () async {
+            final barcode = await BarcodeScanner.scan(
+              context,
+              title: Strings.scanBarcode,
+            );
+            if (barcode != null && barcode.isNotEmpty) {
+              notifier.addProductByBarcode(barcode);
+            }
+          },
+        ),
+        body: CommonSwitchState(
           loaderState: loaderState,
-          categoriesEmpty: categoriesEmpty,
-        ),
-        reload: () => notifier.fetchProducts(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            8.verticalSpace,
-            // Segmented control mode selector
-            // NewBillModeSelector(
-            //   selectedMode: state.billingMode,
-            //   onModeChanged: (val) => notifier.setBillingMode(val),
-            // ),
-            // 8.verticalSpace,
+          reload: () => notifier.fetchProducts(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              8.verticalSpace,
+              // Segmented control mode selector
+              // NewBillModeSelector(
+              //   selectedMode: billingMode,
+              //   onModeChanged: (val) => notifier.setBillingMode(val),
+              // ),
+              // 8.verticalSpace,
 
-            // Active View based on selected billingMode
-            if (billState.billingMode == 0)
-              const QuickTapView()
-            else
-              AmountEntryView(
-                amountController: notifier.amountController,
-                descriptionController: notifier.descriptionController,
-                cartItems: billState.cart,
-                onAddPressed: () => notifier.addAmountEntry(),
-                onRemoveItem: (item) => notifier.decrementQuantity(item),
+              // Active View based on selected billingMode
+              if (billingMode == 0)
+                const QuickTapView()
+              else
+                AmountEntryView(
+                  amountController: notifier.amountController,
+                  descriptionController: notifier.descriptionController,
+                  cartItems: cart,
+                  onAddPressed: () => notifier.addAmountEntry(),
+                  onRemoveItem: (item) => notifier.decrementQuantity(item),
+                ),
+
+              // Footer Section
+              NewBillFooter(
+                totalAmount: totalAmount,
+                isPrinterConnected: canAttemptPrint,
+                isSaving: isSavingBill,
+                paymentMethod: paymentMethod,
+                selectedCustomer: selectedCustomer,
+                paymentStatus: paymentStatus,
+                receivedAmount: receivedAmount,
+                receivedAmountController: notifier.receivedAmountController,
+                onPaymentMethodChanged: (val) => notifier.setPaymentMethod(val),
+                onPaymentStatusChanged: (status) =>
+                    _onPaymentStatusChanged(context, ref, status),
+                onSubmitPressed: () => notifier.saveAndMaybePrint(context),
               ),
-
-            // Footer Section
-            NewBillFooter(
-              totalAmount: totalAmount,
-              isPrinterConnected: canAttemptPrint,
-              paymentMethod: billState.paymentMethod,
-              selectedCustomer: billState.selectedCustomer,
-              paymentStatus: billState.paymentStatus,
-              receivedAmount: billState.receivedAmount,
-              receivedAmountController: notifier.receivedAmountController,
-              onPaymentMethodChanged: (val) => notifier.setPaymentMethod(val),
-              onPaymentStatusChanged: (status) =>
-                  _onPaymentStatusChanged(context, ref, status),
-              onSubmitPressed: () => notifier.saveAndMaybePrint(context),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
       ),
     );
   }

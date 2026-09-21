@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:thuga/res/constants/string_constants.dart';
 import 'package:thuga/res/styles/color_palette.dart';
 import 'package:thuga/res/styles/font_palette.dart';
 import 'package:thuga/utils/common_widgets/common_app_bar.dart';
@@ -26,7 +27,7 @@ class PurchasesScreen extends ConsumerWidget {
     return CommonScaffold(
       backgroundColor: colors.background,
       appBar: CommonAppBar(
-        title: 'Purchases',
+        title: Strings.purchasesTitle,
         showBackButton: true,
         actions: [
           IconButton(

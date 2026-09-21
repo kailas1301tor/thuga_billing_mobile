@@ -9,7 +9,9 @@ part 'reports_state.freezed.dart';
 sealed class ReportsState with _$ReportsState {
   const factory ReportsState({
     @Default(LoaderState.loaded) LoaderState loaderState,
-    @Default('Today') String selectedRange, // 'Today', 'Yesterday', 'Last 7 Days', 'This Month'
+    required DateTime startDate,
+    required DateTime endDate,
+    @Default('Today') String? selectedPreset,
     ReportsDataModel? data,
     String? errorMessage,
   }) = _ReportsState;

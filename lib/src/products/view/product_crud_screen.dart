@@ -11,6 +11,7 @@ import 'package:thuga/utils/common_widgets/common_app_bar.dart';
 import 'package:thuga/utils/common_widgets/common_bottom_sheet.dart';
 import 'package:thuga/utils/common_widgets/common_cached_network_image.dart';
 import 'package:thuga/utils/common_widgets/common_dialog_box.dart';
+import 'package:thuga/utils/common_widgets/common_loader.dart';
 import 'package:thuga/utils/common_widgets/common_nav_bar_button.dart';
 import 'package:thuga/utils/common_widgets/common_scaffold.dart';
 import 'package:thuga/utils/common_widgets/common_search_bar.dart';
@@ -27,6 +28,7 @@ import 'package:thuga/src/categories/notifier/categories_notifier.dart';
 import 'package:thuga/src/categories/model/category_model.dart';
 import 'package:thuga/src/main/model/dropdown_model.dart';
 import 'package:thuga/src/main/notifier/dropdowns_notifier.dart';
+import 'package:thuga/src/bar_code_scanner/view/barcode_scanner.dart';
 import 'package:thuga/utils/common_widgets/bottomsheet_content.dart';
 import 'package:thuga/utils/helpers/extensions.dart';
 
@@ -92,7 +94,7 @@ class ProductCrudScreen extends ConsumerWidget {
                   child: CommonSearchBar(
                     controller: notifier.searchController,
                     focusNode: notifier.searchFocusNode,
-                    hintText: 'Search products...',
+                    hintText: Strings.searchProductsHint,
                     onClear: notifier.clearSearch,
                   ),
                 ),
@@ -103,13 +105,13 @@ class ProductCrudScreen extends ConsumerWidget {
                     showSingleSelectBottomSheet<String>(
                       context: context,
                       ref: ref,
-                      title: 'Sort By',
+                      title: Strings.sortBy,
                       options: const ['lowest', 'highest'],
                       currentValue: state.sort,
                       onSelected: notifier.setSort,
                       displayText: (val) {
-                        if (val == 'lowest') return 'Lowest Price';
-                        if (val == 'highest') return 'Highest Price';
+                        if (val == 'lowest') return Strings.lowestPrice;
+                        if (val == 'highest') return Strings.highestPrice;
                         return '';
                       },
                     );
@@ -226,15 +228,9 @@ class ProductCrudScreen extends ConsumerWidget {
           if (index == products.length) {
             return Padding(
               padding: EdgeInsets.symmetric(vertical: 16.h),
-              child: Center(
-                child: SizedBox(
-                  width: 24.r,
-                  height: 24.r,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.w,
-                    color: colors.primary,
-                  ),
-                ),
+              child: CommonLoader(
+                size: 24.r,
+                color: colors.primary,
               ),
             );
           }
@@ -258,6 +254,7 @@ class ProductCrudScreen extends ConsumerWidget {
     ProductsNotifier notifier,
     ProductCrudModel? product,
   ) {
+    final colors = context.appColors;
     final isEditing = product != null;
     if (isEditing) {
       notifier.nameController.text = product.name;
@@ -345,7 +342,7 @@ class ProductCrudScreen extends ConsumerWidget {
                                       Icon(Icons.photo_camera, size: 30.r),
                                       8.verticalSpace,
                                       Text(
-                                        'Add Image',
+                                        Strings.addImage,
                                         style: FontPalette.base500(
                                           12,
                                           color: context.appColors.primaryText,
@@ -665,6 +662,23 @@ class ProductCrudScreen extends ConsumerWidget {
                   hintText: Strings.barcode,
                   inputType: TextInputType.text,
                   inputAction: TextInputAction.next,
+                  suffix: IconButton(
+                    icon: Icon(
+                      Icons.qr_code_scanner_rounded,
+                      size: 20.r,
+                      color: colors.primary,
+                    ),
+                    tooltip: Strings.scanBarcode,
+                    onPressed: () async {
+                      final scanned = await BarcodeScanner.scan(
+                        context,
+                        title: Strings.scanBarcode,
+                      );
+                      if (scanned != null && scanned.isNotEmpty) {
+                        notifier.barcodeController.text = scanned;
+                      }
+                    },
+                  ),
                 ),
               ),
               16.verticalSpace,
@@ -711,14 +725,14 @@ class ProductCrudScreen extends ConsumerWidget {
                   return SwitchListTile.adaptive(
                     contentPadding: EdgeInsets.zero,
                     title: Text(
-                      'Quick Product',
+                      Strings.quickProduct,
                       style: FontPalette.base400(
                         14,
                         color: context.appColors.primaryText,
                       ),
                     ),
                     subtitle: Text(
-                      'Instantly add to bill from the quick actions section',
+                      Strings.quickProductHint,
                       style: FontPalette.base400(
                         12,
                         color: context.appColors.secondaryText,

@@ -7,6 +7,7 @@ import '../../res/enums/enums.dart';
 import '../../res/styles/color_palette.dart';
 import '../../res/styles/font_palette.dart';
 
+import 'common_loader.dart';
 import 'primary_button.dart';
 import 'common_search_bar.dart';
 
@@ -210,7 +211,7 @@ class _SingleSelectBottomSheetBodyState<T>
               }
               Future.delayed(const Duration(milliseconds: 100), () {
                 widget.onSelected(option);
-                if (context.mounted) {
+                if (mounted) {
                   Navigator.pop(context);
                 }
               });
@@ -220,15 +221,9 @@ class _SingleSelectBottomSheetBodyState<T>
           if (isLoadingMore)
             Padding(
               padding: EdgeInsets.symmetric(vertical: 16.h),
-              child: Center(
-                child: SizedBox(
-                  width: 24.r,
-                  height: 24.r,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.w,
-                    color: colors.primary,
-                  ),
-                ),
+              child: CommonLoader(
+                size: 24.r,
+                color: colors.primary,
               ),
             ),
         ],

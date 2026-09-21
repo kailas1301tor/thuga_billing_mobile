@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import 'amount_formatter.dart';
+import '../common_widgets/common_loader.dart';
 import '../common_widgets/common_shimmer_box.dart';
 
 // ════════════════════════════════════════════════════════════════
@@ -448,7 +449,7 @@ extension ContextDialogExtension on BuildContext {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const CircularProgressIndicator(),
+                  const CommonLoader(),
                   if (message != null) ...[
                     const SizedBox(height: 16),
                     Text(message),

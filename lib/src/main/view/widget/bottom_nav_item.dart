@@ -24,45 +24,53 @@ class BottomNavItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final isSelected = index == selectedIndex;
 
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: SizedBox(
-        width: 70.w,
-        height: 56.h,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (isSelected)
-              Container(
-                width: 28.w,
-                height: 3.h,
-                margin: EdgeInsets.only(bottom: 6.h),
-                decoration: BoxDecoration(
-                  color: ColorPalette.primaryColor,
-                  borderRadius: BorderRadius.circular(2.r),
-                ),
-              )
-            else
-              SizedBox(height: 9.h),
-            Icon(
-              icon,
-              size: 24.r,
-              color: isSelected
-                  ? ColorPalette.primaryColor
-                  : ColorPalette.navInactive,
-            ),
-            4.verticalSpace,
-            Text(
-              label,
-              style: FontPalette.base600(
-                11,
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 8.h),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (isSelected)
+                Container(
+                  width: 28.w,
+                  height: 3.h,
+                  margin: EdgeInsets.only(bottom: 4.h),
+                  decoration: BoxDecoration(
+                    color: ColorPalette.primaryColor,
+                    borderRadius: BorderRadius.circular(2.r),
+                  ),
+                )
+              else
+                SizedBox(height: 7.h),
+              Icon(
+                icon,
+                size: 22.r,
                 color: isSelected
                     ? ColorPalette.primaryColor
                     : ColorPalette.navInactive,
               ),
-            ),
-          ],
+              2.verticalSpace,
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  softWrap: false,
+                  textAlign: TextAlign.center,
+                  style: FontPalette.base600(
+                    10,
+                    color: isSelected
+                        ? ColorPalette.primaryColor
+                        : ColorPalette.navInactive,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

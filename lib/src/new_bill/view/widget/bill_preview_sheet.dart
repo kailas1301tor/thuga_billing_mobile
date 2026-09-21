@@ -160,13 +160,13 @@ class _BillPreviewSheetState extends ConsumerState<BillPreviewSheet> {
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 16.h),
                 child: Text(
-                  'Share Receipt',
+                  Strings.shareReceipt,
                   style: FontPalette.base700(16, color: colors.primaryText),
                 ),
               ),
               ListTile(
                 leading: Icon(Icons.image_outlined, color: colors.primary),
-                title: Text('Share as Image', style: FontPalette.base600(14, color: colors.primaryText)),
+                title: Text(Strings.shareAsImage, style: FontPalette.base600(14, color: colors.primaryText)),
                 onTap: () {
                   Navigator.pop(context);
                   _shareImage();
@@ -174,7 +174,7 @@ class _BillPreviewSheetState extends ConsumerState<BillPreviewSheet> {
               ),
               ListTile(
                 leading: Icon(Icons.text_fields_outlined, color: colors.primary),
-                title: Text('Share as Text', style: FontPalette.base600(14, color: colors.primaryText)),
+                title: Text(Strings.shareAsText, style: FontPalette.base600(14, color: colors.primaryText)),
                 onTap: () {
                   Navigator.pop(context);
                   _shareText(displayName);
@@ -286,7 +286,7 @@ class _BillPreviewSheetState extends ConsumerState<BillPreviewSheet> {
                   children: [
                     Expanded(
                       child: Text(
-                        'Item Description',
+                        Strings.itemDescription,
                         style: FontPalette.base700(
                           12,
                           color: colors.secondaryText,
@@ -535,7 +535,7 @@ class _BillPreviewSheetState extends ConsumerState<BillPreviewSheet> {
                 const DottedDivider(),
                 16.verticalSpace,
                 Text(
-                  'Thank you for shopping with us!',
+                  Strings.thankYouShopping,
                   style: FontPalette.base500(12, color: colors.secondaryText),
                   textAlign: TextAlign.center,
                 ),
@@ -563,32 +563,39 @@ class _BillPreviewSheetState extends ConsumerState<BillPreviewSheet> {
           Row(
             children: [
               Expanded(
-                flex: 1,
                 child: TextButton(
                   onPressed: () => _showShareOptions(context, displayName),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.share_rounded,
-                        size: 18.r,
-                        color: colors.primary,
-                      ),
-                      6.horizontalSpace,
-                      Text(
-                        'Share',
-                        style: FontPalette.base600(15, color: colors.primary),
-                      ),
-                    ],
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: 8.w),
+                  ),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.share_rounded,
+                          size: 18.r,
+                          color: colors.primary,
+                        ),
+                        6.horizontalSpace,
+                        Text(
+                          Strings.share,
+                          maxLines: 1,
+                          style: FontPalette.base600(15, color: colors.primary),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
               12.horizontalSpace,
               Expanded(
-                flex: 2,
                 child: PrimaryButton(
-                  text: Strings.printInvoice,
+                  height: 38,
+                  text: Strings.print,
                   radius: 12,
+                  fontStyle: FontPalette.base600(14, color: ColorPalette.white),
                   prefixIcon: Icon(
                     Icons.print_rounded,
                     size: 20.r,

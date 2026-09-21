@@ -83,14 +83,14 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
     try {
       final boundary = _repaintKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
       if (boundary == null) {
-        showCustomErrorToast(message: 'Failed to capture bill preview');
+        showCustomErrorToast(message: Strings.failedCaptureBillPreview);
         return;
       }
 
       final image = await boundary.toImage(pixelRatio: 3.0);
       final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
       if (byteData == null) {
-        showCustomErrorToast(message: 'Failed to format bill image');
+        showCustomErrorToast(message: Strings.failedFormatBillImage);
         return;
       }
 
@@ -103,12 +103,12 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
       await SharePlus.instance.share(
         ShareParams(
           files: [XFile(tempFile.path)],
-          text: 'Invoice ${widget.billDetail.orderNumber}',
+          text: Strings.invoiceWithNumber(widget.billDetail.orderNumber),
         ),
       );
     } catch (e) {
       debugPrint("🔴 SHARE IMAGE ERROR: $e");
-      showCustomErrorToast(message: 'Error sharing image: $e');
+      showCustomErrorToast(message: Strings.errorSharingImage(e));
     }
   }
 
@@ -134,7 +134,7 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
     SharePlus.instance.share(
       ShareParams(
         text: receiptBuffer,
-        subject: 'Invoice ${widget.billDetail.orderNumber}',
+        subject: Strings.invoiceWithNumber(widget.billDetail.orderNumber),
       ),
     );
   }
@@ -155,13 +155,13 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 16.h),
                 child: Text(
-                  'Share Receipt',
+                  Strings.shareReceipt,
                   style: FontPalette.base700(16, color: colors.primaryText),
                 ),
               ),
               ListTile(
                 leading: Icon(Icons.image_outlined, color: colors.primary),
-                title: Text('Share as Image', style: FontPalette.base600(14, color: colors.primaryText)),
+                title: Text(Strings.shareAsImage, style: FontPalette.base600(14, color: colors.primaryText)),
                 onTap: () {
                   Navigator.pop(context);
                   _shareImage();
@@ -169,7 +169,7 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
               ),
               ListTile(
                 leading: Icon(Icons.text_fields_outlined, color: colors.primary),
-                title: Text('Share as Text', style: FontPalette.base600(14, color: colors.primaryText)),
+                title: Text(Strings.shareAsText, style: FontPalette.base600(14, color: colors.primaryText)),
                 onTap: () {
                   Navigator.pop(context);
                   _shareText(displayName, customerName);
@@ -239,7 +239,7 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
                       ),
                       4.verticalSpace,
                       Text(
-                        'RECEIPT',
+                        Strings.receiptHeader,
                         style: FontPalette.base600(
                           11,
                           color: colors.secondaryText,
@@ -253,14 +253,14 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _buildMetaLabel(context, 'Invoice No'),
+                                _buildMetaLabel(context, Strings.invoiceNo),
                                 _buildMetaValue(context, widget.billDetail.orderNumber),
                                 12.verticalSpace,
-                                _buildMetaLabel(context, 'Customer'),
+                                _buildMetaLabel(context, Strings.customer),
                                 _buildMetaValue(context, customerName),
                                 if (customerPhone?.isNotEmpty == true) ...[
                                   12.verticalSpace,
-                                  _buildMetaLabel(context, 'Phone'),
+                                  _buildMetaLabel(context, Strings.phone),
                                   _buildMetaValue(context, customerPhone!),
                                 ],
                               ],
@@ -270,10 +270,10 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _buildMetaLabel(context, 'Date'),
+                                _buildMetaLabel(context, Strings.date),
                                 _buildMetaValue(context, widget.billDetail.dateString),
                                 12.verticalSpace,
-                                _buildMetaLabel(context, 'Payment Method'),
+                                _buildMetaLabel(context, Strings.paymentMethod),
                                 _buildMetaValue(context, '${widget.billDetail.paymentMethod} (${widget.billDetail.paymentStatus})'),
                                 if (billShowsPaidDate(
                                   widget.billDetail.paymentStatus,
@@ -297,18 +297,18 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
                         children: [
                           Expanded(
                             child: Text(
-                              'Item Description',
+                              Strings.itemDescription,
                               style: FontPalette.base700(12, color: colors.secondaryText),
                             ),
                           ),
                           Text(
-                            'Qty',
+                            Strings.qty,
                             style: FontPalette.base700(12, color: colors.secondaryText),
                           ),
                           SizedBox(
                             width: 80.w,
                             child: Text(
-                              'Total',
+                              Strings.total,
                               textAlign: TextAlign.end,
                               style: FontPalette.base700(12, color: colors.secondaryText),
                             ),
@@ -374,7 +374,7 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Subtotal',
+                            Strings.subtotal,
                             style: FontPalette.base500(13, color: colors.secondaryText),
                           ),
                           Text(
@@ -389,7 +389,7 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Item Discounts',
+                              Strings.itemDiscounts,
                               style: FontPalette.base500(13, color: colors.secondaryText),
                             ),
                             Text(
@@ -408,7 +408,7 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Bill Discount',
+                              Strings.billDiscount,
                               style: FontPalette.base500(13, color: colors.secondaryText),
                             ),
                             Text(
@@ -426,7 +426,7 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Grand Total',
+                            Strings.grandTotal,
                             style: FontPalette.base700(15, color: colors.primaryText),
                           ),
                           Text(
@@ -441,7 +441,7 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Amount Paid',
+                              Strings.amountPaid,
                               style: FontPalette.base500(
                                 13,
                                 color: colors.secondaryText,
@@ -460,7 +460,7 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Remaining Balance',
+                              Strings.remainingBalance,
                               style: FontPalette.base700(
                                 13,
                                 color: colors.errorText,
@@ -476,7 +476,7 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
                       const DottedDivider(),
                       16.verticalSpace,
                       Text(
-                        'Thank you for shopping with us!',
+                        Strings.thankYouShopping,
                         style: FontPalette.base500(12, color: colors.secondaryText),
                         textAlign: TextAlign.center,
                       ),
@@ -485,7 +485,7 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            'Billed via ',
+                            Strings.billedViaPrefix,
                             style: FontPalette.base400(10, color: colors.secondaryText),
                           ),
                           Text(
@@ -512,32 +512,39 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
           Row(
             children: [
               Expanded(
-                flex: 1,
                 child: TextButton(
                   onPressed: () => _showShareOptions(context, displayName, customerName),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.share_rounded,
-                        size: 18.r,
-                        color: colors.primary,
-                      ),
-                      6.horizontalSpace,
-                      Text(
-                        'Share',
-                        style: FontPalette.base600(15, color: colors.primary),
-                      ),
-                    ],
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: 8.w),
+                  ),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.share_rounded,
+                          size: 18.r,
+                          color: colors.primary,
+                        ),
+                        6.horizontalSpace,
+                        Text(
+                          Strings.share,
+                          maxLines: 1,
+                          style: FontPalette.base600(15, color: colors.primary),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
               12.horizontalSpace,
               Expanded(
-                flex: 2,
                 child: PrimaryButton(
-                  text: Strings.printInvoice,
+                  height: 38,
+                  text: Strings.print,
                   radius: 12,
+                  fontStyle: FontPalette.base600(14, color: ColorPalette.white),
                   prefixIcon: Icon(
                     Icons.print_rounded,
                     size: 20.r,
@@ -590,7 +597,7 @@ class _BillDetailContentState extends ConsumerState<BillDetailContent> {
             (c) => c.id == widget.billDetail.customerId,
             orElse: () => DropdownCustomerModel(
               id: widget.billDetail.customerId!,
-              name: 'Customer #${widget.billDetail.customerId}',
+              name: Strings.customerNumber(widget.billDetail.customerId),
             ),
           )
           .name;

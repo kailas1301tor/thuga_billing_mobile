@@ -271,14 +271,16 @@ class AuthNotifier extends _$AuthNotifier {
           debugPrint("🔴 UNEXPECTED LOGOUT ERROR: $e");
         });
 
+    // Always clear local session even if the API call failed.
     await tokenService.clearTokens();
     await safeCrashlyticsSetUserIdentifier('');
-    disposeProviders(container);
 
-    if (ref.mounted) {
-      state = state.copyWith(logoutLoader: false);
-    }
-
+    // Leave settings/main before invalidating keepAlives so widgets like
+    // PrinterStateSyncHost don't rebuild printer mid-teardown.
     navigateAndClearStack(RouteConstants.routeLoginScreen);
+
+    Future.microtask(() {
+      disposeProviders(container);
+    });
   }
 }

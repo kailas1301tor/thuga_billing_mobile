@@ -85,7 +85,11 @@ class AuthRepoImpl extends AuthRepo {
   @override
   Future<Either<ResponseError, CommonResponseModel>> logout() async {
     return await _networkServices
-        .safe(_networkServices.postRequest(endPoint: AppConstants.logout))
+        .safe(
+          _networkServices.postRequest(
+            endPoint: AppConstants.logout,
+          ),
+        )
         .thenRight(_networkServices.checkHttpStatus)
         .thenRight(_networkServices.parseJson)
         .mapRight((right) => CommonResponseModel.fromJson(right));

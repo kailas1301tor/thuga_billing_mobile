@@ -29,7 +29,9 @@ class QuickTapCartList extends StatelessWidget {
     final colors = context.appColors;
 
     return ListView.separated(
-      physics: const ClampingScrollPhysics(),
+      physics: const AlwaysScrollableScrollPhysics(
+        parent: BouncingScrollPhysics(),
+      ),
       itemCount: cartItems.length,
       separatorBuilder: (_, _) => Divider(color: colors.inputBorder, height: 1.h),
       itemBuilder: (context, index) {

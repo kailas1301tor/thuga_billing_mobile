@@ -76,7 +76,7 @@ class NewBillNotifier extends _$NewBillNotifier {
 
   void _onSearchChanged() {
     _searchDebounce?.cancel();
-    _searchDebounce = Timer(const Duration(milliseconds: 900), () {
+    _searchDebounce = Timer(const Duration(milliseconds: 400), () {
       if (!ref.mounted) return;
       final query = searchController.text.trim();
       if (query == state.searchQuery) return;
@@ -84,7 +84,7 @@ class NewBillNotifier extends _$NewBillNotifier {
       state = state.copyWith(searchQuery: query, currentPage: 1);
       fetchProducts(
         search: query.isNotEmpty ? query : null,
-        categoryId: _resolvedCategoryId(),
+        categoryId: state.selectedCategoryId,
         showLoader: false,
         trackSearchLoading: true,
       );
@@ -92,13 +92,15 @@ class NewBillNotifier extends _$NewBillNotifier {
   }
 
   void clearSearch() {
-    if (searchController.text.isEmpty) return;
+    if (searchController.text.isEmpty && state.searchQuery.isEmpty) return;
     searchController.clear();
-  }
-
-  int? _resolvedCategoryId([int? categoryId]) {
-    final id = categoryId ?? state.selectedCategoryId;
-    return id == 0 ? null : id;
+    state = state.copyWith(searchQuery: '', currentPage: 1);
+    fetchProducts(
+      search: null,
+      categoryId: state.selectedCategoryId,
+      showLoader: false,
+      trackSearchLoading: true,
+    );
   }
 
   LoaderState _resolveProductLoaderState({
@@ -125,8 +127,6 @@ class NewBillNotifier extends _$NewBillNotifier {
   }) async {
     if (!ref.mounted) return;
 
-    final apiCategoryId = _resolvedCategoryId(categoryId);
-
     if (trackSearchLoading && page == 1) {
       state = state.copyWith(isSearchingProducts: true);
     } else if (page == 1 && showLoader) {
@@ -139,7 +139,7 @@ class NewBillNotifier extends _$NewBillNotifier {
         .read(newBillRepositoryProvider)
         .getCategoriesWithProducts(
           search: search,
-          categoryId: apiCategoryId,
+          categoryId: categoryId,
           page: page,
           pageSize: 9,
         )
@@ -157,9 +157,7 @@ class NewBillNotifier extends _$NewBillNotifier {
                 errorMessage: left.message,
               );
             } else {
-              debugPrint(
-                "🔴 Silent product refresh failed: ${left.message}",
-              );
+              debugPrint("🔴 Silent product refresh failed: ${left.message}");
             }
           },
           (right) {
@@ -168,21 +166,77 @@ class NewBillNotifier extends _$NewBillNotifier {
 
             // Find the selected category's products
             final selectedCatId = categoryId ?? state.selectedCategoryId;
-            final selectedCat = categories.firstWhere(
+            final returnedCat = categories.firstWhere(
               (c) => c.id == selectedCatId,
-              orElse: () => categories.first,
+              orElse: () => categories.isNotEmpty
+                  ? categories.first
+                  : const CategoryWithProductsModel(
+                      id: 0,
+                      name: '',
+                      isActive: true,
+                      deleted: false,
+                      products: [],
+                    ),
             );
-            final newProducts = selectedCat.products;
 
-            // Page 1 → replace; page > 1 → append
-            final allProducts = page == 1
-                ? newProducts
-                : [...state.products, ...newProducts];
+            // Merge into state.categories safely
+            final List<CategoryWithProductsModel> updatedCategories;
+            if (state.categories.isEmpty) {
+              updatedCategories = categories;
+            } else {
+              final returnedMap = {for (final c in categories) c.id: c};
+              updatedCategories = state.categories.map((existingCat) {
+                final returned = returnedMap[existingCat.id];
+                if (returned == null) return existingCat;
+
+                if (page == 1) {
+                  return existingCat.copyWith(products: returned.products);
+                } else {
+                  final existingIds =
+                      existingCat.products.map((p) => p.id).toSet();
+                  final combined = [
+                    ...existingCat.products,
+                    ...returned.products
+                        .where((p) => !existingIds.contains(p.id)),
+                  ];
+                  return existingCat.copyWith(products: combined);
+                }
+              }).toList();
+
+              // Add any new categories returned that weren't in state.categories
+              final existingCatIds = state.categories.map((c) => c.id).toSet();
+              for (final newCat in categories) {
+                if (!existingCatIds.contains(newCat.id)) {
+                  updatedCategories.add(newCat);
+                }
+              }
+            }
+
+            final activeCat = updatedCategories.firstWhere(
+              (c) => c.id == selectedCatId,
+              orElse: () => updatedCategories.isNotEmpty
+                  ? updatedCategories.first
+                  : returnedCat,
+            );
+            final allProducts = activeCat.products;
 
             // On first load, default selection to the first category
-            final selectedName = page == 1 && state.selectedCategory.isEmpty
-                ? selectedCat.name
-                : state.selectedCategory;
+            final isInitialLoad = page == 1 && state.selectedCategory.isEmpty;
+            final selectedName = isInitialLoad
+                ? activeCat.name
+                : (categoryId != null ? activeCat.name : state.selectedCategory);
+            final selectedId = isInitialLoad
+                ? activeCat.id
+                : selectedCatId;
+
+            final updatedPages = {
+              ...state.categoryPages,
+              selectedCatId: right.results.currentPage,
+            };
+            final updatedTotalPages = {
+              ...state.categoryTotalPages,
+              selectedCatId: right.results.totalPages,
+            };
 
             state = state.copyWith(
               loaderState: _resolveProductLoaderState(
@@ -191,11 +245,14 @@ class NewBillNotifier extends _$NewBillNotifier {
               ),
               isLoadingMore: false,
               isSearchingProducts: false,
-              categories: categories,
+              categories: updatedCategories,
               products: allProducts,
               selectedCategory: selectedName,
+              selectedCategoryId: selectedId,
               currentPage: right.results.currentPage,
               totalPages: right.results.totalPages,
+              categoryPages: updatedPages,
+              categoryTotalPages: updatedTotalPages,
             );
           },
         )
@@ -213,10 +270,19 @@ class NewBillNotifier extends _$NewBillNotifier {
         });
   }
 
+  Future<void> refreshActiveCategory() {
+    return fetchProducts(
+      categoryId: state.selectedCategoryId,
+      search: state.searchQuery.isNotEmpty ? state.searchQuery : null,
+      page: 1,
+      showLoader: false,
+    );
+  }
+
   Future<void> _refreshProductsAfterBill() {
     if (!ref.mounted) return Future.value();
     return fetchProducts(
-      categoryId: _resolvedCategoryId(),
+      categoryId: state.selectedCategoryId,
       search: state.searchQuery.isNotEmpty ? state.searchQuery : null,
       showLoader: false,
     );
@@ -225,14 +291,49 @@ class NewBillNotifier extends _$NewBillNotifier {
   // ── Mode & Filter ──────────────────────────────────────────────
   void setBillingMode(int mode) => state = state.copyWith(billingMode: mode);
   void setCategory(String catName, int catId) {
+    if (state.searchQuery.isNotEmpty) {
+      state = state.copyWith(
+        selectedCategory: catName,
+        selectedCategoryId: catId,
+        currentPage: 1,
+      );
+      fetchProducts(
+        search: state.searchQuery,
+        categoryId: catId,
+        page: 1,
+        showLoader: false,
+        trackSearchLoading: true,
+      );
+      return;
+    }
+
+    // Find category in already loaded categories in memory
+    final selectedCat = state.categories.firstWhere(
+      (c) => c.id == catId,
+      orElse: () => state.categories.isNotEmpty
+          ? state.categories.first
+          : const CategoryWithProductsModel(
+              id: 0,
+              name: '',
+              isActive: true,
+              deleted: false,
+              products: [],
+            ),
+    );
+
+    final catPage = state.categoryPages[catId] ?? 1;
+    final catTotal = state.categoryTotalPages[catId] ?? 1;
+
     state = state.copyWith(
       selectedCategory: catName,
       selectedCategoryId: catId,
-      currentPage: 1,
-    );
-    fetchProducts(
-      categoryId: catId,
-      search: state.searchQuery.isNotEmpty ? state.searchQuery : null,
+      products: selectedCat.products,
+      currentPage: catPage,
+      totalPages: catTotal,
+      loaderState: _resolveProductLoaderState(
+        allProductsEmpty: selectedCat.products.isEmpty,
+        search: null,
+      ),
     );
   }
 
@@ -240,7 +341,7 @@ class NewBillNotifier extends _$NewBillNotifier {
     if (state.isLoadingMore || state.currentPage >= state.totalPages) return;
     fetchProducts(
       search: state.searchQuery.isNotEmpty ? state.searchQuery : null,
-      categoryId: _resolvedCategoryId(),
+      categoryId: state.selectedCategoryId,
       page: state.currentPage + 1,
     );
   }
@@ -294,6 +395,11 @@ class NewBillNotifier extends _$NewBillNotifier {
 
   void toggleCartExpanded() {
     state = state.copyWith(isCartExpanded: !state.isCartExpanded);
+  }
+
+  void setCartExpanded(bool expanded) {
+    if (state.isCartExpanded == expanded) return;
+    state = state.copyWith(isCartExpanded: expanded);
   }
 
   // ── Cart Operations ────────────────────────────────────────────
@@ -399,11 +505,72 @@ class NewBillNotifier extends _$NewBillNotifier {
     state = state.copyWith(cart: [...state.cart, initialItem]);
   }
 
-  void setProductQuantity(
-    ProductModel prod,
-    double qty, {
-    String? unit,
-  }) {
+  /// Searches for a product matching [barcode] in current products,
+  /// across loaded categories, or via the search API, and adds it to the cart.
+  Future<bool> addProductByBarcode(String barcode) async {
+    final cleanCode = barcode.trim().toLowerCase();
+    if (cleanCode.isEmpty) return false;
+
+    // 1. Search in currently loaded products
+    ProductModel? matchedProduct;
+    for (final prod in state.products) {
+      if (prod.barcode?.trim().toLowerCase() == cleanCode) {
+        matchedProduct = prod;
+        break;
+      }
+    }
+
+    // 2. Search across all loaded categories
+    if (matchedProduct == null) {
+      for (final category in state.categories) {
+        for (final prod in category.products) {
+          if (prod.barcode?.trim().toLowerCase() == cleanCode) {
+            matchedProduct = prod;
+            break;
+          }
+        }
+        if (matchedProduct != null) break;
+      }
+    }
+
+    // 3. If found locally, add to cart
+    if (matchedProduct != null) {
+      addToCart(matchedProduct);
+      showCustomToast(message: '${matchedProduct.name} ${Strings.addedToBill}');
+      return true;
+    }
+
+    // 4. Fallback search via API
+    try {
+      final res = await ref
+          .read(newBillRepositoryProvider)
+          .getCategoriesWithProducts(search: barcode.trim(), page: 1);
+      if (res.isRight) {
+        final categories = res.right.results.data;
+        for (final category in categories) {
+          for (final prod in category.products) {
+            if (prod.barcode?.trim().toLowerCase() == cleanCode) {
+              matchedProduct = prod;
+              break;
+            }
+          }
+          if (matchedProduct != null) break;
+        }
+        if (matchedProduct != null) {
+          addToCart(matchedProduct);
+          showCustomToast(
+            message: '${matchedProduct.name} ${Strings.addedToBill}',
+          );
+          return true;
+        }
+      }
+    } catch (_) {}
+
+    showCustomErrorToast(message: Strings.barcodeNotFound);
+    return false;
+  }
+
+  void setProductQuantity(ProductModel prod, double qty, {String? unit}) {
     if (qty <= 0) {
       HapticFeedback.lightImpact();
       state = state.copyWith(
@@ -631,10 +798,12 @@ class NewBillNotifier extends _$NewBillNotifier {
       grandTotalText: grandTotal.toCurrency(),
       balanceText: balance.toCurrency(),
       amountPaidText: amountPaid.toCurrency(),
-      itemDiscountText:
-          itemDiscountAmount > 0 ? itemDiscountAmount.toCurrency() : null,
-      billDiscountText:
-          billDiscountAmount > 0 ? billDiscountAmount.toCurrency() : null,
+      itemDiscountText: itemDiscountAmount > 0
+          ? itemDiscountAmount.toCurrency()
+          : null,
+      billDiscountText: billDiscountAmount > 0
+          ? billDiscountAmount.toCurrency()
+          : null,
       sgstTotalText: sgstTotal > 0 ? sgstTotal.toCurrency() : null,
       cgstTotalText: cgstTotal > 0 ? cgstTotal.toCurrency() : null,
       items: state.cart
@@ -719,8 +888,7 @@ class NewBillNotifier extends _$NewBillNotifier {
     final totals = billTotals;
     final totalDiscount = itemDiscountTotal + state.discountAmount;
     final balance = calculateBalance(totals.grandTotal);
-    final paymentStatus =
-        resolvePaymentStatus(totals.grandTotal, balance);
+    final paymentStatus = resolvePaymentStatus(totals.grandTotal, balance);
 
     const printSource = 'new_bill_save';
     final printerNotifier = ref.read(printerProvider.notifier);
@@ -733,8 +901,9 @@ class NewBillNotifier extends _$NewBillNotifier {
       },
     );
 
-    final savedPrinter =
-        await ref.read(printerServiceProvider).getSavedPrinter();
+    final savedPrinter = await ref
+        .read(printerServiceProvider)
+        .getSavedPrinter();
     if (!ref.mounted) return;
     if (savedPrinter != null) {
       await printerNotifier.warmUpConnection(source: printSource);

@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:thuga/res/constants/string_constants.dart';
 import 'package:thuga/res/styles/color_palette.dart';
 import 'package:thuga/res/styles/font_palette.dart';
+import 'package:thuga/utils/common_widgets/common_loader.dart';
 import 'package:thuga/utils/common_widgets/primary_button.dart';
 
 class BillPaymentStatusAction extends StatelessWidget {
@@ -33,18 +34,17 @@ class BillPaymentStatusAction extends StatelessWidget {
         child: OutlinedButton.icon(
           onPressed: isLoading ? null : onMarkUnpaid,
           icon: isLoading
-              ? SizedBox(
-                  width: 16.r,
-                  height: 16.r,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.w,
-                    color: colors.primary,
-                  ),
+              ? CommonLoader(
+                  size: 16.r,
+                  color: colors.primary,
                 )
               : Icon(Icons.money_off_outlined, size: 16.r),
-          label: Text(
-            Strings.markAsUnpaid,
-            style: FontPalette.base600(13, color: colors.primaryText),
+          label: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              Strings.markAsUnpaid,
+              style: FontPalette.base600(13, color: colors.primaryText),
+            ),
           ),
           style: OutlinedButton.styleFrom(
             foregroundColor: colors.primaryText,
@@ -57,13 +57,17 @@ class BillPaymentStatusAction extends StatelessWidget {
       );
     }
 
-    return PrimaryButton(
-      height: 38,
-      text: Strings.markAsPaid,
-      radius: 12,
-      isLoading: isLoading,
-      prefixIcon: Icon(Icons.check_circle_outline_rounded, size: 18.r),
-      onPressed: isLoading ? null : onMarkPaid,
+    return SizedBox(
+      width: double.infinity,
+      child: PrimaryButton(
+        height: 38,
+        text: Strings.markAsPaid,
+        radius: 12,
+        isLoading: isLoading,
+        fontStyle: FontPalette.base600(13, color: ColorPalette.white),
+        prefixIcon: Icon(Icons.check_circle_outline_rounded, size: 18.r),
+        onPressed: isLoading ? null : onMarkPaid,
+      ),
     );
   }
 }

@@ -6,6 +6,7 @@ import 'package:thuga/res/constants/string_constants.dart';
 import 'package:thuga/res/styles/color_palette.dart';
 import 'package:thuga/res/styles/font_palette.dart';
 import 'package:thuga/utils/common_widgets/common_app_bar.dart';
+import 'package:thuga/utils/common_widgets/common_loader.dart';
 import 'package:thuga/utils/common_widgets/common_refresh_indicator.dart';
 import 'package:thuga/utils/common_widgets/common_scaffold.dart';
 import 'package:thuga/utils/common_widgets/common_search_bar.dart';
@@ -26,8 +27,17 @@ class BillsScreen extends ConsumerWidget {
     final loaderState = ref.watch(
       billsProvider.select((s) => s.loaderState),
     );
-    final dateRangeFilter = ref.watch(
-      billsProvider.select((s) => s.dateRangeFilter),
+    final startDate = ref.watch(
+      billsProvider.select((s) => s.startDate),
+    );
+    final endDate = ref.watch(
+      billsProvider.select((s) => s.endDate),
+    );
+    final statusFilter = ref.watch(
+      billsProvider.select((s) => s.statusFilter),
+    );
+    final selectedPreset = ref.watch(
+      billsProvider.select((s) => s.selectedPreset),
     );
     final totalCount = ref.watch(
       billsProvider.select((s) => s.data?.results.totalCount),
@@ -50,7 +60,7 @@ class BillsScreen extends ConsumerWidget {
 
     return CommonScaffold(
       backgroundColor: colors.background,
-      appBar: const CommonAppBar(
+      appBar: CommonAppBar(
         title: Strings.billsTitle,
         showBackButton: false,
       ),
@@ -60,13 +70,18 @@ class BillsScreen extends ConsumerWidget {
             padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
             child: CommonSearchBar(
               controller: notifier.searchController,
-              hintText: 'Search by Bill No, Customer or Amount',
+              hintText: Strings.searchBillsHint,
               onClear: notifier.clearSearch,
             ),
           ),
           BillsFilterRow(
-            selectedDate: dateRangeFilter,
-            onDateChanged: notifier.setDateRangeFilter,
+            startDate: startDate,
+            endDate: endDate,
+            selectedPreset: selectedPreset,
+            selectedStatus: statusFilter,
+            onDateRangeChanged: notifier.setDateRange,
+            onPresetChanged: notifier.setPresetRange,
+            onStatusChanged: notifier.setStatusFilter,
           ),
           Expanded(
             child: CommonSwitchState(
@@ -119,15 +134,9 @@ class BillsScreen extends ConsumerWidget {
                 if (index == bills.length) {
                   return Padding(
                     padding: EdgeInsets.symmetric(vertical: 16.h),
-                    child: Center(
-                      child: SizedBox(
-                        width: 24.r,
-                        height: 24.r,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2.w,
-                          color: colors.primary,
-                        ),
-                      ),
+                    child: CommonLoader(
+                      size: 24.r,
+                      color: colors.primary,
                     ),
                   );
                 }

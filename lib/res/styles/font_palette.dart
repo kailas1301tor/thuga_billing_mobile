@@ -4,6 +4,7 @@ import 'package:thuga/res/styles/color_palette.dart';
 
 class FontPalette {
   static const String fontFamily = 'onest';
+  static const List<String> fontFamilyFallback = ['NotoSansMalayalam'];
 
   //! 🔹 Base styles by weight
   static TextStyle base400(
@@ -13,6 +14,7 @@ class FontPalette {
   }) {
     return TextStyle(
       fontFamily: fontFamily,
+      fontFamilyFallback: fontFamilyFallback,
       fontSize: fontSize.sp,
       fontWeight: FontWeight.w400,
       color: gradient == null ? color : null,
@@ -31,6 +33,7 @@ class FontPalette {
   }) {
     return TextStyle(
       fontFamily: fontFamily,
+      fontFamilyFallback: fontFamilyFallback,
       fontSize: fontSize.sp,
       fontWeight: FontWeight.w500,
       color: gradient == null ? color : null,
@@ -50,6 +53,7 @@ class FontPalette {
   }) {
     return TextStyle(
       fontFamily: fontFamily,
+      fontFamilyFallback: fontFamilyFallback,
       fontSize: fontSize.sp,
       fontWeight: FontWeight.w600,
       color: gradient == null ? color : null,
@@ -69,6 +73,7 @@ class FontPalette {
   }) {
     return TextStyle(
       fontFamily: fontFamily,
+      fontFamilyFallback: fontFamilyFallback,
       fontSize: fontSize.sp,
       fontWeight: FontWeight.w700,
       color: gradient == null ? color : null,

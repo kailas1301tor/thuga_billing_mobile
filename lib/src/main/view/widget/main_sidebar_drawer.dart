@@ -68,8 +68,8 @@ class MainSidebarDrawer extends StatelessWidget {
             _buildMenuItem(
               context: context,
               icon: Icons.grid_view_rounded,
-              title: 'Categories',
-              subtitle: 'Manage product divisions',
+              title: Strings.categoriesTitle,
+              subtitle: Strings.categoriesSubtitle,
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(
@@ -81,8 +81,8 @@ class MainSidebarDrawer extends StatelessWidget {
             _buildMenuItem(
               context: context,
               icon: Icons.inventory_2_rounded,
-              title: 'Products',
-              subtitle: 'Stock lists & pricing',
+              title: Strings.productsTitle,
+              subtitle: Strings.productsSubtitle,
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(
@@ -94,8 +94,8 @@ class MainSidebarDrawer extends StatelessWidget {
             _buildMenuItem(
               context: context,
               icon: Icons.people_alt_rounded,
-              title: 'Customers',
-              subtitle: 'Store contacts directory',
+              title: Strings.customersTitle,
+              subtitle: Strings.customersSubtitle,
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(
@@ -122,8 +122,8 @@ class MainSidebarDrawer extends StatelessWidget {
             _buildMenuItem(
               context: context,
               icon: Icons.shopping_bag_rounded,
-              title: 'Purchases',
-              subtitle: 'Stock procurement & bills',
+              title: Strings.purchasesTitle,
+              subtitle: Strings.purchasesSubtitle,
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(

@@ -11,10 +11,12 @@ class QuickTapCategoryChips extends ConsumerWidget {
   const QuickTapCategoryChips({
     super.key,
     required this.selectedCategory,
+    this.selectedCategoryId,
     required this.onCategorySelected,
   });
 
   final String selectedCategory;
+  final int? selectedCategoryId;
   final void Function(String name, int id) onCategorySelected;
 
   @override
@@ -31,7 +33,11 @@ class QuickTapCategoryChips extends ConsumerWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: categoriesData.map((cat) {
-          final isSelected = selectedCategory == cat.name;
+          final isSelected = (selectedCategoryId != null && selectedCategoryId != 0)
+              ? selectedCategoryId == cat.id
+              : (selectedCategory.isNotEmpty
+                  ? selectedCategory == cat.name
+                  : cat == categoriesData.firstOrNull);
           return Padding(
             padding: EdgeInsets.only(right: 6.w),
             child: GestureDetector(

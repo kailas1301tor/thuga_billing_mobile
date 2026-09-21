@@ -28,8 +28,24 @@ class QuickTapCartStrip extends ConsumerWidget {
     final totalItems = cart.length;
 
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: () {
         ref.read(newBillProvider.notifier).toggleCartExpanded();
+      },
+      onVerticalDragEnd: (details) {
+        final velocity = details.primaryVelocity ?? 0;
+        if (isExpanded && velocity > 100) {
+          ref.read(newBillProvider.notifier).setCartExpanded(false);
+        } else if (!isExpanded && velocity < -100) {
+          ref.read(newBillProvider.notifier).setCartExpanded(true);
+        }
+      },
+      onVerticalDragUpdate: (details) {
+        if (isExpanded && details.delta.dy > 8) {
+          ref.read(newBillProvider.notifier).setCartExpanded(false);
+        } else if (!isExpanded && details.delta.dy < -8) {
+          ref.read(newBillProvider.notifier).setCartExpanded(true);
+        }
       },
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),

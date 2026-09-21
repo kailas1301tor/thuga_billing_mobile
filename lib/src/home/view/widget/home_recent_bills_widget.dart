@@ -23,7 +23,7 @@ class HomeRecentBillsWidget extends StatelessWidget {
           CommonSectionHeader(title: Strings.recentBills),
           10.verticalSpace,
           if (bills.isEmpty)
-            const HomeSectionEmptyText(message: Strings.noRecentBills)
+            HomeSectionEmptyText(message: Strings.noRecentBills)
           else
             Column(
               children: [

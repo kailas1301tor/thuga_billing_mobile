@@ -1,6 +1,7 @@
 // lib/src/reports/view/widget/reports_payment_share.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:thuga/res/constants/string_constants.dart';
 import 'package:thuga/res/styles/color_palette.dart';
 import 'package:thuga/res/styles/font_palette.dart';
 import 'package:thuga/utils/common_widgets/common_container.dart';
@@ -36,11 +37,12 @@ class ReportsPaymentShare extends StatelessWidget {
     return CommonContainer(
       padding: EdgeInsets.all(16.r),
       borderRadius: 20.r,
+      border: Border.all(color: colors.inputBorder, width: 1.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Payment Mode Share',
+            Strings.paymentModeShare,
             style: FontPalette.base700(14, color: colors.primaryText),
           ),
           16.verticalSpace,
@@ -50,7 +52,7 @@ class ReportsPaymentShare extends StatelessWidget {
             Container(
               alignment: Alignment.center,
               child: Text(
-                'No transactions',
+                Strings.noTransactions,
                 style: FontPalette.base400(13, color: colors.secondaryText),
               ),
             )

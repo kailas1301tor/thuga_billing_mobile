@@ -5,6 +5,7 @@ import 'package:thuga/res/constants/string_constants.dart';
 import 'package:thuga/res/styles/color_palette.dart';
 import 'package:thuga/res/styles/font_palette.dart';
 import 'package:thuga/utils/common_widgets/common_container.dart';
+import 'package:thuga/utils/common_widgets/common_loader.dart';
 import 'package:thuga/utils/common_widgets/common_cached_network_image.dart';
 import 'package:thuga/utils/helpers/extensions.dart';
 import 'package:thuga/src/products/model/product_crud_model.dart';
@@ -192,17 +193,9 @@ class _ProductCardHeader extends StatelessWidget {
                     SizedBox(
                       width: 28.w,
                       height: 24.h,
-                      child: Center(
-                        child: SizedBox(
-                          width: 14.r,
-                          height: 14.r,
-                          child: CircularProgressIndicator.adaptive(
-                            strokeWidth: 2.w,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              colors.primary,
-                            ),
-                          ),
-                        ),
+                      child: CommonLoader(
+                        size: 14.r,
+                        color: colors.primary,
                       ),
                     )
                   else

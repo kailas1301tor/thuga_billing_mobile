@@ -7,7 +7,10 @@ import 'package:thuga/utils/helpers/safe_converters.dart';
 import '../model/reports_model.dart';
 
 abstract class ReportsRepo {
-  Future<Either<ResponseError, ReportsDataModel>> getReportsData(String range);
+  Future<Either<ResponseError, ReportsDataModel>> getReportsData({
+    required String startDate,
+    required String endDate,
+  });
 }
 
 class ReportsRepoImpl implements ReportsRepo {
@@ -16,35 +19,17 @@ class ReportsRepoImpl implements ReportsRepo {
   ReportsRepoImpl(this._networkServices);
 
   @override
-  Future<Either<ResponseError, ReportsDataModel>> getReportsData(String range) async {
-    final now = DateTime.now();
-    DateTime startDate = now;
-    DateTime endDate = now;
-
-    if (range == 'Today') {
-      startDate = now;
-      endDate = now;
-    } else if (range == 'Yesterday') {
-      startDate = now.subtract(const Duration(days: 1));
-      endDate = now.subtract(const Duration(days: 1));
-    } else if (range == 'Last 7 Days') {
-      startDate = now.subtract(const Duration(days: 7));
-      endDate = now;
-    } else if (range == 'This Month') {
-      startDate = DateTime(now.year, now.month, 1);
-      endDate = now;
-    }
-
-    final startStr = _formatYmd(startDate);
-    final endStr = _formatYmd(endDate);
-
+  Future<Either<ResponseError, ReportsDataModel>> getReportsData({
+    required String startDate,
+    required String endDate,
+  }) async {
     final result = await _networkServices
         .safe(
           _networkServices.getRequest(
             endPoint: AppConstants.reports,
             queryParameters: {
-              'start_date': startStr,
-              'end_date': endStr,
+              'start_date': startDate,
+              'end_date': endDate,
             },
           ),
         )
@@ -57,9 +42,5 @@ class ReportsRepoImpl implements ReportsRepo {
         });
 
     return result;
-  }
-
-  String _formatYmd(DateTime date) {
-    return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
   }
 }

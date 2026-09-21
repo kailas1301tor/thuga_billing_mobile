@@ -70,6 +70,21 @@ class CategoryWithProductsModel {
             .map((x) => ProductModel.fromJson(convertToMap(x)))
             .toList(),
       );
+
+  CategoryWithProductsModel copyWith({
+    int? id,
+    String? name,
+    bool? isActive,
+    bool? deleted,
+    List<ProductModel>? products,
+  }) =>
+      CategoryWithProductsModel(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        isActive: isActive ?? this.isActive,
+        deleted: deleted ?? this.deleted,
+        products: products ?? this.products,
+      );
 }
 
 class ProductModel {
