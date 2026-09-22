@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$BillsState {
 
- LoaderState get loaderState; BillsResponseModel? get data; String get searchQuery; String get dateRangeFilter; bool get isNewestFirst; int get currentPage; int get totalPages; int get pageSize; bool get isLoadingMore; int? get updatingBillId; String? get errorMessage;
+ LoaderState get loaderState; BillsResponseModel? get data; String get searchQuery; DateTime get startDate; DateTime get endDate; String? get selectedPreset; String get statusFilter; bool get isNewestFirst; int get currentPage; int get totalPages; int get pageSize; bool get isLoadingMore; int? get updatingBillId; String? get errorMessage;
 /// Create a copy of BillsState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $BillsStateCopyWith<BillsState> get copyWith => _$BillsStateCopyWithImpl<BillsSt
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is BillsState&&(identical(other.loaderState, loaderState) || other.loaderState == loaderState)&&(identical(other.data, data) || other.data == data)&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery)&&(identical(other.dateRangeFilter, dateRangeFilter) || other.dateRangeFilter == dateRangeFilter)&&(identical(other.isNewestFirst, isNewestFirst) || other.isNewestFirst == isNewestFirst)&&(identical(other.currentPage, currentPage) || other.currentPage == currentPage)&&(identical(other.totalPages, totalPages) || other.totalPages == totalPages)&&(identical(other.pageSize, pageSize) || other.pageSize == pageSize)&&(identical(other.isLoadingMore, isLoadingMore) || other.isLoadingMore == isLoadingMore)&&(identical(other.updatingBillId, updatingBillId) || other.updatingBillId == updatingBillId)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is BillsState&&(identical(other.loaderState, loaderState) || other.loaderState == loaderState)&&(identical(other.data, data) || other.data == data)&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.endDate, endDate) || other.endDate == endDate)&&(identical(other.selectedPreset, selectedPreset) || other.selectedPreset == selectedPreset)&&(identical(other.statusFilter, statusFilter) || other.statusFilter == statusFilter)&&(identical(other.isNewestFirst, isNewestFirst) || other.isNewestFirst == isNewestFirst)&&(identical(other.currentPage, currentPage) || other.currentPage == currentPage)&&(identical(other.totalPages, totalPages) || other.totalPages == totalPages)&&(identical(other.pageSize, pageSize) || other.pageSize == pageSize)&&(identical(other.isLoadingMore, isLoadingMore) || other.isLoadingMore == isLoadingMore)&&(identical(other.updatingBillId, updatingBillId) || other.updatingBillId == updatingBillId)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,loaderState,data,searchQuery,dateRangeFilter,isNewestFirst,currentPage,totalPages,pageSize,isLoadingMore,updatingBillId,errorMessage);
+int get hashCode => Object.hash(runtimeType,loaderState,data,searchQuery,startDate,endDate,selectedPreset,statusFilter,isNewestFirst,currentPage,totalPages,pageSize,isLoadingMore,updatingBillId,errorMessage);
 
 @override
 String toString() {
-  return 'BillsState(loaderState: $loaderState, data: $data, searchQuery: $searchQuery, dateRangeFilter: $dateRangeFilter, isNewestFirst: $isNewestFirst, currentPage: $currentPage, totalPages: $totalPages, pageSize: $pageSize, isLoadingMore: $isLoadingMore, updatingBillId: $updatingBillId, errorMessage: $errorMessage)';
+  return 'BillsState(loaderState: $loaderState, data: $data, searchQuery: $searchQuery, startDate: $startDate, endDate: $endDate, selectedPreset: $selectedPreset, statusFilter: $statusFilter, isNewestFirst: $isNewestFirst, currentPage: $currentPage, totalPages: $totalPages, pageSize: $pageSize, isLoadingMore: $isLoadingMore, updatingBillId: $updatingBillId, errorMessage: $errorMessage)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $BillsStateCopyWith<$Res>  {
   factory $BillsStateCopyWith(BillsState value, $Res Function(BillsState) _then) = _$BillsStateCopyWithImpl;
 @useResult
 $Res call({
- LoaderState loaderState, BillsResponseModel? data, String searchQuery, String dateRangeFilter, bool isNewestFirst, int currentPage, int totalPages, int pageSize, bool isLoadingMore, int? updatingBillId, String? errorMessage
+ LoaderState loaderState, BillsResponseModel? data, String searchQuery, DateTime startDate, DateTime endDate, String? selectedPreset, String statusFilter, bool isNewestFirst, int currentPage, int totalPages, int pageSize, bool isLoadingMore, int? updatingBillId, String? errorMessage
 });
 
 
@@ -62,12 +62,15 @@ class _$BillsStateCopyWithImpl<$Res>
 
 /// Create a copy of BillsState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? loaderState = null,Object? data = freezed,Object? searchQuery = null,Object? dateRangeFilter = null,Object? isNewestFirst = null,Object? currentPage = null,Object? totalPages = null,Object? pageSize = null,Object? isLoadingMore = null,Object? updatingBillId = freezed,Object? errorMessage = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? loaderState = null,Object? data = freezed,Object? searchQuery = null,Object? startDate = null,Object? endDate = null,Object? selectedPreset = freezed,Object? statusFilter = null,Object? isNewestFirst = null,Object? currentPage = null,Object? totalPages = null,Object? pageSize = null,Object? isLoadingMore = null,Object? updatingBillId = freezed,Object? errorMessage = freezed,}) {
   return _then(_self.copyWith(
 loaderState: null == loaderState ? _self.loaderState : loaderState // ignore: cast_nullable_to_non_nullable
 as LoaderState,data: freezed == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
 as BillsResponseModel?,searchQuery: null == searchQuery ? _self.searchQuery : searchQuery // ignore: cast_nullable_to_non_nullable
-as String,dateRangeFilter: null == dateRangeFilter ? _self.dateRangeFilter : dateRangeFilter // ignore: cast_nullable_to_non_nullable
+as String,startDate: null == startDate ? _self.startDate : startDate // ignore: cast_nullable_to_non_nullable
+as DateTime,endDate: null == endDate ? _self.endDate : endDate // ignore: cast_nullable_to_non_nullable
+as DateTime,selectedPreset: freezed == selectedPreset ? _self.selectedPreset : selectedPreset // ignore: cast_nullable_to_non_nullable
+as String?,statusFilter: null == statusFilter ? _self.statusFilter : statusFilter // ignore: cast_nullable_to_non_nullable
 as String,isNewestFirst: null == isNewestFirst ? _self.isNewestFirst : isNewestFirst // ignore: cast_nullable_to_non_nullable
 as bool,currentPage: null == currentPage ? _self.currentPage : currentPage // ignore: cast_nullable_to_non_nullable
 as int,totalPages: null == totalPages ? _self.totalPages : totalPages // ignore: cast_nullable_to_non_nullable
@@ -157,10 +160,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( LoaderState loaderState,  BillsResponseModel? data,  String searchQuery,  String dateRangeFilter,  bool isNewestFirst,  int currentPage,  int totalPages,  int pageSize,  bool isLoadingMore,  int? updatingBillId,  String? errorMessage)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( LoaderState loaderState,  BillsResponseModel? data,  String searchQuery,  DateTime startDate,  DateTime endDate,  String? selectedPreset,  String statusFilter,  bool isNewestFirst,  int currentPage,  int totalPages,  int pageSize,  bool isLoadingMore,  int? updatingBillId,  String? errorMessage)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _BillsState() when $default != null:
-return $default(_that.loaderState,_that.data,_that.searchQuery,_that.dateRangeFilter,_that.isNewestFirst,_that.currentPage,_that.totalPages,_that.pageSize,_that.isLoadingMore,_that.updatingBillId,_that.errorMessage);case _:
+return $default(_that.loaderState,_that.data,_that.searchQuery,_that.startDate,_that.endDate,_that.selectedPreset,_that.statusFilter,_that.isNewestFirst,_that.currentPage,_that.totalPages,_that.pageSize,_that.isLoadingMore,_that.updatingBillId,_that.errorMessage);case _:
   return orElse();
 
 }
@@ -178,10 +181,10 @@ return $default(_that.loaderState,_that.data,_that.searchQuery,_that.dateRangeFi
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( LoaderState loaderState,  BillsResponseModel? data,  String searchQuery,  String dateRangeFilter,  bool isNewestFirst,  int currentPage,  int totalPages,  int pageSize,  bool isLoadingMore,  int? updatingBillId,  String? errorMessage)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( LoaderState loaderState,  BillsResponseModel? data,  String searchQuery,  DateTime startDate,  DateTime endDate,  String? selectedPreset,  String statusFilter,  bool isNewestFirst,  int currentPage,  int totalPages,  int pageSize,  bool isLoadingMore,  int? updatingBillId,  String? errorMessage)  $default,) {final _that = this;
 switch (_that) {
 case _BillsState():
-return $default(_that.loaderState,_that.data,_that.searchQuery,_that.dateRangeFilter,_that.isNewestFirst,_that.currentPage,_that.totalPages,_that.pageSize,_that.isLoadingMore,_that.updatingBillId,_that.errorMessage);}
+return $default(_that.loaderState,_that.data,_that.searchQuery,_that.startDate,_that.endDate,_that.selectedPreset,_that.statusFilter,_that.isNewestFirst,_that.currentPage,_that.totalPages,_that.pageSize,_that.isLoadingMore,_that.updatingBillId,_that.errorMessage);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -195,10 +198,10 @@ return $default(_that.loaderState,_that.data,_that.searchQuery,_that.dateRangeFi
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( LoaderState loaderState,  BillsResponseModel? data,  String searchQuery,  String dateRangeFilter,  bool isNewestFirst,  int currentPage,  int totalPages,  int pageSize,  bool isLoadingMore,  int? updatingBillId,  String? errorMessage)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( LoaderState loaderState,  BillsResponseModel? data,  String searchQuery,  DateTime startDate,  DateTime endDate,  String? selectedPreset,  String statusFilter,  bool isNewestFirst,  int currentPage,  int totalPages,  int pageSize,  bool isLoadingMore,  int? updatingBillId,  String? errorMessage)?  $default,) {final _that = this;
 switch (_that) {
 case _BillsState() when $default != null:
-return $default(_that.loaderState,_that.data,_that.searchQuery,_that.dateRangeFilter,_that.isNewestFirst,_that.currentPage,_that.totalPages,_that.pageSize,_that.isLoadingMore,_that.updatingBillId,_that.errorMessage);case _:
+return $default(_that.loaderState,_that.data,_that.searchQuery,_that.startDate,_that.endDate,_that.selectedPreset,_that.statusFilter,_that.isNewestFirst,_that.currentPage,_that.totalPages,_that.pageSize,_that.isLoadingMore,_that.updatingBillId,_that.errorMessage);case _:
   return null;
 
 }
@@ -210,13 +213,16 @@ return $default(_that.loaderState,_that.data,_that.searchQuery,_that.dateRangeFi
 
 
 class _BillsState implements BillsState {
-  const _BillsState({this.loaderState = LoaderState.loading, this.data, this.searchQuery = '', this.dateRangeFilter = 'Today', this.isNewestFirst = true, this.currentPage = 1, this.totalPages = 1, this.pageSize = 10, this.isLoadingMore = false, this.updatingBillId, this.errorMessage});
+  const _BillsState({this.loaderState = LoaderState.loading, this.data, this.searchQuery = '', required this.startDate, required this.endDate, this.selectedPreset = 'Today', this.statusFilter = 'All', this.isNewestFirst = true, this.currentPage = 1, this.totalPages = 1, this.pageSize = 10, this.isLoadingMore = false, this.updatingBillId, this.errorMessage});
   
 
 @override@JsonKey() final  LoaderState loaderState;
 @override final  BillsResponseModel? data;
 @override@JsonKey() final  String searchQuery;
-@override@JsonKey() final  String dateRangeFilter;
+@override final  DateTime startDate;
+@override final  DateTime endDate;
+@override@JsonKey() final  String? selectedPreset;
+@override@JsonKey() final  String statusFilter;
 @override@JsonKey() final  bool isNewestFirst;
 @override@JsonKey() final  int currentPage;
 @override@JsonKey() final  int totalPages;
@@ -235,16 +241,16 @@ _$BillsStateCopyWith<_BillsState> get copyWith => __$BillsStateCopyWithImpl<_Bil
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _BillsState&&(identical(other.loaderState, loaderState) || other.loaderState == loaderState)&&(identical(other.data, data) || other.data == data)&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery)&&(identical(other.dateRangeFilter, dateRangeFilter) || other.dateRangeFilter == dateRangeFilter)&&(identical(other.isNewestFirst, isNewestFirst) || other.isNewestFirst == isNewestFirst)&&(identical(other.currentPage, currentPage) || other.currentPage == currentPage)&&(identical(other.totalPages, totalPages) || other.totalPages == totalPages)&&(identical(other.pageSize, pageSize) || other.pageSize == pageSize)&&(identical(other.isLoadingMore, isLoadingMore) || other.isLoadingMore == isLoadingMore)&&(identical(other.updatingBillId, updatingBillId) || other.updatingBillId == updatingBillId)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _BillsState&&(identical(other.loaderState, loaderState) || other.loaderState == loaderState)&&(identical(other.data, data) || other.data == data)&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.endDate, endDate) || other.endDate == endDate)&&(identical(other.selectedPreset, selectedPreset) || other.selectedPreset == selectedPreset)&&(identical(other.statusFilter, statusFilter) || other.statusFilter == statusFilter)&&(identical(other.isNewestFirst, isNewestFirst) || other.isNewestFirst == isNewestFirst)&&(identical(other.currentPage, currentPage) || other.currentPage == currentPage)&&(identical(other.totalPages, totalPages) || other.totalPages == totalPages)&&(identical(other.pageSize, pageSize) || other.pageSize == pageSize)&&(identical(other.isLoadingMore, isLoadingMore) || other.isLoadingMore == isLoadingMore)&&(identical(other.updatingBillId, updatingBillId) || other.updatingBillId == updatingBillId)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,loaderState,data,searchQuery,dateRangeFilter,isNewestFirst,currentPage,totalPages,pageSize,isLoadingMore,updatingBillId,errorMessage);
+int get hashCode => Object.hash(runtimeType,loaderState,data,searchQuery,startDate,endDate,selectedPreset,statusFilter,isNewestFirst,currentPage,totalPages,pageSize,isLoadingMore,updatingBillId,errorMessage);
 
 @override
 String toString() {
-  return 'BillsState(loaderState: $loaderState, data: $data, searchQuery: $searchQuery, dateRangeFilter: $dateRangeFilter, isNewestFirst: $isNewestFirst, currentPage: $currentPage, totalPages: $totalPages, pageSize: $pageSize, isLoadingMore: $isLoadingMore, updatingBillId: $updatingBillId, errorMessage: $errorMessage)';
+  return 'BillsState(loaderState: $loaderState, data: $data, searchQuery: $searchQuery, startDate: $startDate, endDate: $endDate, selectedPreset: $selectedPreset, statusFilter: $statusFilter, isNewestFirst: $isNewestFirst, currentPage: $currentPage, totalPages: $totalPages, pageSize: $pageSize, isLoadingMore: $isLoadingMore, updatingBillId: $updatingBillId, errorMessage: $errorMessage)';
 }
 
 
@@ -255,7 +261,7 @@ abstract mixin class _$BillsStateCopyWith<$Res> implements $BillsStateCopyWith<$
   factory _$BillsStateCopyWith(_BillsState value, $Res Function(_BillsState) _then) = __$BillsStateCopyWithImpl;
 @override @useResult
 $Res call({
- LoaderState loaderState, BillsResponseModel? data, String searchQuery, String dateRangeFilter, bool isNewestFirst, int currentPage, int totalPages, int pageSize, bool isLoadingMore, int? updatingBillId, String? errorMessage
+ LoaderState loaderState, BillsResponseModel? data, String searchQuery, DateTime startDate, DateTime endDate, String? selectedPreset, String statusFilter, bool isNewestFirst, int currentPage, int totalPages, int pageSize, bool isLoadingMore, int? updatingBillId, String? errorMessage
 });
 
 
@@ -272,12 +278,15 @@ class __$BillsStateCopyWithImpl<$Res>
 
 /// Create a copy of BillsState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? loaderState = null,Object? data = freezed,Object? searchQuery = null,Object? dateRangeFilter = null,Object? isNewestFirst = null,Object? currentPage = null,Object? totalPages = null,Object? pageSize = null,Object? isLoadingMore = null,Object? updatingBillId = freezed,Object? errorMessage = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? loaderState = null,Object? data = freezed,Object? searchQuery = null,Object? startDate = null,Object? endDate = null,Object? selectedPreset = freezed,Object? statusFilter = null,Object? isNewestFirst = null,Object? currentPage = null,Object? totalPages = null,Object? pageSize = null,Object? isLoadingMore = null,Object? updatingBillId = freezed,Object? errorMessage = freezed,}) {
   return _then(_BillsState(
 loaderState: null == loaderState ? _self.loaderState : loaderState // ignore: cast_nullable_to_non_nullable
 as LoaderState,data: freezed == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
 as BillsResponseModel?,searchQuery: null == searchQuery ? _self.searchQuery : searchQuery // ignore: cast_nullable_to_non_nullable
-as String,dateRangeFilter: null == dateRangeFilter ? _self.dateRangeFilter : dateRangeFilter // ignore: cast_nullable_to_non_nullable
+as String,startDate: null == startDate ? _self.startDate : startDate // ignore: cast_nullable_to_non_nullable
+as DateTime,endDate: null == endDate ? _self.endDate : endDate // ignore: cast_nullable_to_non_nullable
+as DateTime,selectedPreset: freezed == selectedPreset ? _self.selectedPreset : selectedPreset // ignore: cast_nullable_to_non_nullable
+as String?,statusFilter: null == statusFilter ? _self.statusFilter : statusFilter // ignore: cast_nullable_to_non_nullable
 as String,isNewestFirst: null == isNewestFirst ? _self.isNewestFirst : isNewestFirst // ignore: cast_nullable_to_non_nullable
 as bool,currentPage: null == currentPage ? _self.currentPage : currentPage // ignore: cast_nullable_to_non_nullable
 as int,totalPages: null == totalPages ? _self.totalPages : totalPages // ignore: cast_nullable_to_non_nullable

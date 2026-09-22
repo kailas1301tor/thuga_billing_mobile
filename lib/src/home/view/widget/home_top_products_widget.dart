@@ -26,7 +26,7 @@ class HomeTopProductsWidget extends StatelessWidget {
           CommonSectionHeader(title: Strings.topProductsToday),
           10.verticalSpace,
           if (products.isEmpty)
-            const HomeSectionEmptyText(message: Strings.noTopProductsToday)
+            HomeSectionEmptyText(message: Strings.noTopProductsToday)
           else
             Column(
               children: [

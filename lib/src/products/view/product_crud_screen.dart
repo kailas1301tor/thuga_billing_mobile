@@ -11,6 +11,7 @@ import 'package:thuga/utils/common_widgets/common_app_bar.dart';
 import 'package:thuga/utils/common_widgets/common_bottom_sheet.dart';
 import 'package:thuga/utils/common_widgets/common_cached_network_image.dart';
 import 'package:thuga/utils/common_widgets/common_dialog_box.dart';
+import 'package:thuga/utils/common_widgets/common_loader.dart';
 import 'package:thuga/utils/common_widgets/common_nav_bar_button.dart';
 import 'package:thuga/utils/common_widgets/common_scaffold.dart';
 import 'package:thuga/utils/common_widgets/common_search_bar.dart';
@@ -25,6 +26,9 @@ import '../state/products_state.dart';
 import 'package:thuga/res/enums/enums.dart';
 import 'package:thuga/src/categories/notifier/categories_notifier.dart';
 import 'package:thuga/src/categories/model/category_model.dart';
+import 'package:thuga/src/main/model/dropdown_model.dart';
+import 'package:thuga/src/main/notifier/dropdowns_notifier.dart';
+import 'package:thuga/src/bar_code_scanner/view/barcode_scanner.dart';
 import 'package:thuga/utils/common_widgets/bottomsheet_content.dart';
 import 'package:thuga/utils/helpers/extensions.dart';
 
@@ -90,7 +94,7 @@ class ProductCrudScreen extends ConsumerWidget {
                   child: CommonSearchBar(
                     controller: notifier.searchController,
                     focusNode: notifier.searchFocusNode,
-                    hintText: 'Search products...',
+                    hintText: Strings.searchProductsHint,
                     onClear: notifier.clearSearch,
                   ),
                 ),
@@ -101,13 +105,13 @@ class ProductCrudScreen extends ConsumerWidget {
                     showSingleSelectBottomSheet<String>(
                       context: context,
                       ref: ref,
-                      title: 'Sort By',
+                      title: Strings.sortBy,
                       options: const ['lowest', 'highest'],
                       currentValue: state.sort,
                       onSelected: notifier.setSort,
                       displayText: (val) {
-                        if (val == 'lowest') return 'Lowest Price';
-                        if (val == 'highest') return 'Highest Price';
+                        if (val == 'lowest') return Strings.lowestPrice;
+                        if (val == 'highest') return Strings.highestPrice;
                         return '';
                       },
                     );
@@ -224,15 +228,9 @@ class ProductCrudScreen extends ConsumerWidget {
           if (index == products.length) {
             return Padding(
               padding: EdgeInsets.symmetric(vertical: 16.h),
-              child: Center(
-                child: SizedBox(
-                  width: 24.r,
-                  height: 24.r,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.w,
-                    color: colors.primary,
-                  ),
-                ),
+              child: CommonLoader(
+                size: 24.r,
+                color: colors.primary,
               ),
             );
           }
@@ -256,10 +254,14 @@ class ProductCrudScreen extends ConsumerWidget {
     ProductsNotifier notifier,
     ProductCrudModel? product,
   ) {
+    final colors = context.appColors;
     final isEditing = product != null;
     if (isEditing) {
       notifier.nameController.text = product.name;
       notifier.priceController.text = product.price.toString();
+      notifier.purchasePriceController.text = product.purchasePrice == null
+          ? ''
+          : product.purchasePrice!.toString();
       notifier.barcodeController.text = product.barcode ?? '';
       notifier.qtyController.text = product.quantity == null
           ? ''
@@ -270,7 +272,8 @@ class ProductCrudScreen extends ConsumerWidget {
           product.sgst == null ? '' : product.sgst!.toString();
       notifier.cgstController.text =
           product.cgst == null ? '' : product.cgst!.toString();
-      notifier.selectCategory(product.categoryId);
+      notifier.selectCategory(product.categoryId, name: product.categoryName);
+      notifier.selectUnit(product.unit);
       notifier.initializeEdit(isQuickProduct: product.isQuickProduct);
     } else {
       notifier.clearForm();
@@ -339,7 +342,7 @@ class ProductCrudScreen extends ConsumerWidget {
                                       Icon(Icons.photo_camera, size: 30.r),
                                       8.verticalSpace,
                                       Text(
-                                        'Add Image',
+                                        Strings.addImage,
                                         style: FontPalette.base500(
                                           12,
                                           color: context.appColors.primaryText,
@@ -421,7 +424,13 @@ class ProductCrudScreen extends ConsumerWidget {
               16.verticalSpace,
               Consumer(
                 builder: (context, ref, child) {
-                  final state = ref.watch(productsProvider);
+                  final categorySelection = ref.watch(
+                    productsProvider.select(
+                      (s) => Tuple2(s.selectedCategoryId, s.selectedCategoryName),
+                    ),
+                  );
+                  final selectedCategoryId = categorySelection.item1;
+                  final selectedCategoryName = categorySelection.item2;
                   final categories =
                       ref
                           .watch(categoriesProvider)
@@ -431,22 +440,53 @@ class ProductCrudScreen extends ConsumerWidget {
                       [];
 
                   final selectedCategory = categories.firstWhereOrNull(
-                    (c) => c.id == state.selectedCategoryId,
+                    (c) => c.id == selectedCategoryId,
                   );
+                  final hasCategorySelection = selectedCategoryId != null;
+                  final categoryDisplayName =
+                      selectedCategoryName ??
+                      selectedCategory?.name ??
+                      Strings.selectCategory;
 
                   return _buildLabeledField(
                     context: context,
                     label: Strings.categoryName,
                     child: GestureDetector(
                       onTap: () {
+                        final categoriesNotifier =
+                            ref.read(categoriesProvider.notifier);
                         showSingleSelectBottomSheet<CategoryModel>(
                           context: context,
                           ref: ref,
                           title: Strings.selectCategory,
                           options: categories,
-                          currentValue: selectedCategory,
-                          onSelected: (cat) => notifier.selectCategory(cat.id),
+                          currentValue: selectedCategoryId != null
+                              ? (selectedCategory ??
+                                  CategoryModel(
+                                    id: selectedCategoryId,
+                                    name: selectedCategoryName ?? '',
+                                  ))
+                              : null,
+                          onSelected: (cat) =>
+                              notifier.selectCategory(cat.id, name: cat.name),
                           displayText: (cat) => cat.name,
+                          useRemoteSearch: true,
+                          onOpen: categoriesNotifier.prepareCategoryPicker,
+                          onDismiss: categoriesNotifier.resetAfterCategoryPicker,
+                          onSearchChanged: categoriesNotifier.searchCategories,
+                          onLoadMore: categoriesNotifier.loadMoreCategories,
+                          watchOptions: (sheetRef) => sheetRef.watch(
+                            categoriesProvider.select(
+                              (s) => s.response?.results.data ?? [],
+                            ),
+                          ),
+                          watchLoaderState: (sheetRef) => sheetRef.watch(
+                            categoriesProvider.select((s) => s.loaderState),
+                          ),
+                          watchIsLoadingMore: (sheetRef) => sheetRef.watch(
+                            categoriesProvider.select((s) => s.isLoadingMore),
+                          ),
+                          optionEquals: (a, b) => a.id == b.id,
                         );
                       },
                       child: Container(
@@ -463,10 +503,116 @@ class ProductCrudScreen extends ConsumerWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                selectedCategory?.name ?? Strings.selectCategory,
+                                categoryDisplayName,
                                 style: FontPalette.base400(
                                   14,
-                                  color: selectedCategory != null
+                                  color: hasCategorySelection
+                                      ? context.appColors.primaryText
+                                      : context.appColors.secondaryText,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              color: context.appColors.secondaryText,
+                              size: 20.r,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              16.verticalSpace,
+              Consumer(
+                builder: (context, ref, _) {
+                  final selectedUnitId = ref.watch(
+                    productsProvider.select((s) => s.selectedUnitId),
+                  );
+                  final dropdowns = ref.watch(
+                    dropdownsProvider.select((s) => s.data),
+                  );
+                  final selectableUnits = dropdowns.selectableProductUnits;
+                  final selectedUnit = dropdowns.unitById(selectedUnitId);
+
+                  if (isEditing) {
+                    return _buildLabeledField(
+                      context: context,
+                      label: Strings.unit,
+                      child: Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16.w,
+                          vertical: 16.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: context.appColors.inputBackground,
+                          borderRadius: BorderRadius.circular(14.r),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              selectedUnit?.name ??
+                                  (product.unit != null && product.unit!.isNotEmpty
+                                      ? dropdowns.displayNameForUnit(product.unit)
+                                      : Strings.notAvailable),
+                              style: FontPalette.base400(
+                                14,
+                                color: context.appColors.primaryText,
+                              ),
+                            ),
+                            4.verticalSpace,
+                            Text(
+                              Strings.unitLockedHint,
+                              style: FontPalette.base400(
+                                12,
+                                color: context.appColors.secondaryText,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+
+                  return _buildLabeledField(
+                    context: context,
+                    label: Strings.unitRequired,
+                    child: GestureDetector(
+                      onTap: () {
+                        showSingleSelectBottomSheet<DropdownUnitItemModel>(
+                          context: context,
+                          ref: ref,
+                          title: Strings.selectUnit,
+                          options: selectableUnits,
+                          currentValue: selectedUnit,
+                          onSelected: (unit) => notifier.selectUnit(unit.id),
+                          displayText: (unit) => unit.name,
+                          height: 0.6.sh,
+                          optionEquals: (a, b) => a.id == b.id,
+                        );
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16.w,
+                          vertical: 16.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: context.appColors.inputBackground,
+                          borderRadius: BorderRadius.circular(14.r),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                selectedUnit?.name ?? Strings.selectUnit,
+                                style: FontPalette.base400(
+                                  14,
+                                  color: selectedUnit != null
                                       ? context.appColors.primaryText
                                       : context.appColors.secondaryText,
                                 ),
@@ -499,12 +645,40 @@ class ProductCrudScreen extends ConsumerWidget {
               16.verticalSpace,
               _buildLabeledField(
                 context: context,
+                label: Strings.purchasePrice,
+                child: CommonTextFormField(
+                  controller: notifier.purchasePriceController,
+                  hintText: Strings.purchasePrice,
+                  inputType: const TextInputType.numberWithOptions(decimal: true),
+                  inputAction: TextInputAction.next,
+                ),
+              ),
+              16.verticalSpace,
+              _buildLabeledField(
+                context: context,
                 label: Strings.barcode,
                 child: CommonTextFormField(
                   controller: notifier.barcodeController,
                   hintText: Strings.barcode,
                   inputType: TextInputType.text,
                   inputAction: TextInputAction.next,
+                  suffix: IconButton(
+                    icon: Icon(
+                      Icons.qr_code_scanner_rounded,
+                      size: 20.r,
+                      color: colors.primary,
+                    ),
+                    tooltip: Strings.scanBarcode,
+                    onPressed: () async {
+                      final scanned = await BarcodeScanner.scan(
+                        context,
+                        title: Strings.scanBarcode,
+                      );
+                      if (scanned != null && scanned.isNotEmpty) {
+                        notifier.barcodeController.text = scanned;
+                      }
+                    },
+                  ),
                 ),
               ),
               16.verticalSpace,
@@ -551,14 +725,14 @@ class ProductCrudScreen extends ConsumerWidget {
                   return SwitchListTile.adaptive(
                     contentPadding: EdgeInsets.zero,
                     title: Text(
-                      'Quick Product',
+                      Strings.quickProduct,
                       style: FontPalette.base400(
                         14,
                         color: context.appColors.primaryText,
                       ),
                     ),
                     subtitle: Text(
-                      'Instantly add to bill from the quick actions section',
+                      Strings.quickProductHint,
                       style: FontPalette.base400(
                         12,
                         color: context.appColors.secondaryText,

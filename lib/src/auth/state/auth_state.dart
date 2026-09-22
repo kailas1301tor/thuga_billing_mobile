@@ -8,6 +8,7 @@ part 'auth_state.freezed.dart';
 sealed class AuthState with _$AuthState {
   const factory AuthState({
     @Default(LoaderState.loaded) LoaderState loaderState,
+    @Default(false) bool logoutLoader,
 
     // !error texts
     String? emailErrorText,

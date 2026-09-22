@@ -41,7 +41,7 @@ final class NewBillNotifierProvider
   }
 }
 
-String _$newBillNotifierHash() => r'9b64833ef62a3bb8427c6d5dd9b3cd1456f803b7';
+String _$newBillNotifierHash() => r'5a78bf01dc6847c312ff9e43507719ee1039c95a';
 
 abstract class _$NewBillNotifier extends $Notifier<NewBillState> {
   NewBillState build();

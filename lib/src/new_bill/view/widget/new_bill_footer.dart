@@ -26,6 +26,7 @@ class NewBillFooter extends ConsumerWidget {
     required this.onPaymentMethodChanged,
     required this.onPaymentStatusChanged,
     required this.onSubmitPressed,
+    this.isSaving = false,
   });
 
   final double totalAmount;
@@ -38,6 +39,7 @@ class NewBillFooter extends ConsumerWidget {
   final ValueChanged<String> onPaymentMethodChanged;
   final ValueChanged<String> onPaymentStatusChanged;
   final VoidCallback onSubmitPressed;
+  final bool isSaving;
 
   IconData _getPaymentIcon(String method) {
     final lower = method.toLowerCase();
@@ -256,7 +258,10 @@ class NewBillFooter extends ConsumerWidget {
                 // Right: Save/Print Button (Takes all remaining width)
                 Expanded(
                   child: PrimaryButton(
-                    onPressed: totalAmount > 0 ? onSubmitPressed : null,
+                    isLoading: isSaving,
+                    onPressed: (totalAmount > 0 && !isSaving)
+                        ? onSubmitPressed
+                        : null,
                     radius: 12,
                     prefixIcon: Icon(
                       isPrinterConnected

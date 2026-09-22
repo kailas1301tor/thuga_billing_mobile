@@ -5,6 +5,7 @@ import 'package:either_dart/either.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:thuga/res/enums/enums.dart';
 import 'package:thuga/services/repo_di.dart';
+import 'package:thuga/res/constants/string_constants.dart';
 import 'package:thuga/utils/helpers/api_error_handler.dart';
 import 'package:thuga/utils/helpers/toast_helper.dart';
 import 'package:thuga/utils/helpers/debounce_helper.dart';
@@ -19,6 +20,7 @@ part 'products_notifier.g.dart';
 class ProductsNotifier extends _$ProductsNotifier {
   late final TextEditingController nameController;
   late final TextEditingController priceController;
+  late final TextEditingController purchasePriceController;
   late final TextEditingController barcodeController;
   late final TextEditingController qtyController;
   late final TextEditingController sgstController;
@@ -31,6 +33,7 @@ class ProductsNotifier extends _$ProductsNotifier {
   ProductsState build() {
     nameController = TextEditingController();
     priceController = TextEditingController();
+    purchasePriceController = TextEditingController();
     barcodeController = TextEditingController();
     qtyController = TextEditingController();
     sgstController = TextEditingController();
@@ -45,6 +48,7 @@ class ProductsNotifier extends _$ProductsNotifier {
       scrollController.removeListener(_onScroll);
       nameController.dispose();
       priceController.dispose();
+      purchasePriceController.dispose();
       barcodeController.dispose();
       qtyController.dispose();
       sgstController.dispose();
@@ -170,19 +174,29 @@ class ProductsNotifier extends _$ProductsNotifier {
     fetchProducts();
   }
 
-  void selectCategory(int? id) {
-    state = state.copyWith(selectedCategoryId: id);
+  void selectCategory(int? id, {String? name}) {
+    state = state.copyWith(
+      selectedCategoryId: id,
+      selectedCategoryName: name,
+    );
+  }
+
+  void selectUnit(String? unitId) {
+    state = state.copyWith(selectedUnitId: unitId);
   }
 
   void clearForm() {
     nameController.clear();
     priceController.clear();
+    purchasePriceController.clear();
     barcodeController.clear();
     qtyController.clear();
     sgstController.clear();
     cgstController.clear();
     state = state.copyWith(
       selectedCategoryId: null,
+      selectedCategoryName: null,
+      selectedUnitId: null,
       isQuickProduct: true,
       selectedImagePath: null,
     );
@@ -237,6 +251,33 @@ class ProductsNotifier extends _$ProductsNotifier {
     return true;
   }
 
+  bool _validateOptionalPurchasePrice() {
+    final value = purchasePriceController.text.trim();
+    if (value.isEmpty) return true;
+
+    final parsed = double.tryParse(value);
+    if (parsed == null) {
+      showCustomErrorToast(
+        message: '${Strings.purchasePrice} must be a valid number',
+      );
+      return false;
+    }
+    if (parsed < 0) {
+      showCustomErrorToast(
+        message: '${Strings.purchasePrice} must be zero or greater',
+      );
+      return false;
+    }
+    return true;
+  }
+
+  void _appendOptionalPurchasePrice(Map<String, dynamic> map) {
+    final purchasePrice = purchasePriceController.text.trim();
+    if (purchasePrice.isNotEmpty) {
+      map['purchase_price'] = purchasePrice;
+    }
+  }
+
   void _appendOptionalTaxFields(Map<String, dynamic> map) {
     final sgst = sgstController.text.trim();
     if (sgst.isNotEmpty) {
@@ -255,11 +296,17 @@ class ProductsNotifier extends _$ProductsNotifier {
     final categoryId = state.selectedCategoryId;
 
     if (name.isEmpty || priceStr.isEmpty || categoryId == null) {
-      showCustomErrorToast(message: 'Please fill all required fields');
+      showCustomErrorToast(message: Strings.fillAllRequiredFields);
       return false;
     }
 
-    if (!_validateOptionalTaxFields()) {
+    final unitId = state.selectedUnitId;
+    if (unitId == null || unitId.isEmpty) {
+      showCustomErrorToast(message: Strings.selectUnitRequired);
+      return false;
+    }
+
+    if (!_validateOptionalTaxFields() || !_validateOptionalPurchasePrice()) {
       return false;
     }
 
@@ -269,6 +316,7 @@ class ProductsNotifier extends _$ProductsNotifier {
       'name': name,
       'category': categoryId,
       'price': priceStr,
+      'unit': unitId,
       'is_quick_product': state.isQuickProduct,
     };
 
@@ -280,6 +328,7 @@ class ProductsNotifier extends _$ProductsNotifier {
     if (qty.isNotEmpty) {
       map['qty'] = qty;
     }
+    _appendOptionalPurchasePrice(map);
     _appendOptionalTaxFields(map);
 
     if (state.selectedImagePath != null) {
@@ -316,11 +365,11 @@ class ProductsNotifier extends _$ProductsNotifier {
     final categoryId = state.selectedCategoryId;
 
     if (name.isEmpty || priceStr.isEmpty || categoryId == null) {
-      showCustomErrorToast(message: 'Please fill all required fields');
+      showCustomErrorToast(message: Strings.fillAllRequiredFields);
       return false;
     }
 
-    if (!_validateOptionalTaxFields()) {
+    if (!_validateOptionalTaxFields() || !_validateOptionalPurchasePrice()) {
       return false;
     }
 
@@ -341,6 +390,7 @@ class ProductsNotifier extends _$ProductsNotifier {
     if (qty.isNotEmpty) {
       map['qty'] = qty;
     }
+    _appendOptionalPurchasePrice(map);
     _appendOptionalTaxFields(map);
 
     if (state.selectedImagePath != null) {
@@ -408,8 +458,10 @@ class ProductsNotifier extends _$ProductsNotifier {
             categoryName: product.categoryName,
             name: product.name,
             barcode: product.barcode,
+            unit: product.unit,
             quantity: product.quantity,
             price: product.price,
+            purchasePrice: product.purchasePrice,
             sgst: product.sgst,
             cgst: product.cgst,
             isQuickProduct: product.isQuickProduct,

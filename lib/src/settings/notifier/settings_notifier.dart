@@ -128,19 +128,19 @@ class SettingsNotifier extends _$SettingsNotifier {
     final endWorkingHour = formatWorkingHour24(state.endWorkingTime);
 
     if (name.isEmpty) {
-      showCustomErrorToast(message: 'Store name cannot be empty');
+      showCustomErrorToast(message: Strings.storeNameEmpty);
       return;
     }
     if (email.isEmpty || !email.contains('@')) {
-      showCustomErrorToast(message: 'Please enter a valid email address');
+      showCustomErrorToast(message: Strings.invalidEmail);
       return;
     }
     if (address.isEmpty) {
-      showCustomErrorToast(message: 'Address cannot be empty');
+      showCustomErrorToast(message: Strings.addressEmpty);
       return;
     }
     if (phone.isEmpty) {
-      showCustomErrorToast(message: 'Phone number cannot be empty');
+      showCustomErrorToast(message: Strings.phoneEmpty);
       return;
     }
 
@@ -164,7 +164,7 @@ class SettingsNotifier extends _$SettingsNotifier {
     updateResult.fold(
       (left) {
         state = state.copyWith(loaderState: LoaderState.error);
-        showCustomErrorToast(message: left.message ?? 'Failed to update remote company details');
+        showCustomErrorToast(message: left.message ?? Strings.companyDetailsSaveFailed);
       },
       (success) async {
         // 2. Save local preferences
@@ -190,7 +190,7 @@ class SettingsNotifier extends _$SettingsNotifier {
             endWorkingHour: endWorkingHour,
           ),
         );
-        showCustomToast(message: 'Company details and settings saved successfully!');
+        showCustomToast(message: Strings.companyDetailsSavedSuccess);
       },
     );
   }
@@ -208,7 +208,7 @@ class SettingsNotifier extends _$SettingsNotifier {
   }
 
   Future<void> resetToDefaults() async {
-    final defaults = const SettingsModel(
+    final defaults = SettingsModel(
       storeName: Strings.appName,
       email: 'contact@thuga.com',
       autoPrint: false,
@@ -251,7 +251,7 @@ class SettingsNotifier extends _$SettingsNotifier {
             endWorkingHour: formatWorkingHour24(defaultEndWorkingTime),
           ),
         );
-        showCustomToast(message: 'Settings reset to defaults');
+        showCustomToast(message: Strings.settingsResetSuccess);
       },
     );
   }

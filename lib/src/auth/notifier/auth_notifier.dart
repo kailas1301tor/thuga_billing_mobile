@@ -248,18 +248,39 @@ class AuthNotifier extends _$AuthNotifier {
     state = state.copyWith(emailErrorText: null);
   }
 
-  /// Log out the user, clear local Sembast DB tokens, and redirect to the login screen.
+  /// Log out via API, clear local tokens, and redirect to the login screen.
   Future<void> logout() async {
-    state = state.copyWith(loaderState: LoaderState.loading);
+    if (!ref.mounted) return;
 
-    // Clear local storage and tokens
-    await ref.read(tokenServiceProvider).clearTokens();
+    state = state.copyWith(logoutLoader: true);
+
+    final container = ref.container;
+    final tokenService = container.read(tokenServiceProvider);
+
+    await authRepo
+        .logout()
+        .fold(
+          (left) {
+            debugPrint("🔴 LOGOUT API ERROR: ${left.message}");
+          },
+          (right) {
+            debugPrint("🟢 LOGOUT API SUCCESS: ${right.message}");
+          },
+        )
+        .catchError((e) {
+          debugPrint("🔴 UNEXPECTED LOGOUT ERROR: $e");
+        });
+
+    // Always clear local session even if the API call failed.
+    await tokenService.clearTokens();
     await safeCrashlyticsSetUserIdentifier('');
-    disposeProviders(ref);
 
-    state = state.copyWith(loaderState: LoaderState.loaded);
-
-    // Redirect to login screen
+    // Leave settings/main before invalidating keepAlives so widgets like
+    // PrinterStateSyncHost don't rebuild printer mid-teardown.
     navigateAndClearStack(RouteConstants.routeLoginScreen);
+
+    Future.microtask(() {
+      disposeProviders(container);
+    });
   }
 }

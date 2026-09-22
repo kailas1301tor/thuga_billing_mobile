@@ -1,5 +1,3 @@
-// /Users/wac/Documents/wac projects/tsuite/lib/utils/common_widgets/common_error_state.dart
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -7,6 +5,7 @@ import 'package:lottie/lottie.dart';
 import 'package:thuga/res/constants/string_constants.dart';
 import 'package:thuga/res/styles/color_palette.dart';
 import 'package:thuga/res/styles/font_palette.dart';
+import 'package:thuga/utils/common_widgets/common_loader.dart';
 import 'package:thuga/utils/common_widgets/primary_button.dart';
 
 class CommonErrorState extends StatelessWidget {
@@ -122,7 +121,7 @@ class _ErrorIllustration extends StatelessWidget {
       dimension: 120.r,
       child: SvgPicture.asset(
         assetPath!,
-        placeholderBuilder: (_) => const CupertinoActivityIndicator(),
+        placeholderBuilder: (_) => const CommonLoader(),
       ),
     );
   }

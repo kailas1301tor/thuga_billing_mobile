@@ -42,40 +42,42 @@ class ThugaBottomNavBar extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          BottomNavItem(
-            index: 0,
-            selectedIndex: selectedTab,
-            label: Strings.navHome,
-            icon: Icons.home_outlined,
-            onTap: () => onTabSelected(0),
-          ),
-          BottomNavItem(
-            index: 1,
-            selectedIndex: selectedTab,
-            label: Strings.navBills,
-            icon: Icons.receipt_long_outlined,
-            onTap: () => onTabSelected(1),
-          ),
-          CenterNewBillButton(isSelected: false, onTap: onNewBillPressed),
-          BottomNavItem(
-            index: 2,
-            selectedIndex: selectedTab,
-            label: Strings.navReports,
-            icon: Icons.bar_chart_outlined,
-            onTap: () => onTabSelected(2),
-          ),
-          BottomNavItem(
-            index: 3,
-            selectedIndex: selectedTab,
-            label: Strings.navSettings,
-            icon: Icons.settings_outlined,
-            onTap: () => onTabSelected(3),
-          ),
-        ],
+      child: Padding(
+        padding: EdgeInsets.only(top: 4.h),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            BottomNavItem(
+              index: 0,
+              selectedIndex: selectedTab,
+              label: Strings.navHome,
+              icon: Icons.home_outlined,
+              onTap: () => onTabSelected(0),
+            ),
+            BottomNavItem(
+              index: 1,
+              selectedIndex: selectedTab,
+              label: Strings.navBills,
+              icon: Icons.receipt_long_outlined,
+              onTap: () => onTabSelected(1),
+            ),
+            CenterNewBillButton(isSelected: false, onTap: onNewBillPressed),
+            BottomNavItem(
+              index: 2,
+              selectedIndex: selectedTab,
+              label: Strings.navReports,
+              icon: Icons.bar_chart_outlined,
+              onTap: () => onTabSelected(2),
+            ),
+            BottomNavItem(
+              index: 3,
+              selectedIndex: selectedTab,
+              label: Strings.navSettings,
+              icon: Icons.settings_outlined,
+              onTap: () => onTabSelected(3),
+            ),
+          ],
+        ),
       ),
     );
   }

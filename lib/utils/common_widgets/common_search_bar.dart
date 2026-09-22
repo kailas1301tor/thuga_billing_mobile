@@ -43,9 +43,7 @@ class CommonSearchBar extends StatelessWidget {
           inputAction: TextInputAction.search,
           height: dense ? 40.h : 48.h,
           borderRadius: 24, // Search bar should be pill-shaped
-          contentPadding: dense
-              ? EdgeInsets.symmetric(horizontal: 12.w)
-              : EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+
           suffix: hasText
               ? IconButton(
                   tooltip: Strings.clear,
@@ -71,7 +69,10 @@ class CommonSearchBar extends StatelessWidget {
                 )
               : null,
           prefixIcon: Padding(
-            padding: EdgeInsets.only(left: dense ? 12.w : 14.w, right: dense ? 6.w : 8.w),
+            padding: EdgeInsets.only(
+              left: dense ? 12.w : 14.w,
+              right: dense ? 6.w : 8.w,
+            ),
             child: SvgPicture.asset(
               Assets.svgSearch,
               width: dense ? 16.r : 18.r,

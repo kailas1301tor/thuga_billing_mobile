@@ -10,7 +10,9 @@ import '../model/bill_detail_model.dart';
 
 abstract class BillsRepo {
   Future<Either<ResponseError, BillsResponseModel>> getBills({
-    required String dateFilter,
+    required String startDate,
+    required String endDate,
+    String? status,
     required String search,
     required int page,
     required int pageSize,
@@ -29,21 +31,29 @@ class BillsRepoImpl implements BillsRepo {
 
   @override
   Future<Either<ResponseError, BillsResponseModel>> getBills({
-    required String dateFilter,
+    required String startDate,
+    required String endDate,
+    String? status,
     required String search,
     required int page,
     required int pageSize,
   }) async {
+    final queryParams = <String, dynamic>{
+      'start_date': startDate,
+      'end_date': endDate,
+      'search': search,
+      'page': page,
+      'page_size': pageSize,
+    };
+    if (status != null && status.isNotEmpty && status != 'All') {
+      queryParams['status'] = status;
+    }
+
     return await _networkServices
         .safe(
           _networkServices.getRequest(
             endPoint: AppConstants.bills,
-            queryParameters: {
-              'date': dateFilter,
-              'search': search,
-              'page': page,
-              'page_size': pageSize,
-            },
+            queryParameters: queryParams,
           ),
         )
         .thenRight(_networkServices.checkHttpStatus)

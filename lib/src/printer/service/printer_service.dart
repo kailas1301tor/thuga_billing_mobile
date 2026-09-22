@@ -168,7 +168,7 @@ class PrinterServiceImpl implements PrinterService {
         if (!granted) {
           _recordPrinterError(
             'requestPermissions',
-            const PrinterError(
+            PrinterError(
               code: PrinterErrorCodes.permissionDenied,
               message: 'One or more Bluetooth permissions were denied',
               userMessage: Strings.printerPermissionDenied,
@@ -182,7 +182,7 @@ class PrinterServiceImpl implements PrinterService {
         if (!granted) {
           _recordPrinterError(
             'requestPermissions',
-            const PrinterError(
+            PrinterError(
               code: PrinterErrorCodes.permissionDenied,
               message: 'Bluetooth permission was denied',
               userMessage: Strings.printerPermissionDenied,
@@ -197,7 +197,7 @@ class PrinterServiceImpl implements PrinterService {
       if (!pluginGranted) {
         _recordPrinterError(
           'requestPermissions',
-          const PrinterError(
+          PrinterError(
             code: PrinterErrorCodes.permissionDenied,
             message: 'Bluetooth permission was denied by the system',
             userMessage: Strings.printerPermissionDenied,
@@ -279,7 +279,7 @@ class PrinterServiceImpl implements PrinterService {
 
       _recordPrinterError(
         'connectBluetooth',
-        const PrinterError(
+        PrinterError(
           code: PrinterErrorCodes.connectionFailed,
           message: 'connect returned false',
           userMessage: Strings.printerConnectionFailed,
@@ -305,7 +305,7 @@ class PrinterServiceImpl implements PrinterService {
       } else {
         _recordPrinterError(
           'disconnectBluetooth',
-          const PrinterError(
+          PrinterError(
             code: PrinterErrorCodes.disconnectFailed,
             message: 'disconnect returned false',
             userMessage: Strings.printerUnknownError,
@@ -404,7 +404,7 @@ class PrinterServiceImpl implements PrinterService {
       if (_lastError == null) {
         _recordPrinterError(
           'printReceipt',
-          const PrinterError(
+          PrinterError(
             code: PrinterErrorCodes.printFailed,
             message: 'writeBytes returned false',
             userMessage: Strings.printerPrintFailed,
@@ -455,7 +455,7 @@ class PrinterServiceImpl implements PrinterService {
       if (_lastError == null) {
         _recordPrinterError(
           'printDemoReceipt',
-          const PrinterError(
+          PrinterError(
             code: PrinterErrorCodes.printFailed,
             message: 'writeBytes returned false',
             userMessage: Strings.printerPrintFailed,

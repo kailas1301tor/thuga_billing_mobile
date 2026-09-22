@@ -10,6 +10,7 @@ class BillDetailItemModel {
     required this.quantity,
     required this.price,
     required this.totalPrice,
+    this.unit,
     required this.discountType,
     required this.discountValue,
     required this.discountAmount,
@@ -21,7 +22,8 @@ class BillDetailItemModel {
   final int billId;
   final int productId;
   final String productName;
-  final int quantity;
+  final double quantity;
+  final String? unit;
   final double price;
   final double totalPrice;
   final String discountType;
@@ -54,7 +56,8 @@ class BillDetailItemModel {
       billId: convertToInt(json['bill']),
       productId: convertToInt(json['product']),
       productName: convertToString(productDetails['name']),
-      quantity: convertToInt(json['qty']),
+      quantity: convertToDouble(json['qty']),
+      unit: json['unit'] != null ? convertToString(json['unit']) : null,
       price: convertToDouble(json['price']),
       totalPrice: convertToDouble(json['total_price']),
       discountType: json['discount_type'] != null

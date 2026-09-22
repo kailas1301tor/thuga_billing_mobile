@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$AuthState {
 
- LoaderState get loaderState; String? get emailErrorText; String? get passwordErrorText; String? get phoneErrorText; String? get companyNameErrorText; String? get addressErrorText; AuthModel? get authModel;
+ LoaderState get loaderState; bool get logoutLoader; String? get emailErrorText; String? get passwordErrorText; String? get phoneErrorText; String? get companyNameErrorText; String? get addressErrorText; AuthModel? get authModel;
 /// Create a copy of AuthState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $AuthStateCopyWith<AuthState> get copyWith => _$AuthStateCopyWithImpl<AuthState>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthState&&(identical(other.loaderState, loaderState) || other.loaderState == loaderState)&&(identical(other.emailErrorText, emailErrorText) || other.emailErrorText == emailErrorText)&&(identical(other.passwordErrorText, passwordErrorText) || other.passwordErrorText == passwordErrorText)&&(identical(other.phoneErrorText, phoneErrorText) || other.phoneErrorText == phoneErrorText)&&(identical(other.companyNameErrorText, companyNameErrorText) || other.companyNameErrorText == companyNameErrorText)&&(identical(other.addressErrorText, addressErrorText) || other.addressErrorText == addressErrorText)&&(identical(other.authModel, authModel) || other.authModel == authModel));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthState&&(identical(other.loaderState, loaderState) || other.loaderState == loaderState)&&(identical(other.logoutLoader, logoutLoader) || other.logoutLoader == logoutLoader)&&(identical(other.emailErrorText, emailErrorText) || other.emailErrorText == emailErrorText)&&(identical(other.passwordErrorText, passwordErrorText) || other.passwordErrorText == passwordErrorText)&&(identical(other.phoneErrorText, phoneErrorText) || other.phoneErrorText == phoneErrorText)&&(identical(other.companyNameErrorText, companyNameErrorText) || other.companyNameErrorText == companyNameErrorText)&&(identical(other.addressErrorText, addressErrorText) || other.addressErrorText == addressErrorText)&&(identical(other.authModel, authModel) || other.authModel == authModel));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,loaderState,emailErrorText,passwordErrorText,phoneErrorText,companyNameErrorText,addressErrorText,authModel);
+int get hashCode => Object.hash(runtimeType,loaderState,logoutLoader,emailErrorText,passwordErrorText,phoneErrorText,companyNameErrorText,addressErrorText,authModel);
 
 @override
 String toString() {
-  return 'AuthState(loaderState: $loaderState, emailErrorText: $emailErrorText, passwordErrorText: $passwordErrorText, phoneErrorText: $phoneErrorText, companyNameErrorText: $companyNameErrorText, addressErrorText: $addressErrorText, authModel: $authModel)';
+  return 'AuthState(loaderState: $loaderState, logoutLoader: $logoutLoader, emailErrorText: $emailErrorText, passwordErrorText: $passwordErrorText, phoneErrorText: $phoneErrorText, companyNameErrorText: $companyNameErrorText, addressErrorText: $addressErrorText, authModel: $authModel)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $AuthStateCopyWith<$Res>  {
   factory $AuthStateCopyWith(AuthState value, $Res Function(AuthState) _then) = _$AuthStateCopyWithImpl;
 @useResult
 $Res call({
- LoaderState loaderState, String? emailErrorText, String? passwordErrorText, String? phoneErrorText, String? companyNameErrorText, String? addressErrorText, AuthModel? authModel
+ LoaderState loaderState, bool logoutLoader, String? emailErrorText, String? passwordErrorText, String? phoneErrorText, String? companyNameErrorText, String? addressErrorText, AuthModel? authModel
 });
 
 
@@ -62,10 +62,11 @@ class _$AuthStateCopyWithImpl<$Res>
 
 /// Create a copy of AuthState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? loaderState = null,Object? emailErrorText = freezed,Object? passwordErrorText = freezed,Object? phoneErrorText = freezed,Object? companyNameErrorText = freezed,Object? addressErrorText = freezed,Object? authModel = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? loaderState = null,Object? logoutLoader = null,Object? emailErrorText = freezed,Object? passwordErrorText = freezed,Object? phoneErrorText = freezed,Object? companyNameErrorText = freezed,Object? addressErrorText = freezed,Object? authModel = freezed,}) {
   return _then(_self.copyWith(
 loaderState: null == loaderState ? _self.loaderState : loaderState // ignore: cast_nullable_to_non_nullable
-as LoaderState,emailErrorText: freezed == emailErrorText ? _self.emailErrorText : emailErrorText // ignore: cast_nullable_to_non_nullable
+as LoaderState,logoutLoader: null == logoutLoader ? _self.logoutLoader : logoutLoader // ignore: cast_nullable_to_non_nullable
+as bool,emailErrorText: freezed == emailErrorText ? _self.emailErrorText : emailErrorText // ignore: cast_nullable_to_non_nullable
 as String?,passwordErrorText: freezed == passwordErrorText ? _self.passwordErrorText : passwordErrorText // ignore: cast_nullable_to_non_nullable
 as String?,phoneErrorText: freezed == phoneErrorText ? _self.phoneErrorText : phoneErrorText // ignore: cast_nullable_to_non_nullable
 as String?,companyNameErrorText: freezed == companyNameErrorText ? _self.companyNameErrorText : companyNameErrorText // ignore: cast_nullable_to_non_nullable
@@ -153,10 +154,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( LoaderState loaderState,  String? emailErrorText,  String? passwordErrorText,  String? phoneErrorText,  String? companyNameErrorText,  String? addressErrorText,  AuthModel? authModel)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( LoaderState loaderState,  bool logoutLoader,  String? emailErrorText,  String? passwordErrorText,  String? phoneErrorText,  String? companyNameErrorText,  String? addressErrorText,  AuthModel? authModel)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AuthState() when $default != null:
-return $default(_that.loaderState,_that.emailErrorText,_that.passwordErrorText,_that.phoneErrorText,_that.companyNameErrorText,_that.addressErrorText,_that.authModel);case _:
+return $default(_that.loaderState,_that.logoutLoader,_that.emailErrorText,_that.passwordErrorText,_that.phoneErrorText,_that.companyNameErrorText,_that.addressErrorText,_that.authModel);case _:
   return orElse();
 
 }
@@ -174,10 +175,10 @@ return $default(_that.loaderState,_that.emailErrorText,_that.passwordErrorText,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( LoaderState loaderState,  String? emailErrorText,  String? passwordErrorText,  String? phoneErrorText,  String? companyNameErrorText,  String? addressErrorText,  AuthModel? authModel)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( LoaderState loaderState,  bool logoutLoader,  String? emailErrorText,  String? passwordErrorText,  String? phoneErrorText,  String? companyNameErrorText,  String? addressErrorText,  AuthModel? authModel)  $default,) {final _that = this;
 switch (_that) {
 case _AuthState():
-return $default(_that.loaderState,_that.emailErrorText,_that.passwordErrorText,_that.phoneErrorText,_that.companyNameErrorText,_that.addressErrorText,_that.authModel);}
+return $default(_that.loaderState,_that.logoutLoader,_that.emailErrorText,_that.passwordErrorText,_that.phoneErrorText,_that.companyNameErrorText,_that.addressErrorText,_that.authModel);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -191,10 +192,10 @@ return $default(_that.loaderState,_that.emailErrorText,_that.passwordErrorText,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( LoaderState loaderState,  String? emailErrorText,  String? passwordErrorText,  String? phoneErrorText,  String? companyNameErrorText,  String? addressErrorText,  AuthModel? authModel)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( LoaderState loaderState,  bool logoutLoader,  String? emailErrorText,  String? passwordErrorText,  String? phoneErrorText,  String? companyNameErrorText,  String? addressErrorText,  AuthModel? authModel)?  $default,) {final _that = this;
 switch (_that) {
 case _AuthState() when $default != null:
-return $default(_that.loaderState,_that.emailErrorText,_that.passwordErrorText,_that.phoneErrorText,_that.companyNameErrorText,_that.addressErrorText,_that.authModel);case _:
+return $default(_that.loaderState,_that.logoutLoader,_that.emailErrorText,_that.passwordErrorText,_that.phoneErrorText,_that.companyNameErrorText,_that.addressErrorText,_that.authModel);case _:
   return null;
 
 }
@@ -206,10 +207,11 @@ return $default(_that.loaderState,_that.emailErrorText,_that.passwordErrorText,_
 
 
 class _AuthState implements AuthState {
-  const _AuthState({this.loaderState = LoaderState.loaded, this.emailErrorText, this.passwordErrorText, this.phoneErrorText, this.companyNameErrorText, this.addressErrorText, this.authModel});
+  const _AuthState({this.loaderState = LoaderState.loaded, this.logoutLoader = false, this.emailErrorText, this.passwordErrorText, this.phoneErrorText, this.companyNameErrorText, this.addressErrorText, this.authModel});
   
 
 @override@JsonKey() final  LoaderState loaderState;
+@override@JsonKey() final  bool logoutLoader;
 @override final  String? emailErrorText;
 @override final  String? passwordErrorText;
 @override final  String? phoneErrorText;
@@ -227,16 +229,16 @@ _$AuthStateCopyWith<_AuthState> get copyWith => __$AuthStateCopyWithImpl<_AuthSt
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthState&&(identical(other.loaderState, loaderState) || other.loaderState == loaderState)&&(identical(other.emailErrorText, emailErrorText) || other.emailErrorText == emailErrorText)&&(identical(other.passwordErrorText, passwordErrorText) || other.passwordErrorText == passwordErrorText)&&(identical(other.phoneErrorText, phoneErrorText) || other.phoneErrorText == phoneErrorText)&&(identical(other.companyNameErrorText, companyNameErrorText) || other.companyNameErrorText == companyNameErrorText)&&(identical(other.addressErrorText, addressErrorText) || other.addressErrorText == addressErrorText)&&(identical(other.authModel, authModel) || other.authModel == authModel));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthState&&(identical(other.loaderState, loaderState) || other.loaderState == loaderState)&&(identical(other.logoutLoader, logoutLoader) || other.logoutLoader == logoutLoader)&&(identical(other.emailErrorText, emailErrorText) || other.emailErrorText == emailErrorText)&&(identical(other.passwordErrorText, passwordErrorText) || other.passwordErrorText == passwordErrorText)&&(identical(other.phoneErrorText, phoneErrorText) || other.phoneErrorText == phoneErrorText)&&(identical(other.companyNameErrorText, companyNameErrorText) || other.companyNameErrorText == companyNameErrorText)&&(identical(other.addressErrorText, addressErrorText) || other.addressErrorText == addressErrorText)&&(identical(other.authModel, authModel) || other.authModel == authModel));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,loaderState,emailErrorText,passwordErrorText,phoneErrorText,companyNameErrorText,addressErrorText,authModel);
+int get hashCode => Object.hash(runtimeType,loaderState,logoutLoader,emailErrorText,passwordErrorText,phoneErrorText,companyNameErrorText,addressErrorText,authModel);
 
 @override
 String toString() {
-  return 'AuthState(loaderState: $loaderState, emailErrorText: $emailErrorText, passwordErrorText: $passwordErrorText, phoneErrorText: $phoneErrorText, companyNameErrorText: $companyNameErrorText, addressErrorText: $addressErrorText, authModel: $authModel)';
+  return 'AuthState(loaderState: $loaderState, logoutLoader: $logoutLoader, emailErrorText: $emailErrorText, passwordErrorText: $passwordErrorText, phoneErrorText: $phoneErrorText, companyNameErrorText: $companyNameErrorText, addressErrorText: $addressErrorText, authModel: $authModel)';
 }
 
 
@@ -247,7 +249,7 @@ abstract mixin class _$AuthStateCopyWith<$Res> implements $AuthStateCopyWith<$Re
   factory _$AuthStateCopyWith(_AuthState value, $Res Function(_AuthState) _then) = __$AuthStateCopyWithImpl;
 @override @useResult
 $Res call({
- LoaderState loaderState, String? emailErrorText, String? passwordErrorText, String? phoneErrorText, String? companyNameErrorText, String? addressErrorText, AuthModel? authModel
+ LoaderState loaderState, bool logoutLoader, String? emailErrorText, String? passwordErrorText, String? phoneErrorText, String? companyNameErrorText, String? addressErrorText, AuthModel? authModel
 });
 
 
@@ -264,10 +266,11 @@ class __$AuthStateCopyWithImpl<$Res>
 
 /// Create a copy of AuthState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? loaderState = null,Object? emailErrorText = freezed,Object? passwordErrorText = freezed,Object? phoneErrorText = freezed,Object? companyNameErrorText = freezed,Object? addressErrorText = freezed,Object? authModel = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? loaderState = null,Object? logoutLoader = null,Object? emailErrorText = freezed,Object? passwordErrorText = freezed,Object? phoneErrorText = freezed,Object? companyNameErrorText = freezed,Object? addressErrorText = freezed,Object? authModel = freezed,}) {
   return _then(_AuthState(
 loaderState: null == loaderState ? _self.loaderState : loaderState // ignore: cast_nullable_to_non_nullable
-as LoaderState,emailErrorText: freezed == emailErrorText ? _self.emailErrorText : emailErrorText // ignore: cast_nullable_to_non_nullable
+as LoaderState,logoutLoader: null == logoutLoader ? _self.logoutLoader : logoutLoader // ignore: cast_nullable_to_non_nullable
+as bool,emailErrorText: freezed == emailErrorText ? _self.emailErrorText : emailErrorText // ignore: cast_nullable_to_non_nullable
 as String?,passwordErrorText: freezed == passwordErrorText ? _self.passwordErrorText : passwordErrorText // ignore: cast_nullable_to_non_nullable
 as String?,phoneErrorText: freezed == phoneErrorText ? _self.phoneErrorText : phoneErrorText // ignore: cast_nullable_to_non_nullable
 as String?,companyNameErrorText: freezed == companyNameErrorText ? _self.companyNameErrorText : companyNameErrorText // ignore: cast_nullable_to_non_nullable

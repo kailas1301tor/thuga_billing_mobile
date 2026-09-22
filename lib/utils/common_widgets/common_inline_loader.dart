@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:thuga/res/styles/color_palette.dart';
+import 'package:thuga/utils/common_widgets/common_loader.dart';
 
 class CommonInlineLoader extends StatelessWidget {
   const CommonInlineLoader({
@@ -17,16 +18,10 @@ class CommonInlineLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveSize = size ?? 18.r;
-
-    return SizedBox.square(
-      dimension: effectiveSize,
-      child: CircularProgressIndicator.adaptive(
-        strokeWidth: strokeWidth,
-        valueColor: AlwaysStoppedAnimation<Color>(
-          color ?? context.appColors.accent,
-        ),
-      ),
+    return CommonLoader(
+      size: size ?? 18.r,
+      color: color ?? context.appColors.accent,
+      strokeWidth: strokeWidth,
     );
   }
 }

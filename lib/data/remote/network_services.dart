@@ -209,10 +209,24 @@ class NetworkServices extends NetWorkBaseServices {
   // ── Internet Check (singleton Connectivity) ────────────────────────────
 
   Future<void> _assertInternetAvailable() async {
-    final isConnected = _ref.read(connectivityServiceProvider).isConnected;
-    if (!isConnected) {
-      debugPrint('🔴 No internet connection (cached check)');
-      throw ApiExceptions.noInternet();
+    try {
+      final isConnected = _ref.read(connectivityServiceProvider).isConnected;
+      if (!isConnected) {
+        debugPrint('🔴 No internet connection (cached check)');
+        throw ApiExceptions.noInternet();
+      }
+    } catch (error) {
+      // Ref disposed mid-logout/invalidate — fall back to a direct check.
+      final message = error.toString();
+      final isDisposedRef =
+          message.contains('disposed') || message.contains('Cannot use the Ref');
+      if (!isDisposedRef) rethrow;
+
+      debugPrint('🟡 Connectivity ref unavailable, falling back: $error');
+      final available = await isInternetAvailable();
+      if (!available) {
+        throw ApiExceptions.noInternet();
+      }
     }
   }
 
@@ -604,18 +618,30 @@ class NetworkServices extends NetWorkBaseServices {
 
   Future<void> _logout() async {
     debugPrint('🔴 Failed to refresh token — forcing logout');
-    await _ref.read(tokenServiceProvider).clearTokens();
-    disposeProviders(_ref);
+
+    // Capture before any invalidation — this provider's Ref may die next.
+    final container = _ref.container;
+    try {
+      await _ref.read(tokenServiceProvider).clearTokens();
+    } catch (error) {
+      debugPrint('🟡 Token clear during force logout failed: $error');
+    }
 
     if (appNavigatorKey.currentState != null) {
       executeAfterFrame(() {
+        final navigator = appNavigatorKey.currentState;
+        if (navigator == null) return;
         Navigator.pushNamedAndRemoveUntil(
-          appNavigatorKey.currentState!.context,
+          navigator.context,
           RouteConstants.routeLoginScreen,
           (_) => false,
         );
       });
     }
+
+    // Defer so the current interceptor/request stack can finish without
+    // hitting "Ref of networkServicesProvider after it has been disposed".
+    Future.microtask(() => disposeProviders(container));
   }
 
   @override

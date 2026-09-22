@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:toastification/toastification.dart';
 import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/res/l10n/app_language.dart';
+import 'package:thuga/res/l10n/locale_notifier.dart';
 import 'package:thuga/res/styles/app_theme.dart';
 import 'package:thuga/res/styles/theme_provider.dart';
 import 'package:thuga/utils/common_widgets/connectivity_observer.dart';
@@ -19,6 +21,8 @@ class ThugaApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final themeAsync = ref.watch(themeNotifierProvider);
     final themeMode = themeAsync.value ?? ThemeMode.system;
+    final language =
+        ref.watch(localeProvider).value ?? AppLanguage.english;
 
     return ScreenUtilInit(
       designSize: const Size(393, 852),
@@ -40,7 +44,11 @@ class ThugaApp extends ConsumerWidget {
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
             ],
-            supportedLocales: const [Locale('en')],
+            supportedLocales: const [
+              Locale('en'),
+              Locale('ml'),
+            ],
+            locale: language.locale,
             onGenerateRoute: RouteGenerator.generateRoute,
             initialRoute: RouteConstants.routeSplash,
             theme: AppTheme.lightTheme,

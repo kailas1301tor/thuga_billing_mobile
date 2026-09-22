@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:thuga/res/constants/assets.dart';
 import 'package:thuga/res/constants/string_constants.dart';
 import 'package:thuga/res/enums/enums.dart';
 import 'package:thuga/res/styles/color_palette.dart';
@@ -11,7 +12,6 @@ import 'package:thuga/utils/common_widgets/common_password_field.dart';
 import 'package:thuga/utils/common_widgets/common_text_form_field.dart';
 import 'package:thuga/utils/common_widgets/primary_button.dart';
 import '../../notifier/auth_notifier.dart';
-import 'login_footer_widget.dart';
 
 class LoginFormWidget extends ConsumerWidget {
   const LoginFormWidget({super.key});
@@ -24,6 +24,17 @@ class LoginFormWidget extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        Center(
+          child: Image.asset(
+            Assets.thugaLogo,
+            width: 200.w,
+            height: 72.h,
+            fit: BoxFit.contain,
+            filterQuality: FilterQuality.high,
+            semanticLabel: Strings.appName,
+          ),
+        ),
+        40.verticalSpace,
         Consumer(
           builder: (context, ref, _) {
             final emailErrorText = ref.watch(
@@ -34,7 +45,7 @@ class LoginFormWidget extends ConsumerWidget {
               errorText: emailErrorText,
               child: CommonTextFormField(
                 controller: notifier.emailController,
-                hintText: 'Enter your email address',
+                hintText: Strings.enterEmailAddress,
                 inputType: TextInputType.emailAddress,
                 showErrorText: false,
                 filledColor: colors.surface,
@@ -101,8 +112,6 @@ class LoginFormWidget extends ConsumerWidget {
             );
           },
         ),
-        24.verticalSpace,
-        const LoginFooterWidget(),
       ],
     );
   }

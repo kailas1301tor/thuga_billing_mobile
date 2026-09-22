@@ -1,13 +1,19 @@
 // lib/src/new_bill/view/widget/new_bill_header.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:thuga/res/constants/string_constants.dart';
 import 'package:thuga/res/styles/color_palette.dart';
 import 'package:thuga/res/styles/font_palette.dart';
 
 class NewBillHeader extends StatelessWidget implements PreferredSizeWidget {
-  const NewBillHeader({super.key, required this.billNumber});
+  const NewBillHeader({
+    super.key,
+    required this.billNumber,
+    this.onScanTap,
+  });
 
   final int billNumber;
+  final VoidCallback? onScanTap;
 
   @override
   Widget build(BuildContext context) {
@@ -51,8 +57,21 @@ class NewBillHeader extends StatelessWidget implements PreferredSizeWidget {
               ],
             ),
 
-            // Right: Empty placeholder to keep center title aligned
-            SizedBox(width: 40.w),
+            // Right: Barcode Scanner button (or placeholder)
+            if (onScanTap != null)
+              IconButton(
+                onPressed: onScanTap,
+                icon: Icon(
+                  Icons.qr_code_scanner_rounded,
+                  size: 24.r,
+                  color: colors.primary,
+                ),
+                tooltip: Strings.scanBarcode,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+              )
+            else
+              SizedBox(width: 40.w),
           ],
         ),
       ),

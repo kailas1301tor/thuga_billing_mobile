@@ -1,5 +1,6 @@
 // lib/src/new_bill/model/new_bill_model.dart
 import 'package:thuga/utils/helpers/safe_converters.dart';
+import 'package:thuga/utils/helpers/unit_conversion_helper.dart';
 
 class CategoriesWithProductsResponse {
   final String message;
@@ -69,6 +70,21 @@ class CategoryWithProductsModel {
             .map((x) => ProductModel.fromJson(convertToMap(x)))
             .toList(),
       );
+
+  CategoryWithProductsModel copyWith({
+    int? id,
+    String? name,
+    bool? isActive,
+    bool? deleted,
+    List<ProductModel>? products,
+  }) =>
+      CategoryWithProductsModel(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        isActive: isActive ?? this.isActive,
+        deleted: deleted ?? this.deleted,
+        products: products ?? this.products,
+      );
 }
 
 class ProductModel {
@@ -77,6 +93,7 @@ class ProductModel {
   final String categoryName;
   final String name;
   final double? quantity;
+  final String? unit;
   final double price;
   final String? barcode;
   final double sgst;
@@ -93,6 +110,7 @@ class ProductModel {
     required this.categoryName,
     required this.name,
     this.quantity,
+    this.unit,
     required this.price,
     this.barcode,
     this.sgst = 0.0,
@@ -110,6 +128,7 @@ class ProductModel {
         categoryName: convertToString(json['category_name']),
         name: convertToString(json['name']),
         quantity: json['qty'] == null ? null : convertToDouble(json['qty']),
+        unit: json['unit'] != null ? convertToString(json['unit']) : null,
         price: convertToDouble(json['price']),
         barcode: json['barcode'] != null ? convertToString(json['barcode']) : null,
         sgst: convertToDouble(json['sgst']),
@@ -129,6 +148,7 @@ class ProductModel {
         'category_name': categoryName,
         'name': name,
         'qty': quantity,
+        'unit': unit,
         'price': price.toString(),
         'barcode': barcode,
         'sgst': sgst.toStringAsFixed(2),
@@ -197,6 +217,8 @@ class CartItemModel {
     required this.price,
     required this.quantity,
     required this.emoji,
+    this.productUnit,
+    this.unit,
     this.imageUrl,
     this.isCustom = false,
     this.discountType = 'None',
@@ -210,8 +232,10 @@ class CartItemModel {
   final int? productId;
   final String name;
   final double price;
-  final int quantity;
+  final double quantity;
   final String emoji;
+  final String? productUnit;
+  final String? unit;
   final String? imageUrl;
   final bool isCustom;
   final String discountType;
@@ -221,27 +245,41 @@ class CartItemModel {
   final double sgst;
   final double cgst;
 
+  String get billingUnit => unit ?? productUnit ?? defaultLegacyUnitId;
+
+  String get resolvedProductUnit =>
+      productUnit ?? unit ?? defaultLegacyUnitId;
+
+  /// Quantity converted into the product's pricing unit.
+  double get effectiveQuantity => effectiveQuantityInProductUnit(
+        quantity: quantity,
+        billingUnit: billingUnit,
+        productUnit: resolvedProductUnit,
+      );
+
   /// Raw line total without any discount applied.
-  double get lineTotal => price * quantity;
+  double get lineTotal => price * effectiveQuantity;
 
   /// Computed discount amount — mirrors backend Python logic exactly.
   double get discountAmount {
     double discount = 0.0;
+    final billableQty = effectiveQuantity;
 
     switch (discountType) {
       case 'Percentage':
-        discount = (price * quantity) * (discountValue / 100);
+        discount = (price * billableQty) * (discountValue / 100);
       case 'Amount':
         discount = discountValue;
       case 'BOGO':
         final buyQty = bogoBuyQty ?? 0;
         final getQty = bogoGetQty ?? 0;
         if (buyQty > 0 && getQty > 0) {
-          final freeUnits = (quantity ~/ (buyQty + getQty)) * getQty;
+          final wholeUnits = billableQty.floor();
+          final freeUnits = (wholeUnits ~/ (buyQty + getQty)) * getQty;
           discount = freeUnits * price;
         }
       case 'Slab':
-        discount = (price - discountValue) * quantity;
+        discount = (price - discountValue) * billableQty;
       default:
         discount = 0.0;
     }
@@ -279,8 +317,10 @@ class CartItemModel {
     int? productId,
     String? name,
     double? price,
-    int? quantity,
+    double? quantity,
     String? emoji,
+    String? productUnit,
+    String? unit,
     String? imageUrl,
     bool? isCustom,
     String? discountType,
@@ -296,6 +336,8 @@ class CartItemModel {
       price: price ?? this.price,
       quantity: quantity ?? this.quantity,
       emoji: emoji ?? this.emoji,
+      productUnit: productUnit ?? this.productUnit,
+      unit: unit ?? this.unit,
       imageUrl: imageUrl ?? this.imageUrl,
       isCustom: isCustom ?? this.isCustom,
       discountType: discountType ?? this.discountType,
@@ -311,8 +353,12 @@ class CartItemModel {
         productId: json['productId'] != null ? convertToInt(json['productId']) : null,
         name: convertToString(json['name']),
         price: convertToDouble(json['price']),
-        quantity: convertToInt(json['quantity']),
+        quantity: convertToDouble(json['quantity']),
         emoji: convertToString(json['emoji']),
+        productUnit: json['productUnit'] != null
+            ? convertToString(json['productUnit'])
+            : null,
+        unit: json['unit'] != null ? convertToString(json['unit']) : null,
         imageUrl: json['imageUrl'] != null ? convertToString(json['imageUrl']) : null,
         isCustom: convertToBool(json['isCustom']),
         discountType: json['discount_type'] != null
@@ -334,6 +380,8 @@ class CartItemModel {
         'name': name,
         'price': price,
         'quantity': quantity,
+        'productUnit': productUnit,
+        'unit': unit,
         'emoji': emoji,
         'imageUrl': imageUrl,
         'isCustom': isCustom,

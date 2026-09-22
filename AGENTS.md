@@ -7,11 +7,13 @@ This repo uses the following mappings from generic rule names to actual project 
 | Rule / template name | Thuka implementation |
 |----------------------|------------------------|
 | Package imports | `package:thuga/...` |
-| Font styles | [`FontPalette`](lib/res/styles/font_palette.dart) (`onest` family) |
+| Font styles | [`FontPalette`](lib/res/styles/font_palette.dart) (`onest` + `NotoSansMalayalam` fallback) |
 | Primary CTA button | [`PrimaryButton`](lib/utils/common_widgets/primary_button.dart) |
 | Text inputs | [`CommonTextFormField`](lib/utils/common_widgets/common_text_form_field.dart) |
 | Body text | `Text` with `FontPalette` styles (no `CommonTextWidget` in this repo yet) |
 | App display name | `Strings.appName` → **Thuka** |
+| Localized copy | [`assets/l10n/en.json`](assets/l10n/en.json) / [`assets/l10n/ml.json`](assets/l10n/ml.json) → [`Strings`](lib/res/constants/string_constants.dart) via [`LocaleCatalog`](lib/res/l10n/locale_catalog.dart) |
+| App language | [`localeProvider`](lib/res/l10n/locale_notifier.dart) (`keepAlive: true`) |
 
 ---
 
@@ -30,7 +32,7 @@ Before generating any code:
 1. Scan existing folder structure to stay consistent.
 2. Never create files outside the established feature pattern.
 3. Never modify files outside the scope of the task.
-4. Check `res/constants/string_constants.dart`, `res/styles/color_palette.dart`, and `res/styles/font_palette.dart` before hardcoding any value.
+4. Check `assets/l10n/en.json` + `ml.json`, `res/constants/string_constants.dart`, `res/styles/color_palette.dart`, and `res/styles/font_palette.dart` before hardcoding any value.
 
 ---
 
@@ -768,25 +770,61 @@ Rules:
 
 ---
 
-## STRINGS — NO HARDCODING
+## STRINGS — NO HARDCODING + LOCALIZATION
 
 NEVER hardcode user-visible strings in widget or notifier files.
-ALL strings MUST be defined in `res/constants/string_constants.dart` and referenced via `Strings.`.
+ALL user-visible copy MUST live in locale JSON files and be exposed via `Strings.`.
+
+### Source of truth
+
+| Locale | File |
+|--------|------|
+| English | [`assets/l10n/en.json`](assets/l10n/en.json) |
+| Malayalam | [`assets/l10n/ml.json`](assets/l10n/ml.json) |
+
+[`string_constants.dart`](lib/res/constants/string_constants.dart) is a **locale-aware facade** only — getters read from [`LocaleCatalog`](lib/res/l10n/locale_catalog.dart). Do not put raw English literals back into `Strings`.
+
+### Adding a new string
+
+1. Add the key to **both** `assets/l10n/en.json` and `assets/l10n/ml.json` (same key name).
+2. Add a getter on `Strings` (or a parameterized helper using `LocaleCatalog.instance.tParams`).
+3. Reference via `Strings.yourKey` in UI / notifiers.
 
 ```dart
 // WRONG
 Text("Daily Meals")
 showCustomToast(message: "OTP sent successfully")
-buttonText: "Next"
 
 // CORRECT
 Text(Strings.dailyMeals)
 showCustomToast(message: Strings.otpSentSuccess)
-buttonText: Strings.next
 ```
 
-Covers: titles, labels, button text, error messages, toast messages, hint text, empty state copy, dialog text.
-If a string is missing from `Strings`, add it there first, then reference it.
+Parameterized copy uses `{name}` placeholders in JSON:
+
+```json
+"productInsufficientStock": "Only {count} units available"
+```
+
+```dart
+Strings.productInsufficientStock(count)
+```
+
+### Language switching (Riverpod)
+
+- Own language state with `@Riverpod(keepAlive: true) LocaleNotifier` — do **not** autoDispose.
+- Persist with SharedPreferences (`pref_app_language`: `en` | `ml`).
+- Watch **once** at [`ThugaApp`](lib/src/root/thuga_app.dart) (`localeProvider`) and set `MaterialApp.locale`.
+- Screens must **not** each `ref.watch` locale just to read strings — `Strings.` is context-free.
+- Preload catalogs in `main()` before `runApp` so the first frame is never missing copy.
+- Default language is English; user opts into Malayalam in Settings.
+- Do **not** invalidate `localeProvider` on logout (language persists across sessions).
+
+### Fonts
+
+Malayalam glyphs require `NotoSansMalayalam` as `fontFamilyFallback` on all `FontPalette` base styles. Never remove the fallback.
+
+Covers: titles, labels, button text, error messages, toast messages, hint text, empty state copy, dialog text, printer/receipt labels.
 
 ---
 
@@ -857,7 +895,8 @@ Enforce strictly. Exceed the limit → extract immediately into sub-files.
 | `json_serializable`                  | Manual `fromJson` with safe converters              |
 | `ChangeNotifier`                     | Riverpod code gen                                   |
 | `throw` in repository                | Return `Left(ResponseError(...))`                   |
-| Hardcoded strings in UI              | Use `Strings.` from `string_constants.dart`         |
+| Hardcoded strings in UI              | Add to `assets/l10n/{en,ml}.json` + `Strings.` getter |
+| Raw English in `string_constants.dart` | Facade getters only — literals live in JSON files |
 | Hardcoded colors in UI               | Use `ColorPalette.` from `color_palette.dart`       |
 | Inline `TextStyle(...)` in UI        | Use `FontPalette.` from font palette          |
 | Raw `Scaffold` in screens            | Use `CommonScaffold`                                |
@@ -986,7 +1025,7 @@ debugPrint("🔵 ACTION: fetchData called");
 When assigned a task:
 
 1. **Read first** — scan the feature folder and shared resource files before writing anything.
-2. **Check shared resources** — verify `string_constants.dart`, `color_palette.dart`, and font palette before using any value.
+2. **Check shared resources** — verify `assets/l10n/{en,ml}.json`, `string_constants.dart`, `color_palette.dart`, and font palette before using any value.
 3. **Full slice by default** — generate all layers (model → state → repo → notifier → view) unless told otherwise.
 4. **Show structure** — output the folder tree at the top of every feature generation.
 5. **No partial stubs** — never leave `// TODO` or empty method bodies in generated code.
@@ -1015,6 +1054,6 @@ When generating a full feature, output files in this order:
 4. `notifier/`
 5. `view/screen.dart`
 6. `view/widget/` (if needed)
-7. Additions to `res/constants/string_constants.dart`
+7. Additions to `assets/l10n/en.json` and `assets/l10n/ml.json` (then `Strings` getters)
 8. Additions to `res/styles/color_palette.dart`
 9. Additions to `res/styles/font_palette.dart`

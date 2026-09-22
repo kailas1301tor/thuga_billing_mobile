@@ -1,5 +1,6 @@
 // lib/src/bills/view/bill_detail_screen.dart
 import 'package:flutter/material.dart';
+import 'package:thuga/res/constants/string_constants.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:thuga/utils/common_widgets/common_app_bar.dart';
 import 'package:thuga/utils/common_widgets/common_scaffold.dart';
@@ -18,8 +19,8 @@ class BillDetailScreen extends ConsumerWidget {
     final detailAsync = ref.watch(billDetailProvider(billId));
 
     return CommonScaffold(
-      appBar: const CommonAppBar(
-        title: 'Bill Details',
+      appBar: CommonAppBar(
+        title: Strings.billDetails,
         showBackButton: true,
       ),
       body: detailAsync.when(
@@ -28,11 +29,11 @@ class BillDetailScreen extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Error: $error'),
+              Text('${Strings.errorTitle}: $error'),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () => ref.refresh(billDetailProvider(billId)),
-                child: const Text('Retry'),
+                child: Text(Strings.retry),
               ),
             ],
           ),

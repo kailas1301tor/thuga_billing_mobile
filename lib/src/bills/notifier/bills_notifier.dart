@@ -6,8 +6,8 @@ import 'package:thuga/res/constants/string_constants.dart';
 import 'package:thuga/res/enums/enums.dart';
 import 'package:thuga/services/repo_di.dart';
 import 'package:thuga/utils/helpers/api_error_handler.dart';
-import 'package:thuga/utils/helpers/debounce_helper.dart';
-import 'package:thuga/utils/helpers/toast_helper.dart';
+import 'package:thuga/utils/helpers/common_functions.dart';
+import 'package:thuga/utils/helpers/date_range_labels.dart';
 import '../model/bill_model.dart';
 import '../notifier/bill_detail_notifier.dart';
 import '../repo/bills_repository.dart';
@@ -37,8 +37,15 @@ class BillsNotifier extends _$BillsNotifier {
 
     searchController.addListener(_onSearchChanged);
 
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
     Future.microtask(() => fetchBills());
-    return const BillsState();
+    return BillsState(
+      startDate: today,
+      endDate: today,
+      selectedPreset: DateRangeIds.today,
+    );
   }
 
   void _onScroll() {
@@ -63,9 +70,15 @@ class BillsNotifier extends _$BillsNotifier {
       state = state.copyWith(isLoadingMore: true);
     }
 
+    final startStr = formatDate(state.startDate, pattern: 'yyyy-MM-dd');
+    final endStr = formatDate(state.endDate, pattern: 'yyyy-MM-dd');
+    final status = state.statusFilter == 'All' ? null : state.statusFilter;
+
     return await _billsRepo
         .getBills(
-          dateFilter: state.dateRangeFilter,
+          startDate: startStr,
+          endDate: endStr,
+          status: status,
           search: state.searchQuery,
           page: page,
           pageSize: state.pageSize,
@@ -139,8 +152,30 @@ class BillsNotifier extends _$BillsNotifier {
     fetchBills(page: state.currentPage + 1, showLoader: false);
   }
 
-  void setDateRangeFilter(String value) {
-    state = state.copyWith(dateRangeFilter: value);
+  void setDateRange(DateTime start, DateTime end) {
+    state = state.copyWith(
+      startDate: start,
+      endDate: end,
+      selectedPreset: null,
+      currentPage: 1,
+    );
+    fetchBills();
+  }
+
+  void setPresetRange(String preset) {
+    final (start, end) = calculateDateRangeForPreset(preset);
+    state = state.copyWith(
+      startDate: start,
+      endDate: end,
+      selectedPreset: preset,
+      currentPage: 1,
+    );
+    fetchBills();
+  }
+
+  void setStatusFilter(String status) {
+    if (state.statusFilter == status) return;
+    state = state.copyWith(statusFilter: status);
     fetchBills();
   }
 
@@ -154,7 +189,15 @@ class BillsNotifier extends _$BillsNotifier {
 
   void clearFilters() {
     searchController.clear();
-    state = state.copyWith(searchQuery: '', dateRangeFilter: 'Today');
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    state = state.copyWith(
+      searchQuery: '',
+      startDate: today,
+      endDate: today,
+      selectedPreset: DateRangeIds.today,
+      statusFilter: 'All',
+    );
     fetchBills();
   }
 

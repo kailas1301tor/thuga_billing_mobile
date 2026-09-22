@@ -8,6 +8,7 @@ import 'package:thuga/res/styles/color_palette.dart';
 import 'package:thuga/utils/common_widgets/common_app_bar.dart';
 import 'package:thuga/utils/common_widgets/common_bottom_sheet.dart';
 import 'package:thuga/utils/common_widgets/common_dialog_box.dart';
+import 'package:thuga/utils/common_widgets/common_loader.dart';
 import 'package:thuga/utils/common_widgets/common_nav_bar_button.dart';
 import 'package:thuga/utils/common_widgets/common_scaffold.dart';
 import 'package:thuga/utils/common_widgets/common_switch_state.dart';
@@ -91,15 +92,9 @@ class CategoryCrudScreen extends ConsumerWidget {
                     if (index == (categoryList ?? []).length) {
                       return Padding(
                         padding: EdgeInsets.symmetric(vertical: 16.h),
-                        child: Center(
-                          child: SizedBox(
-                            width: 24.r,
-                            height: 24.r,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2.w,
-                              color: colors.primary,
-                            ),
-                          ),
+                        child: CommonLoader(
+                          size: 24.r,
+                          color: colors.primary,
                         ),
                       );
                     }

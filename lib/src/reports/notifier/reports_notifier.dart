@@ -3,6 +3,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:thuga/res/enums/enums.dart';
 import 'package:thuga/services/repo_di.dart';
 import 'package:thuga/utils/helpers/api_error_handler.dart';
+import 'package:thuga/utils/helpers/common_functions.dart';
+import 'package:thuga/utils/helpers/date_range_labels.dart';
 import '../state/reports_state.dart';
 
 part 'reports_notifier.g.dart';
@@ -11,14 +13,25 @@ part 'reports_notifier.g.dart';
 class ReportsNotifier extends _$ReportsNotifier {
   @override
   ReportsState build() {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
     Future.microtask(() => fetchReportsData());
-    return const ReportsState();
+    return ReportsState(
+      startDate: today,
+      endDate: today,
+      selectedPreset: DateRangeIds.today,
+    );
   }
 
   Future<void> fetchReportsData() async {
     state = state.copyWith(loaderState: LoaderState.loading);
     final repo = ref.read(reportsRepositoryProvider);
-    final result = await repo.getReportsData(state.selectedRange);
+    final startStr = formatDate(state.startDate, pattern: 'yyyy-MM-dd');
+    final endStr = formatDate(state.endDate, pattern: 'yyyy-MM-dd');
+    final result = await repo.getReportsData(
+      startDate: startStr,
+      endDate: endStr,
+    );
 
     result.fold(
       (left) {
@@ -36,9 +49,24 @@ class ReportsNotifier extends _$ReportsNotifier {
     );
   }
 
-  void setRange(String range) {
-    if (state.selectedRange == range) return;
-    state = state.copyWith(selectedRange: range);
+  void setDateRange(DateTime start, DateTime end) {
+    state = state.copyWith(
+      startDate: start,
+      endDate: end,
+      selectedPreset: null,
+    );
+    fetchReportsData();
+  }
+
+  void setRange(String range) => setPresetRange(range);
+
+  void setPresetRange(String preset) {
+    final (start, end) = calculateDateRangeForPreset(preset);
+    state = state.copyWith(
+      startDate: start,
+      endDate: end,
+      selectedPreset: preset,
+    );
     fetchReportsData();
   }
 }

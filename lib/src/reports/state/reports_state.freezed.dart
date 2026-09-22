@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ReportsState {
 
- LoaderState get loaderState; String get selectedRange; ReportsDataModel? get data; String? get errorMessage;
+ LoaderState get loaderState; DateTime get startDate; DateTime get endDate; String? get selectedPreset; ReportsDataModel? get data; String? get errorMessage;
 /// Create a copy of ReportsState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $ReportsStateCopyWith<ReportsState> get copyWith => _$ReportsStateCopyWithImpl<R
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReportsState&&(identical(other.loaderState, loaderState) || other.loaderState == loaderState)&&(identical(other.selectedRange, selectedRange) || other.selectedRange == selectedRange)&&(identical(other.data, data) || other.data == data)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReportsState&&(identical(other.loaderState, loaderState) || other.loaderState == loaderState)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.endDate, endDate) || other.endDate == endDate)&&(identical(other.selectedPreset, selectedPreset) || other.selectedPreset == selectedPreset)&&(identical(other.data, data) || other.data == data)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,loaderState,selectedRange,data,errorMessage);
+int get hashCode => Object.hash(runtimeType,loaderState,startDate,endDate,selectedPreset,data,errorMessage);
 
 @override
 String toString() {
-  return 'ReportsState(loaderState: $loaderState, selectedRange: $selectedRange, data: $data, errorMessage: $errorMessage)';
+  return 'ReportsState(loaderState: $loaderState, startDate: $startDate, endDate: $endDate, selectedPreset: $selectedPreset, data: $data, errorMessage: $errorMessage)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $ReportsStateCopyWith<$Res>  {
   factory $ReportsStateCopyWith(ReportsState value, $Res Function(ReportsState) _then) = _$ReportsStateCopyWithImpl;
 @useResult
 $Res call({
- LoaderState loaderState, String selectedRange, ReportsDataModel? data, String? errorMessage
+ LoaderState loaderState, DateTime startDate, DateTime endDate, String? selectedPreset, ReportsDataModel? data, String? errorMessage
 });
 
 
@@ -62,11 +62,13 @@ class _$ReportsStateCopyWithImpl<$Res>
 
 /// Create a copy of ReportsState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? loaderState = null,Object? selectedRange = null,Object? data = freezed,Object? errorMessage = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? loaderState = null,Object? startDate = null,Object? endDate = null,Object? selectedPreset = freezed,Object? data = freezed,Object? errorMessage = freezed,}) {
   return _then(_self.copyWith(
 loaderState: null == loaderState ? _self.loaderState : loaderState // ignore: cast_nullable_to_non_nullable
-as LoaderState,selectedRange: null == selectedRange ? _self.selectedRange : selectedRange // ignore: cast_nullable_to_non_nullable
-as String,data: freezed == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
+as LoaderState,startDate: null == startDate ? _self.startDate : startDate // ignore: cast_nullable_to_non_nullable
+as DateTime,endDate: null == endDate ? _self.endDate : endDate // ignore: cast_nullable_to_non_nullable
+as DateTime,selectedPreset: freezed == selectedPreset ? _self.selectedPreset : selectedPreset // ignore: cast_nullable_to_non_nullable
+as String?,data: freezed == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
 as ReportsDataModel?,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
@@ -150,10 +152,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( LoaderState loaderState,  String selectedRange,  ReportsDataModel? data,  String? errorMessage)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( LoaderState loaderState,  DateTime startDate,  DateTime endDate,  String? selectedPreset,  ReportsDataModel? data,  String? errorMessage)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ReportsState() when $default != null:
-return $default(_that.loaderState,_that.selectedRange,_that.data,_that.errorMessage);case _:
+return $default(_that.loaderState,_that.startDate,_that.endDate,_that.selectedPreset,_that.data,_that.errorMessage);case _:
   return orElse();
 
 }
@@ -171,10 +173,10 @@ return $default(_that.loaderState,_that.selectedRange,_that.data,_that.errorMess
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( LoaderState loaderState,  String selectedRange,  ReportsDataModel? data,  String? errorMessage)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( LoaderState loaderState,  DateTime startDate,  DateTime endDate,  String? selectedPreset,  ReportsDataModel? data,  String? errorMessage)  $default,) {final _that = this;
 switch (_that) {
 case _ReportsState():
-return $default(_that.loaderState,_that.selectedRange,_that.data,_that.errorMessage);}
+return $default(_that.loaderState,_that.startDate,_that.endDate,_that.selectedPreset,_that.data,_that.errorMessage);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -188,10 +190,10 @@ return $default(_that.loaderState,_that.selectedRange,_that.data,_that.errorMess
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( LoaderState loaderState,  String selectedRange,  ReportsDataModel? data,  String? errorMessage)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( LoaderState loaderState,  DateTime startDate,  DateTime endDate,  String? selectedPreset,  ReportsDataModel? data,  String? errorMessage)?  $default,) {final _that = this;
 switch (_that) {
 case _ReportsState() when $default != null:
-return $default(_that.loaderState,_that.selectedRange,_that.data,_that.errorMessage);case _:
+return $default(_that.loaderState,_that.startDate,_that.endDate,_that.selectedPreset,_that.data,_that.errorMessage);case _:
   return null;
 
 }
@@ -203,11 +205,13 @@ return $default(_that.loaderState,_that.selectedRange,_that.data,_that.errorMess
 
 
 class _ReportsState implements ReportsState {
-  const _ReportsState({this.loaderState = LoaderState.loaded, this.selectedRange = 'Today', this.data, this.errorMessage});
+  const _ReportsState({this.loaderState = LoaderState.loaded, required this.startDate, required this.endDate, this.selectedPreset = 'Today', this.data, this.errorMessage});
   
 
 @override@JsonKey() final  LoaderState loaderState;
-@override@JsonKey() final  String selectedRange;
+@override final  DateTime startDate;
+@override final  DateTime endDate;
+@override@JsonKey() final  String? selectedPreset;
 @override final  ReportsDataModel? data;
 @override final  String? errorMessage;
 
@@ -221,16 +225,16 @@ _$ReportsStateCopyWith<_ReportsState> get copyWith => __$ReportsStateCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ReportsState&&(identical(other.loaderState, loaderState) || other.loaderState == loaderState)&&(identical(other.selectedRange, selectedRange) || other.selectedRange == selectedRange)&&(identical(other.data, data) || other.data == data)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ReportsState&&(identical(other.loaderState, loaderState) || other.loaderState == loaderState)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.endDate, endDate) || other.endDate == endDate)&&(identical(other.selectedPreset, selectedPreset) || other.selectedPreset == selectedPreset)&&(identical(other.data, data) || other.data == data)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,loaderState,selectedRange,data,errorMessage);
+int get hashCode => Object.hash(runtimeType,loaderState,startDate,endDate,selectedPreset,data,errorMessage);
 
 @override
 String toString() {
-  return 'ReportsState(loaderState: $loaderState, selectedRange: $selectedRange, data: $data, errorMessage: $errorMessage)';
+  return 'ReportsState(loaderState: $loaderState, startDate: $startDate, endDate: $endDate, selectedPreset: $selectedPreset, data: $data, errorMessage: $errorMessage)';
 }
 
 
@@ -241,7 +245,7 @@ abstract mixin class _$ReportsStateCopyWith<$Res> implements $ReportsStateCopyWi
   factory _$ReportsStateCopyWith(_ReportsState value, $Res Function(_ReportsState) _then) = __$ReportsStateCopyWithImpl;
 @override @useResult
 $Res call({
- LoaderState loaderState, String selectedRange, ReportsDataModel? data, String? errorMessage
+ LoaderState loaderState, DateTime startDate, DateTime endDate, String? selectedPreset, ReportsDataModel? data, String? errorMessage
 });
 
 
@@ -258,11 +262,13 @@ class __$ReportsStateCopyWithImpl<$Res>
 
 /// Create a copy of ReportsState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? loaderState = null,Object? selectedRange = null,Object? data = freezed,Object? errorMessage = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? loaderState = null,Object? startDate = null,Object? endDate = null,Object? selectedPreset = freezed,Object? data = freezed,Object? errorMessage = freezed,}) {
   return _then(_ReportsState(
 loaderState: null == loaderState ? _self.loaderState : loaderState // ignore: cast_nullable_to_non_nullable
-as LoaderState,selectedRange: null == selectedRange ? _self.selectedRange : selectedRange // ignore: cast_nullable_to_non_nullable
-as String,data: freezed == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
+as LoaderState,startDate: null == startDate ? _self.startDate : startDate // ignore: cast_nullable_to_non_nullable
+as DateTime,endDate: null == endDate ? _self.endDate : endDate // ignore: cast_nullable_to_non_nullable
+as DateTime,selectedPreset: freezed == selectedPreset ? _self.selectedPreset : selectedPreset // ignore: cast_nullable_to_non_nullable
+as String?,data: freezed == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
 as ReportsDataModel?,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,
   ));

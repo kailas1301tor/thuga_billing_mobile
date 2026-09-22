@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:thuga/res/constants/string_constants.dart';
+import 'package:thuga/res/l10n/app_language.dart';
+import 'package:thuga/res/l10n/locale_notifier.dart';
 import 'package:thuga/res/styles/color_palette.dart';
 import 'package:thuga/res/styles/font_palette.dart';
 import 'package:thuga/res/styles/theme_provider.dart';
@@ -41,7 +43,7 @@ class SettingsContentWidget extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // 1. Store Profile Section (Avatar + Company Details)
-          _buildSectionHeader(context, 'Store Profile'),
+          _buildSectionHeader(context, Strings.storeProfile),
           12.verticalSpace,
           CommonContainer(
             padding: EdgeInsets.all(16.r),
@@ -74,7 +76,7 @@ class SettingsContentWidget extends ConsumerWidget {
                           Text(
                             settings.storeName.isNotEmpty
                                 ? settings.storeName
-                                : 'My Store',
+                                : Strings.myStoreFallback,
                             style: FontPalette.base700(
                               16,
                               color: colors.primaryText,
@@ -84,7 +86,7 @@ class SettingsContentWidget extends ConsumerWidget {
                           Text(
                             settings.email.isNotEmpty
                                 ? settings.email
-                                : 'No email set',
+                                : Strings.noEmailSet,
                             style: FontPalette.base400(
                               12,
                               color: colors.secondaryText,
@@ -102,28 +104,28 @@ class SettingsContentWidget extends ConsumerWidget {
                 // Input Forms
                 CommonTextFormField(
                   controller: notifier.storeNameController,
-                  title: 'Store Name',
-                  hintText: 'Enter your business name',
+                  title: Strings.storeName,
+                  hintText: Strings.enterBusinessName,
                 ),
                 16.verticalSpace,
                 CommonTextFormField(
                   controller: notifier.emailController,
-                  title: 'Contact Email',
-                  hintText: 'Enter your business email',
+                  title: Strings.contactEmail,
+                  hintText: Strings.enterBusinessEmail,
                   inputType: TextInputType.emailAddress,
                 ),
                 16.verticalSpace,
                 CommonTextFormField(
                   controller: notifier.phoneController,
-                  title: 'Contact Phone',
-                  hintText: 'Enter your phone number',
+                  title: Strings.contactPhone,
+                  hintText: Strings.enterPhoneNumber,
                   inputType: TextInputType.phone,
                 ),
                 16.verticalSpace,
                 CommonTextFormField(
                   controller: notifier.addressController,
-                  title: 'Address',
-                  hintText: 'Enter your address',
+                  title: Strings.address,
+                  hintText: Strings.enterAddress,
                 ),
                 16.verticalSpace,
                 _buildWorkingHourFields(context, ref),
@@ -133,12 +135,29 @@ class SettingsContentWidget extends ConsumerWidget {
           20.verticalSpace,
 
           // 3. App Customization Section
-          _buildSectionHeader(context, 'App Preference & Customization'),
+          _buildSectionHeader(context, Strings.appPreferenceSection),
           12.verticalSpace,
           CommonContainer(
             padding: EdgeInsets.all(16.r),
             borderRadius: 16.r,
-            child: _buildThemeSelector(context, ref, themeMode),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  Strings.languageSectionTitle,
+                  style: FontPalette.base600(13, color: colors.primaryText),
+                ),
+                12.verticalSpace,
+                _buildLanguageSelector(context, ref),
+                20.verticalSpace,
+                Text(
+                  Strings.themeTitle,
+                  style: FontPalette.base600(13, color: colors.primaryText),
+                ),
+                12.verticalSpace,
+                _buildThemeSelector(context, ref, themeMode),
+              ],
+            ),
           ),
           20.verticalSpace,
           _buildSectionHeader(context, Strings.printerSettingsTitle),
@@ -148,7 +167,7 @@ class SettingsContentWidget extends ConsumerWidget {
 
           // 4. Save Button
           PrimaryButton(
-            text: 'Save Preferences',
+            text: Strings.savePreferences,
             onPressed: () => notifier.savePreferences(),
             height: 50,
             radius: 12,
@@ -156,19 +175,30 @@ class SettingsContentWidget extends ConsumerWidget {
           20.verticalSpace,
 
           // 5. Logout Button
-          TextButton(
-            onPressed: () => _showLogoutConfirmation(context, ref),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.logout_rounded, color: colors.errorText, size: 18.r),
-                8.horizontalSpace,
-                Text(
-                  'Logout',
-                  style: FontPalette.base600(15, color: colors.errorText),
+          Consumer(
+            builder: (context, ref, _) {
+              final isLoggingOut = ref.watch(
+                authProvider.select((s) => s.logoutLoader),
+              );
+
+              return PrimaryButton(
+                text: Strings.logout,
+                height: 50,
+                radius: 12,
+                isLoading: isLoggingOut,
+                onPressed: isLoggingOut
+                    ? null
+                    : () => _showLogoutConfirmation(context, ref),
+                backgroundColor: colors.errorText,
+                textColor: ColorPalette.white,
+                progressColor: ColorPalette.white,
+                prefixIcon: Icon(
+                  Icons.logout_rounded,
+                  color: ColorPalette.white,
+                  size: 18.r,
                 ),
-              ],
-            ),
+              );
+            },
           ),
           20.verticalSpace,
         ],
@@ -247,6 +277,72 @@ class SettingsContentWidget extends ConsumerWidget {
     }
   }
 
+  Widget _buildLanguageSelector(BuildContext context, WidgetRef ref) {
+    final colors = context.appColors;
+    final current =
+        ref.watch(localeProvider).value ?? AppLanguage.english;
+
+    Widget buildOption({
+      required AppLanguage language,
+      required String label,
+      required IconData icon,
+    }) {
+      final isSelected = current == language;
+      return Expanded(
+        child: GestureDetector(
+          onTap: () =>
+              ref.read(localeProvider.notifier).setLanguage(language),
+          child: Container(
+            padding: EdgeInsets.symmetric(vertical: 12.h),
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? colors.primary.withValues(alpha: 0.08)
+                  : colors.inputBackground,
+              borderRadius: BorderRadius.circular(12.r),
+              border: Border.all(
+                color: isSelected ? colors.primary : colors.inputBorder,
+                width: 1.5.w,
+              ),
+            ),
+            child: Column(
+              children: [
+                Icon(
+                  icon,
+                  size: 20.r,
+                  color: isSelected ? colors.primary : colors.secondaryText,
+                ),
+                6.verticalSpace,
+                Text(
+                  label,
+                  style: FontPalette.base700(
+                    11,
+                    color: isSelected ? colors.primary : colors.primaryText,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Row(
+      children: [
+        buildOption(
+          language: AppLanguage.english,
+          label: Strings.english,
+          icon: Icons.language_rounded,
+        ),
+        10.horizontalSpace,
+        buildOption(
+          language: AppLanguage.malayalam,
+          label: Strings.malayalam,
+          icon: Icons.translate_rounded,
+        ),
+      ],
+    );
+  }
+
   Widget _buildThemeSelector(
     BuildContext context,
     WidgetRef ref,
@@ -302,19 +398,19 @@ class SettingsContentWidget extends ConsumerWidget {
       children: [
         buildOption(
           mode: ThemeMode.light,
-          label: 'Light',
+          label: Strings.themeLight,
           icon: Icons.light_mode_rounded,
         ),
         10.horizontalSpace,
         buildOption(
           mode: ThemeMode.dark,
-          label: 'Dark',
+          label: Strings.themeDark,
           icon: Icons.dark_mode_rounded,
         ),
         10.horizontalSpace,
         buildOption(
           mode: ThemeMode.system,
-          label: 'System',
+          label: Strings.themeSystem,
           icon: Icons.settings_suggest_rounded,
         ),
       ],
@@ -476,7 +572,7 @@ class SettingsContentWidget extends ConsumerWidget {
               borderRadius: BorderRadius.circular(12.r),
               style: FontPalette.base600(13, color: colors.primaryText),
               dropdownColor: colors.surface,
-              items: const [
+              items: [
                 DropdownMenuItem(
                   value: PrinterPaperSize.mm58,
                   child: Text(Strings.paperWidth58),
@@ -621,16 +717,31 @@ class SettingsContentWidget extends ConsumerWidget {
   }
 
   void _showLogoutConfirmation(BuildContext context, WidgetRef ref) {
-    CommonDialogBox.show(
+    showDialog<void>(
       context: context,
-      title: 'Confirm Logout',
-      message:
-          'Are you sure you want to log out? All local session data will be cleared.',
-      primaryLabel: 'Logout',
-      secondaryLabel: 'Cancel',
-      onPrimary: () {
-        ref.read(authProvider.notifier).logout();
-      },
+      barrierDismissible: false,
+      builder: (dialogContext) => Consumer(
+        builder: (context, ref, _) {
+          final isLoggingOut = ref.watch(
+            authProvider.select((s) => s.logoutLoader),
+          );
+
+          return CommonDialogBox(
+            title: Strings.confirmLogout,
+            message: Strings.confirmLogoutMessage,
+            primaryLabel: Strings.logout,
+            secondaryLabel: Strings.cancel,
+            isLoadingPrimary: isLoggingOut,
+            autoPop: false,
+            primaryButtonColor: context.appColors.errorText,
+            primaryButtonTextColor: ColorPalette.white,
+            onPrimary: () {
+              if (isLoggingOut) return;
+              ref.read(authProvider.notifier).logout();
+            },
+          );
+        },
+      ),
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 /// A reusable loading indicator widget.
@@ -15,15 +16,14 @@ class CommonLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Center(
       child: SizedBox(
         width: size,
         height: size,
-        child: CircularProgressIndicator.adaptive(
-          strokeWidth: strokeWidth,
-          valueColor: AlwaysStoppedAnimation<Color>(
-            color ?? Theme.of(context).primaryColor,
-          ),
+        child: CupertinoActivityIndicator(
+          radius: size / 4,
+          color: isDarkMode ? Colors.white : Colors.black,
         ),
       ),
     );

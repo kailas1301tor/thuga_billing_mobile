@@ -2,10 +2,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:thuga/res/constants/string_constants.dart';
 import 'package:thuga/res/styles/color_palette.dart';
 import 'package:thuga/res/styles/font_palette.dart';
 import 'package:thuga/utils/common_widgets/common_container.dart';
 import 'package:thuga/utils/common_widgets/common_cached_network_image.dart';
+import 'package:thuga/utils/helpers/common_functions.dart';
+import 'package:thuga/utils/helpers/date_range_labels.dart';
 import 'package:thuga/utils/helpers/extensions.dart';
 import '../../notifier/reports_notifier.dart';
 import '../../model/reports_model.dart';
@@ -21,30 +24,100 @@ class ReportsContentWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
-    final selectedRange = ref.watch(
-      reportsProvider.select((s) => s.selectedRange),
+    final startDate = ref.watch(
+      reportsProvider.select((s) => s.startDate),
+    );
+    final endDate = ref.watch(
+      reportsProvider.select((s) => s.endDate),
+    );
+    final selectedPreset = ref.watch(
+      reportsProvider.select((s) => s.selectedPreset),
     );
     final notifier = ref.read(reportsProvider.notifier);
 
-    final ranges = ['Today', 'Yesterday', 'Last 7 Days', 'This Month'];
+    final ranges = [
+      DateRangeIds.today,
+      DateRangeIds.yesterday,
+      DateRangeIds.thisWeek,
+      DateRangeIds.thisMonth,
+    ];
 
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // 1. Date Range Filter Chips
+          // 1. Date Range Selector
+          GestureDetector(
+            onTap: () async {
+              final picked = await showDateRangePicker(
+                context: context,
+                firstDate: DateTime(2020),
+                lastDate: DateTime(2030),
+                initialDateRange: DateTimeRange(
+                  start: startDate,
+                  end: endDate,
+                ),
+                builder: (context, child) {
+                  return Theme(
+                    data: Theme.of(context).copyWith(
+                      colorScheme: Theme.of(context).colorScheme.copyWith(
+                            primary: colors.primary,
+                            onPrimary: Colors.white,
+                            surface: colors.surface,
+                            onSurface: colors.primaryText,
+                          ),
+                    ),
+                    child: child!,
+                  );
+                },
+              );
+              if (picked != null) {
+                notifier.setDateRange(picked.start, picked.end);
+              }
+            },
+            child: CommonContainer(
+              padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
+              borderRadius: 14.r,
+              border: Border.all(color: colors.inputBorder, width: 1.w),
+              color: colors.surface,
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.date_range_rounded,
+                    color: colors.primary,
+                    size: 18.r,
+                  ),
+                  10.horizontalSpace,
+                  Expanded(
+                    child: Text(
+                      '${formatDate(startDate, pattern: 'dd MMM yyyy')} - ${formatDate(endDate, pattern: 'dd MMM yyyy')}',
+                      style: FontPalette.base600(13, color: colors.primaryText),
+                    ),
+                  ),
+                  Icon(
+                    Icons.arrow_drop_down_rounded,
+                    color: colors.secondaryText,
+                    size: 22.r,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          10.verticalSpace,
+
+          // 2. Date Range Filter Chips
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
               children: ranges.map((range) {
-                final isSelected = selectedRange == range;
+                final isSelected = selectedPreset == range;
                 return Padding(
                   padding: EdgeInsets.only(right: 8.w),
                   child: ChoiceChip(
-                    label: Text(range),
+                    label: Text(localizedDateRangeLabel(range)),
                     selected: isSelected,
-                    onSelected: (_) => notifier.setRange(range),
+                    onSelected: (_) => notifier.setPresetRange(range),
                     selectedColor: colors.primary,
                     checkmarkColor: Colors.white,
                     showCheckmark: false,
@@ -96,18 +169,19 @@ class ReportsContentWidget extends ConsumerWidget {
     return CommonContainer(
       padding: EdgeInsets.all(16.r),
       borderRadius: 20.r,
+      border: Border.all(color: colors.inputBorder, width: 1.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Top Selling Products',
+            Strings.topSellingProducts,
             style: FontPalette.base700(14, color: colors.primaryText),
           ),
           16.verticalSpace,
           if ((products??[]).isEmpty)
             Center(
               child: Text(
-                'No product sales recorded',
+                Strings.noProductSalesRecorded,
                 style: FontPalette.base400(13, color: colors.secondaryText),
               ),
             )

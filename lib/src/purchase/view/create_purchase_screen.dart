@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:thuga/res/constants/string_constants.dart';
 import 'package:thuga/res/styles/color_palette.dart';
 import 'package:thuga/res/styles/font_palette.dart';
 import 'package:thuga/src/main/notifier/dropdowns_notifier.dart';
@@ -36,8 +37,8 @@ class CreatePurchaseScreen extends ConsumerWidget {
 
     return CommonScaffold(
       backgroundColor: colors.background,
-      appBar: const CommonAppBar(
-        title: 'New Purchase',
+      appBar: CommonAppBar(
+        title: Strings.newPurchase,
         showBackButton: true,
       ),
       body: SafeArea(
@@ -51,7 +52,7 @@ class CreatePurchaseScreen extends ConsumerWidget {
                   children: [
                     // Date Selector
                     Text(
-                      'Purchase Date',
+                      Strings.purchaseDate,
                       style: FontPalette.base600(13, color: colors.secondaryText),
                     ),
                     10.verticalSpace,
@@ -94,7 +95,7 @@ class CreatePurchaseScreen extends ConsumerWidget {
 
                     // Add Item Block
                     Text(
-                      'Add Item',
+                      Strings.addItem,
                       style: FontPalette.base700(15, color: colors.primaryText),
                     ),
                     12.verticalSpace,
@@ -112,7 +113,7 @@ class CreatePurchaseScreen extends ConsumerWidget {
                               showSingleSelectBottomSheet<DropdownProductModel>(
                                 context: context,
                                 ref: ref,
-                                title: 'Select Product',
+                                title: Strings.selectProduct,
                                 options: products,
                                 currentValue: state.selectedProduct,
                                 onSelected: (product) => notifier.selectProduct(product),
@@ -139,7 +140,7 @@ class CreatePurchaseScreen extends ConsumerWidget {
                                     child: Text(
                                       state.selectedProduct != null
                                           ? state.selectedProduct!.name
-                                          : 'Select Product',
+                                          : Strings.selectProduct,
                                       style: state.selectedProduct != null
                                           ? FontPalette.base600(
                                               13,
@@ -165,7 +166,7 @@ class CreatePurchaseScreen extends ConsumerWidget {
                               Expanded(
                                 child: CommonTextFormField(
                                   controller: notifier.quantityController,
-                                  hintText: 'Qty',
+                                  hintText: Strings.qty,
                                   inputType: const TextInputType.numberWithOptions(signed: false, decimal: false),
                                   inputFormatters: [
                                     FilteringTextInputFormatter.digitsOnly,
@@ -176,7 +177,7 @@ class CreatePurchaseScreen extends ConsumerWidget {
                               Expanded(
                                 child: CommonTextFormField(
                                   controller: notifier.priceController,
-                                  hintText: 'Price per unit',
+                                  hintText: Strings.pricePerUnit,
                                   inputType: const TextInputType.numberWithOptions(signed: false, decimal: true),
                                   inputFormatters: [
                                     FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
@@ -189,7 +190,7 @@ class CreatePurchaseScreen extends ConsumerWidget {
 
                           // Add Item Button
                           PrimaryButton(
-                            text: 'Add Item to Purchase',
+                            text: Strings.addItemToPurchase,
                             radius: 12,
                             onPressed: () {
                               notifier.addItem();
@@ -202,7 +203,7 @@ class CreatePurchaseScreen extends ConsumerWidget {
 
                     // Items list title
                     Text(
-                      'Purchase Items (${state.items.length})',
+                      Strings.purchaseItemsCount(state.items.length),
                       style: FontPalette.base700(15, color: colors.primaryText),
                     ),
                     12.verticalSpace,
@@ -211,7 +212,7 @@ class CreatePurchaseScreen extends ConsumerWidget {
                       Padding(
                         padding: EdgeInsets.symmetric(vertical: 24.h),
                         child: Text(
-                          'No items added to this purchase yet.',
+                          Strings.noPurchaseItemsYet,
                           textAlign: TextAlign.center,
                           style: FontPalette.base400(13, color: colors.secondaryText),
                         ),
@@ -243,7 +244,7 @@ class CreatePurchaseScreen extends ConsumerWidget {
                                       ),
                                       4.verticalSpace,
                                       Text(
-                                        'Qty: ${item.quantity}  ×  ${item.price.toCurrency()}',
+                                        Strings.qtyTimesPrice(qty: '${item.quantity}', price: item.price.toCurrency()),
                                         style: FontPalette.base400(12, color: colors.secondaryText),
                                       ),
                                     ],
@@ -293,7 +294,7 @@ class CreatePurchaseScreen extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Grand Total',
+                          Strings.grandTotal,
                           style: FontPalette.base700(15, color: colors.primaryText),
                         ),
                         Text(
@@ -306,7 +307,7 @@ class CreatePurchaseScreen extends ConsumerWidget {
                     ),
                     16.verticalSpace,
                     PrimaryButton(
-                      text: 'Create Purchase',
+                      text: Strings.createPurchase,
                       isLoading: state.isSaving,
                       onPressed: state.isSaving
                           ? () {}

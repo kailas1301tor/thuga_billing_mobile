@@ -203,69 +203,72 @@ class _CommonTextFormFieldState extends State<CommonTextFormField> {
           side: widget.showBorder
               ? BorderSide(width: 1, color: borderColor)
               : BorderSide.none,
-          child: TextFormField(
-            controller: widget.controller,
-            focusNode: _effectiveFocusNode,
-            readOnly: widget.readOnly,
-            obscureText: widget.isObscure,
-            obscuringCharacter: '•',
-            keyboardType: widget.inputType,
-            textCapitalization: widget.textCapitalization,
-            cursorWidth: widget.cursorWidth ?? 2.w,
-            cursorHeight: widget.cursorHeight,
-            cursorColor: widget.cursorColor ?? colors.primaryText,
-            autocorrect: false,
-            enableSuggestions: false,
-            onChanged: widget.onChanged,
-            onFieldSubmitted: widget.onSubmitted,
-            onTap: widget.onTap,
-            onTapOutside: (event) {
-              widget.onTapOutside?.call(event);
-              FocusManager.instance.primaryFocus?.unfocus();
-            },
-            validator: widget.validator,
-            ignorePointers: widget.ignorePointers,
-            inputFormatters: widget.inputFormatters,
-            maxLength: widget.maxLength,
-            minLines: widget.expands ? null : widget.minLines,
-            maxLines: widget.expands ? null : widget.maxLines,
-            autofocus: widget.autoFocus,
-            textAlign: widget.textAlign,
-            textAlignVertical:
-                widget.textAlignVertical ?? TextAlignVertical.center,
-            expands: widget.expands,
-            textInputAction: widget.inputAction,
-            style:
-                widget.style ??
-                FontPalette.base500(14, color: colors.primaryText),
-            buildCounter:
-                (
-                  context, {
-                  required currentLength,
-                  required isFocused,
-                  required maxLength,
-                }) => null,
-            decoration: InputDecoration(
-              prefix: widget.prefix,
-              prefixIcon: widget.prefixIcon,
-              prefixIconConstraints: widget.prefixIconConstraints,
-              suffixIcon: effectiveSuffix,
-              hintText: widget.hintText,
-              hintStyle:
-                  widget.hintFontStyle ??
-                  FontPalette.base400(14, color: colors.secondaryText),
-              filled: false,
-              border: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              focusedBorder: InputBorder.none,
-              errorBorder: InputBorder.none,
-              focusedErrorBorder: InputBorder.none,
-              contentPadding:
-                  widget.contentPadding ??
-                  EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-              counterText: '',
-              errorText: widget.showErrorText ? widget.errorText : null,
-              errorStyle: FontPalette.base400(12, color: colors.errorText),
+          child: Center(
+            child: TextFormField(
+              controller: widget.controller,
+              focusNode: _effectiveFocusNode,
+              readOnly: widget.readOnly,
+              obscureText: widget.isObscure,
+              obscuringCharacter: '•',
+              keyboardType: widget.inputType,
+              textCapitalization: widget.textCapitalization,
+              cursorWidth: widget.cursorWidth ?? 2.w,
+              cursorHeight: widget.cursorHeight,
+              cursorColor: widget.cursorColor ?? colors.primaryText,
+              autocorrect: false,
+              enableSuggestions: false,
+              onChanged: widget.onChanged,
+              onFieldSubmitted: widget.onSubmitted,
+              onTap: widget.onTap,
+              onTapOutside: (event) {
+                widget.onTapOutside?.call(event);
+                FocusManager.instance.primaryFocus?.unfocus();
+              },
+              validator: widget.validator,
+              ignorePointers: widget.ignorePointers,
+              inputFormatters: widget.inputFormatters,
+              maxLength: widget.maxLength,
+              minLines: widget.expands ? null : widget.minLines,
+              maxLines: widget.expands ? null : widget.maxLines,
+              autofocus: widget.autoFocus,
+              textAlign: widget.textAlign,
+              textAlignVertical:
+                  widget.textAlignVertical ?? TextAlignVertical.center,
+              expands: widget.expands,
+              textInputAction: widget.inputAction,
+              style:
+                  widget.style ??
+                  FontPalette.base500(14, color: colors.primaryText),
+              buildCounter:
+                  (
+                    context, {
+                    required currentLength,
+                    required isFocused,
+                    required maxLength,
+                  }) => null,
+              decoration: InputDecoration(
+                prefix: widget.prefix,
+                prefixIcon: widget.prefixIcon,
+                prefixIconConstraints: widget.prefixIconConstraints,
+                suffixIcon: effectiveSuffix,
+                hintText: widget.hintText,
+                hintStyle:
+                    widget.hintFontStyle ??
+                    FontPalette.base400(14, color: colors.secondaryText),
+                filled: false,
+                isDense: true,
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                errorBorder: InputBorder.none,
+                focusedErrorBorder: InputBorder.none,
+                contentPadding:
+                    widget.contentPadding ??
+                    EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                counterText: '',
+                errorText: widget.showErrorText ? widget.errorText : null,
+                errorStyle: FontPalette.base400(12, color: colors.errorText),
+              ),
             ),
           ),
         ),
