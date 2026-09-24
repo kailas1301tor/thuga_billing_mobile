@@ -21,6 +21,7 @@ import 'package:thuga/utils/helpers/toast_helper.dart';
 import 'package:thuga/utils/helpers/working_hour_helper.dart';
 import '../../notifier/settings_notifier.dart';
 import '../../model/settings_model.dart';
+import 'settings_payment_qr_section.dart';
 
 class SettingsContentWidget extends ConsumerWidget {
   const SettingsContentWidget({super.key, required this.settings});
@@ -129,6 +130,8 @@ class SettingsContentWidget extends ConsumerWidget {
                 ),
                 16.verticalSpace,
                 _buildWorkingHourFields(context, ref),
+                16.verticalSpace,
+                const SettingsPaymentQrSection(),
               ],
             ),
           ),
