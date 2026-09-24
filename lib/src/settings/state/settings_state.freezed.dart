@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$SettingsState {
 
- LoaderState get loaderState; SettingsModel get settings; CompanyDetailsModel? get companyDetails; TimeOfDay get startWorkingTime; TimeOfDay get endWorkingTime; String? get errorMessage;
+ LoaderState get loaderState; SettingsModel get settings; CompanyDetailsModel? get companyDetails; TimeOfDay get startWorkingTime; TimeOfDay get endWorkingTime; String? get selectedQrPath; String? get errorMessage;
 /// Create a copy of SettingsState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $SettingsStateCopyWith<SettingsState> get copyWith => _$SettingsStateCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SettingsState&&(identical(other.loaderState, loaderState) || other.loaderState == loaderState)&&(identical(other.settings, settings) || other.settings == settings)&&(identical(other.companyDetails, companyDetails) || other.companyDetails == companyDetails)&&(identical(other.startWorkingTime, startWorkingTime) || other.startWorkingTime == startWorkingTime)&&(identical(other.endWorkingTime, endWorkingTime) || other.endWorkingTime == endWorkingTime)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SettingsState&&(identical(other.loaderState, loaderState) || other.loaderState == loaderState)&&(identical(other.settings, settings) || other.settings == settings)&&(identical(other.companyDetails, companyDetails) || other.companyDetails == companyDetails)&&(identical(other.startWorkingTime, startWorkingTime) || other.startWorkingTime == startWorkingTime)&&(identical(other.endWorkingTime, endWorkingTime) || other.endWorkingTime == endWorkingTime)&&(identical(other.selectedQrPath, selectedQrPath) || other.selectedQrPath == selectedQrPath)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,loaderState,settings,companyDetails,startWorkingTime,endWorkingTime,errorMessage);
+int get hashCode => Object.hash(runtimeType,loaderState,settings,companyDetails,startWorkingTime,endWorkingTime,selectedQrPath,errorMessage);
 
 @override
 String toString() {
-  return 'SettingsState(loaderState: $loaderState, settings: $settings, companyDetails: $companyDetails, startWorkingTime: $startWorkingTime, endWorkingTime: $endWorkingTime, errorMessage: $errorMessage)';
+  return 'SettingsState(loaderState: $loaderState, settings: $settings, companyDetails: $companyDetails, startWorkingTime: $startWorkingTime, endWorkingTime: $endWorkingTime, selectedQrPath: $selectedQrPath, errorMessage: $errorMessage)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $SettingsStateCopyWith<$Res>  {
   factory $SettingsStateCopyWith(SettingsState value, $Res Function(SettingsState) _then) = _$SettingsStateCopyWithImpl;
 @useResult
 $Res call({
- LoaderState loaderState, SettingsModel settings, CompanyDetailsModel? companyDetails, TimeOfDay startWorkingTime, TimeOfDay endWorkingTime, String? errorMessage
+ LoaderState loaderState, SettingsModel settings, CompanyDetailsModel? companyDetails, TimeOfDay startWorkingTime, TimeOfDay endWorkingTime, String? selectedQrPath, String? errorMessage
 });
 
 
@@ -62,14 +62,15 @@ class _$SettingsStateCopyWithImpl<$Res>
 
 /// Create a copy of SettingsState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? loaderState = null,Object? settings = null,Object? companyDetails = freezed,Object? startWorkingTime = null,Object? endWorkingTime = null,Object? errorMessage = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? loaderState = null,Object? settings = null,Object? companyDetails = freezed,Object? startWorkingTime = null,Object? endWorkingTime = null,Object? selectedQrPath = freezed,Object? errorMessage = freezed,}) {
   return _then(_self.copyWith(
 loaderState: null == loaderState ? _self.loaderState : loaderState // ignore: cast_nullable_to_non_nullable
 as LoaderState,settings: null == settings ? _self.settings : settings // ignore: cast_nullable_to_non_nullable
 as SettingsModel,companyDetails: freezed == companyDetails ? _self.companyDetails : companyDetails // ignore: cast_nullable_to_non_nullable
 as CompanyDetailsModel?,startWorkingTime: null == startWorkingTime ? _self.startWorkingTime : startWorkingTime // ignore: cast_nullable_to_non_nullable
 as TimeOfDay,endWorkingTime: null == endWorkingTime ? _self.endWorkingTime : endWorkingTime // ignore: cast_nullable_to_non_nullable
-as TimeOfDay,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
+as TimeOfDay,selectedQrPath: freezed == selectedQrPath ? _self.selectedQrPath : selectedQrPath // ignore: cast_nullable_to_non_nullable
+as String?,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -152,10 +153,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( LoaderState loaderState,  SettingsModel settings,  CompanyDetailsModel? companyDetails,  TimeOfDay startWorkingTime,  TimeOfDay endWorkingTime,  String? errorMessage)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( LoaderState loaderState,  SettingsModel settings,  CompanyDetailsModel? companyDetails,  TimeOfDay startWorkingTime,  TimeOfDay endWorkingTime,  String? selectedQrPath,  String? errorMessage)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SettingsState() when $default != null:
-return $default(_that.loaderState,_that.settings,_that.companyDetails,_that.startWorkingTime,_that.endWorkingTime,_that.errorMessage);case _:
+return $default(_that.loaderState,_that.settings,_that.companyDetails,_that.startWorkingTime,_that.endWorkingTime,_that.selectedQrPath,_that.errorMessage);case _:
   return orElse();
 
 }
@@ -173,10 +174,10 @@ return $default(_that.loaderState,_that.settings,_that.companyDetails,_that.star
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( LoaderState loaderState,  SettingsModel settings,  CompanyDetailsModel? companyDetails,  TimeOfDay startWorkingTime,  TimeOfDay endWorkingTime,  String? errorMessage)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( LoaderState loaderState,  SettingsModel settings,  CompanyDetailsModel? companyDetails,  TimeOfDay startWorkingTime,  TimeOfDay endWorkingTime,  String? selectedQrPath,  String? errorMessage)  $default,) {final _that = this;
 switch (_that) {
 case _SettingsState():
-return $default(_that.loaderState,_that.settings,_that.companyDetails,_that.startWorkingTime,_that.endWorkingTime,_that.errorMessage);}
+return $default(_that.loaderState,_that.settings,_that.companyDetails,_that.startWorkingTime,_that.endWorkingTime,_that.selectedQrPath,_that.errorMessage);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -190,10 +191,10 @@ return $default(_that.loaderState,_that.settings,_that.companyDetails,_that.star
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( LoaderState loaderState,  SettingsModel settings,  CompanyDetailsModel? companyDetails,  TimeOfDay startWorkingTime,  TimeOfDay endWorkingTime,  String? errorMessage)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( LoaderState loaderState,  SettingsModel settings,  CompanyDetailsModel? companyDetails,  TimeOfDay startWorkingTime,  TimeOfDay endWorkingTime,  String? selectedQrPath,  String? errorMessage)?  $default,) {final _that = this;
 switch (_that) {
 case _SettingsState() when $default != null:
-return $default(_that.loaderState,_that.settings,_that.companyDetails,_that.startWorkingTime,_that.endWorkingTime,_that.errorMessage);case _:
+return $default(_that.loaderState,_that.settings,_that.companyDetails,_that.startWorkingTime,_that.endWorkingTime,_that.selectedQrPath,_that.errorMessage);case _:
   return null;
 
 }
@@ -205,7 +206,7 @@ return $default(_that.loaderState,_that.settings,_that.companyDetails,_that.star
 
 
 class _SettingsState implements SettingsState {
-  const _SettingsState({this.loaderState = LoaderState.loaded, required this.settings, this.companyDetails, this.startWorkingTime = defaultStartWorkingTime, this.endWorkingTime = defaultEndWorkingTime, this.errorMessage});
+  const _SettingsState({this.loaderState = LoaderState.loaded, required this.settings, this.companyDetails, this.startWorkingTime = defaultStartWorkingTime, this.endWorkingTime = defaultEndWorkingTime, this.selectedQrPath, this.errorMessage});
   
 
 @override@JsonKey() final  LoaderState loaderState;
@@ -213,6 +214,7 @@ class _SettingsState implements SettingsState {
 @override final  CompanyDetailsModel? companyDetails;
 @override@JsonKey() final  TimeOfDay startWorkingTime;
 @override@JsonKey() final  TimeOfDay endWorkingTime;
+@override final  String? selectedQrPath;
 @override final  String? errorMessage;
 
 /// Create a copy of SettingsState
@@ -225,16 +227,16 @@ _$SettingsStateCopyWith<_SettingsState> get copyWith => __$SettingsStateCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SettingsState&&(identical(other.loaderState, loaderState) || other.loaderState == loaderState)&&(identical(other.settings, settings) || other.settings == settings)&&(identical(other.companyDetails, companyDetails) || other.companyDetails == companyDetails)&&(identical(other.startWorkingTime, startWorkingTime) || other.startWorkingTime == startWorkingTime)&&(identical(other.endWorkingTime, endWorkingTime) || other.endWorkingTime == endWorkingTime)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SettingsState&&(identical(other.loaderState, loaderState) || other.loaderState == loaderState)&&(identical(other.settings, settings) || other.settings == settings)&&(identical(other.companyDetails, companyDetails) || other.companyDetails == companyDetails)&&(identical(other.startWorkingTime, startWorkingTime) || other.startWorkingTime == startWorkingTime)&&(identical(other.endWorkingTime, endWorkingTime) || other.endWorkingTime == endWorkingTime)&&(identical(other.selectedQrPath, selectedQrPath) || other.selectedQrPath == selectedQrPath)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,loaderState,settings,companyDetails,startWorkingTime,endWorkingTime,errorMessage);
+int get hashCode => Object.hash(runtimeType,loaderState,settings,companyDetails,startWorkingTime,endWorkingTime,selectedQrPath,errorMessage);
 
 @override
 String toString() {
-  return 'SettingsState(loaderState: $loaderState, settings: $settings, companyDetails: $companyDetails, startWorkingTime: $startWorkingTime, endWorkingTime: $endWorkingTime, errorMessage: $errorMessage)';
+  return 'SettingsState(loaderState: $loaderState, settings: $settings, companyDetails: $companyDetails, startWorkingTime: $startWorkingTime, endWorkingTime: $endWorkingTime, selectedQrPath: $selectedQrPath, errorMessage: $errorMessage)';
 }
 
 
@@ -245,7 +247,7 @@ abstract mixin class _$SettingsStateCopyWith<$Res> implements $SettingsStateCopy
   factory _$SettingsStateCopyWith(_SettingsState value, $Res Function(_SettingsState) _then) = __$SettingsStateCopyWithImpl;
 @override @useResult
 $Res call({
- LoaderState loaderState, SettingsModel settings, CompanyDetailsModel? companyDetails, TimeOfDay startWorkingTime, TimeOfDay endWorkingTime, String? errorMessage
+ LoaderState loaderState, SettingsModel settings, CompanyDetailsModel? companyDetails, TimeOfDay startWorkingTime, TimeOfDay endWorkingTime, String? selectedQrPath, String? errorMessage
 });
 
 
@@ -262,14 +264,15 @@ class __$SettingsStateCopyWithImpl<$Res>
 
 /// Create a copy of SettingsState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? loaderState = null,Object? settings = null,Object? companyDetails = freezed,Object? startWorkingTime = null,Object? endWorkingTime = null,Object? errorMessage = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? loaderState = null,Object? settings = null,Object? companyDetails = freezed,Object? startWorkingTime = null,Object? endWorkingTime = null,Object? selectedQrPath = freezed,Object? errorMessage = freezed,}) {
   return _then(_SettingsState(
 loaderState: null == loaderState ? _self.loaderState : loaderState // ignore: cast_nullable_to_non_nullable
 as LoaderState,settings: null == settings ? _self.settings : settings // ignore: cast_nullable_to_non_nullable
 as SettingsModel,companyDetails: freezed == companyDetails ? _self.companyDetails : companyDetails // ignore: cast_nullable_to_non_nullable
 as CompanyDetailsModel?,startWorkingTime: null == startWorkingTime ? _self.startWorkingTime : startWorkingTime // ignore: cast_nullable_to_non_nullable
 as TimeOfDay,endWorkingTime: null == endWorkingTime ? _self.endWorkingTime : endWorkingTime // ignore: cast_nullable_to_non_nullable
-as TimeOfDay,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
+as TimeOfDay,selectedQrPath: freezed == selectedQrPath ? _self.selectedQrPath : selectedQrPath // ignore: cast_nullable_to_non_nullable
+as String?,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }

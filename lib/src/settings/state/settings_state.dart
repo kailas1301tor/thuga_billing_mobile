@@ -16,6 +16,7 @@ sealed class SettingsState with _$SettingsState {
     CompanyDetailsModel? companyDetails,
     @Default(defaultStartWorkingTime) TimeOfDay startWorkingTime,
     @Default(defaultEndWorkingTime) TimeOfDay endWorkingTime,
+    String? selectedQrPath,
     String? errorMessage,
   }) = _SettingsState;
 }

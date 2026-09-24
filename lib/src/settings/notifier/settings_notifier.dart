@@ -1,10 +1,14 @@
 // lib/src/settings/notifier/settings_notifier.dart
+import 'package:dio/dio.dart';
+import 'package:either_dart/either.dart';
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:thuga/res/constants/string_constants.dart';
 import 'package:thuga/res/enums/enums.dart';
 import 'package:thuga/services/repo_di.dart';
 import 'package:thuga/services/token_service.dart';
+import 'package:thuga/utils/helpers/file_picker.dart';
+import 'package:thuga/utils/helpers/payment_qr_helper.dart';
 import 'package:thuga/utils/helpers/toast_helper.dart';
 import 'package:thuga/utils/helpers/working_hour_helper.dart';
 import '../model/settings_model.dart';
@@ -61,6 +65,25 @@ class SettingsNotifier extends _$SettingsNotifier {
     state = state.copyWith(endWorkingTime: time);
   }
 
+  Future<void> pickPaymentQr() async {
+    try {
+      final file = await FileSelectionService.instance.pickImage();
+      if (file == null) return;
+      if (!isAllowedPaymentQrExtension(file.path)) {
+        showCustomErrorToast(message: Strings.paymentQrUnsupportedType);
+        return;
+      }
+      state = state.copyWith(selectedQrPath: file.path);
+    } catch (e) {
+      debugPrint('🔴 Error picking payment QR: $e');
+      showCustomErrorToast(message: Strings.paymentQrUnsupportedType);
+    }
+  }
+
+  void clearSelectedPaymentQr() {
+    state = state.copyWith(selectedQrPath: null);
+  }
+
   Future<void> fetchSettings() async {
     state = state.copyWith(loaderState: LoaderState.loading);
 
@@ -110,6 +133,7 @@ class SettingsNotifier extends _$SettingsNotifier {
               companyDetails: companyDetails,
               startWorkingTime: startTime,
               endWorkingTime: endTime,
+              selectedQrPath: null,
             );
           },
         );
@@ -149,50 +173,92 @@ class SettingsNotifier extends _$SettingsNotifier {
     final userIdStr = await ref.read(tokenServiceProvider).getUserId();
     final userId = int.tryParse(userIdStr ?? '') ?? 1;
 
-    // 1. Update remote company details
-    final updateResult = await ref.read(settingsRepositoryProvider).updateCompanyDetails(
-      companyId: userId,
-      email: email,
-      password: password,
-      companyName: name,
-      address: address,
-      phoneNumber: phone,
-      startWorkingHour: startWorkingHour,
-      endWorkingHour: endWorkingHour,
-    );
+    final map = <String, dynamic>{
+      'id': userId,
+      'email': email,
+      'company_name': name,
+      'address': address,
+      'phone_number': phone,
+      'start_working_hour': startWorkingHour,
+      'end_working_hour': endWorkingHour,
+    };
+    if (password.isNotEmpty) {
+      map['password'] = password;
+    }
 
-    updateResult.fold(
-      (left) {
-        state = state.copyWith(loaderState: LoaderState.error);
-        showCustomErrorToast(message: left.message ?? Strings.companyDetailsSaveFailed);
-      },
-      (success) async {
-        // 2. Save local preferences
-        final updatedLocal = state.settings.copyWith(
-          storeName: name,
-          email: email,
-          taxRate: tax,
-        );
-        await ref.read(settingsRepositoryProvider).saveSettings(updatedLocal);
+    final path = state.selectedQrPath;
+    if (path != null) {
+      map['qr_code'] = await MultipartFile.fromFile(
+        path,
+        filename: path.split('/').last,
+      );
+    }
+    final formData = FormData.fromMap(map);
 
-        state = state.copyWith(
-          loaderState: LoaderState.loaded,
-          settings: updatedLocal,
-          companyDetails: CompanyDetailsModel(
-            id: userId,
-            companyName: name,
-            status: state.companyDetails?.status ?? 'Active',
-            address: address,
-            phoneNumber: phone,
-            isActive: state.companyDetails?.isActive ?? true,
-            email: email,
-            startWorkingHour: startWorkingHour,
-            endWorkingHour: endWorkingHour,
-          ),
-        );
-        showCustomToast(message: Strings.companyDetailsSavedSuccess);
-      },
-    );
+    return await ref
+        .read(settingsRepositoryProvider)
+        .updateCompanyDetails(formData)
+        .fold(
+          (left) {
+            debugPrint('🔴 API ERROR saving company details: ${left.message}');
+            state = state.copyWith(loaderState: LoaderState.error);
+            showCustomErrorToast(
+              message: left.message ?? Strings.companyDetailsSaveFailed,
+            );
+          },
+          (success) async {
+            final updatedLocal = state.settings.copyWith(
+              storeName: name,
+              email: email,
+              taxRate: tax,
+            );
+            await ref.read(settingsRepositoryProvider).saveSettings(updatedLocal);
+
+            final remote = await ref
+                .read(settingsRepositoryProvider)
+                .getCompanyDetails(userId);
+
+            remote.fold(
+              (left) {
+                debugPrint(
+                  '🔴 API ERROR re-fetching company details: ${left.message}',
+                );
+                state = state.copyWith(
+                  loaderState: LoaderState.loaded,
+                  settings: updatedLocal,
+                  selectedQrPath: null,
+                  companyDetails: CompanyDetailsModel(
+                    id: userId,
+                    companyName: name,
+                    status: state.companyDetails?.status ?? 'Active',
+                    address: address,
+                    phoneNumber: phone,
+                    isActive: state.companyDetails?.isActive ?? true,
+                    email: email,
+                    startWorkingHour: startWorkingHour,
+                    endWorkingHour: endWorkingHour,
+                    qrCode: state.companyDetails?.qrCode,
+                  ),
+                );
+                showCustomToast(message: Strings.companyDetailsSavedSuccess);
+              },
+              (companyDetails) {
+                state = state.copyWith(
+                  loaderState: LoaderState.loaded,
+                  settings: updatedLocal,
+                  companyDetails: companyDetails,
+                  selectedQrPath: null,
+                );
+                showCustomToast(message: Strings.companyDetailsSavedSuccess);
+              },
+            );
+          },
+        )
+        .catchError((e) {
+          debugPrint('🔴 UNEXPECTED ERROR saving company details: $e');
+          state = state.copyWith(loaderState: LoaderState.error);
+          showCustomErrorToast(message: Strings.companyDetailsSaveFailed);
+        });
   }
 
   Future<void> updateAutoPrint(bool val) async {
@@ -239,6 +305,7 @@ class SettingsNotifier extends _$SettingsNotifier {
           settings: right,
           startWorkingTime: defaultStartWorkingTime,
           endWorkingTime: defaultEndWorkingTime,
+          selectedQrPath: null,
           companyDetails: CompanyDetailsModel(
             id: state.companyDetails?.id ?? 1,
             companyName: right.storeName,
@@ -249,6 +316,7 @@ class SettingsNotifier extends _$SettingsNotifier {
             email: right.email,
             startWorkingHour: formatWorkingHour24(defaultStartWorkingTime),
             endWorkingHour: formatWorkingHour24(defaultEndWorkingTime),
+            qrCode: state.companyDetails?.qrCode,
           ),
         );
         showCustomToast(message: Strings.settingsResetSuccess);

@@ -1,4 +1,5 @@
 // lib/src/settings/repo/settings_repository.dart
+import 'package:dio/dio.dart';
 import 'package:either_dart/either.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,16 +16,9 @@ abstract class SettingsRepo {
   Future<Either<ResponseError, SettingsModel>> getSettings();
   Future<Either<ResponseError, SettingsModel>> saveSettings(SettingsModel settings);
   Future<Either<ResponseError, CompanyDetailsModel>> getCompanyDetails(int companyId);
-  Future<Either<ResponseError, CommonResponseModel>> updateCompanyDetails({
-    required int companyId,
-    required String email,
-    String? password,
-    required String companyName,
-    required String address,
-    required String phoneNumber,
-    required String startWorkingHour,
-    required String endWorkingHour,
-  });
+  Future<Either<ResponseError, CommonResponseModel>> updateCompanyDetails(
+    FormData formData,
+  );
 }
 
 class SettingsRepoImpl implements SettingsRepo {
@@ -139,38 +133,19 @@ class SettingsRepoImpl implements SettingsRepo {
       email: 'contact@thuga.com',
       startWorkingHour: '00:00:00',
       endWorkingHour: '12:00:00',
+      qrCode: null,
     );
   }
 
   @override
-  Future<Either<ResponseError, CommonResponseModel>> updateCompanyDetails({
-    required int companyId,
-    required String email,
-    String? password,
-    required String companyName,
-    required String address,
-    required String phoneNumber,
-    required String startWorkingHour,
-    required String endWorkingHour,
-  }) async {
-    final Map<String, dynamic> params = {
-      'id': companyId,
-      'email': email,
-      'company_name': companyName,
-      'address': address,
-      'phone_number': phoneNumber,
-      'start_working_hour': startWorkingHour,
-      'end_working_hour': endWorkingHour,
-    };
-    if (password != null && password.isNotEmpty) {
-      params['password'] = password;
-    }
-
+  Future<Either<ResponseError, CommonResponseModel>> updateCompanyDetails(
+    FormData formData,
+  ) async {
     return await _networkServices
         .safe(
-          _networkServices.putRequest(
+          _networkServices.putMultiPartRequest(
             endPoint: AppConstants.companyDetails,
-            parameters: params,
+            formFields: formData,
           ),
         )
         .thenRight(_networkServices.checkHttpStatus)

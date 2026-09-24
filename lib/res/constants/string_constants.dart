@@ -354,6 +354,17 @@ class Strings {
   static String get phoneEmpty => LocaleCatalog.instance.t('phoneEmpty');
   static String get companyDetailsSaveFailed => LocaleCatalog.instance.t('companyDetailsSaveFailed');
   static String get companyDetailsSavedSuccess => LocaleCatalog.instance.t('companyDetailsSavedSuccess');
+  static String get paymentQrSectionTitle => LocaleCatalog.instance.t('paymentQrSectionTitle');
+  static String get paymentQrHint => LocaleCatalog.instance.t('paymentQrHint');
+  static String get paymentQrAdd => LocaleCatalog.instance.t('paymentQrAdd');
+  static String get paymentQrChange => LocaleCatalog.instance.t('paymentQrChange');
+  static String get paymentQrClearLocal => LocaleCatalog.instance.t('paymentQrClearLocal');
+  static String get paymentQrUnsupportedType => LocaleCatalog.instance.t('paymentQrUnsupportedType');
+  static String get showPaymentQr => LocaleCatalog.instance.t('showPaymentQr');
+  static String get paymentQrSheetTitle => LocaleCatalog.instance.t('paymentQrSheetTitle');
+  static String get paymentQrScanHelper => LocaleCatalog.instance.t('paymentQrScanHelper');
+  static String get paymentQrEmpty => LocaleCatalog.instance.t('paymentQrEmpty');
+  static String get paymentQrLoadFailed => LocaleCatalog.instance.t('paymentQrLoadFailed');
   static String get settingsResetSuccess => LocaleCatalog.instance.t('settingsResetSuccess');
 
   static String dueAmount(String amount) =>
