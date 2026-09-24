@@ -1,4 +1,5 @@
 // lib/src/settings/model/company_details_model.dart
+import 'package:thuga/utils/helpers/payment_qr_helper.dart';
 import 'package:thuga/utils/helpers/safe_converters.dart';
 
 class CompanyDetailsModel {
@@ -11,6 +12,7 @@ class CompanyDetailsModel {
   final String email;
   final String? startWorkingHour;
   final String? endWorkingHour;
+  final String? qrCode;
 
   CompanyDetailsModel({
     required this.id,
@@ -22,6 +24,7 @@ class CompanyDetailsModel {
     required this.email,
     this.startWorkingHour,
     this.endWorkingHour,
+    this.qrCode,
   });
 
   factory CompanyDetailsModel.fromJson(Map<String, dynamic> json) {
@@ -40,6 +43,7 @@ class CompanyDetailsModel {
           : convertToString(json['email']),
       startWorkingHour: startRaw == null ? null : convertToString(startRaw),
       endWorkingHour: endRaw == null ? null : convertToString(endRaw),
+      qrCode: normalizeQrCodeUrl(convertToString(json['qr_code'])),
     );
   }
 }
