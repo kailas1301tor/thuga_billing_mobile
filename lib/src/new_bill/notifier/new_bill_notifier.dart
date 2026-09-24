@@ -7,12 +7,14 @@ import 'package:flutter/services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:thuga/res/enums/enums.dart';
 import 'package:thuga/services/repo_di.dart';
+import 'package:thuga/services/token_service.dart';
 import 'package:thuga/src/printer/notifier/printer_notifier.dart';
 import 'package:thuga/src/printer/service/printer_service.dart';
 import 'package:thuga/src/settings/notifier/settings_notifier.dart';
 import 'package:thuga/utils/helpers/api_error_handler.dart';
 import 'package:thuga/utils/helpers/bill_tax_helper.dart';
 import 'package:thuga/utils/helpers/extensions.dart';
+import 'package:thuga/utils/helpers/payment_qr_helper.dart';
 import 'package:thuga/utils/helpers/product_stock_helper.dart';
 import 'package:thuga/utils/helpers/receipt_print_helper.dart';
 import 'package:thuga/utils/helpers/toast_helper.dart';
@@ -1051,5 +1053,50 @@ class NewBillNotifier extends _$NewBillNotifier {
           if (!ref.mounted) return;
           state = state.copyWith(isSavingBill: false);
         });
+  }
+
+  Future<void> loadPaymentQr() async {
+    state = state.copyWith(
+      paymentQrLoaderState: LoaderState.loading,
+      paymentQrUrl: null,
+    );
+
+    final userIdStr = await ref.read(tokenServiceProvider).getUserId();
+    final userId = int.tryParse(userIdStr ?? '') ?? 1;
+
+    return await ref
+        .read(settingsRepositoryProvider)
+        .getCompanyDetails(userId)
+        .fold(
+          (left) {
+            debugPrint('🔴 API ERROR payment QR: ${left.message}');
+            if (!ref.mounted) return;
+            state = state.copyWith(
+              paymentQrLoaderState: handleResponseError(left.key),
+              paymentQrUrl: null,
+            );
+          },
+          (company) {
+            if (!ref.mounted) return;
+            final url = normalizeQrCodeUrl(company.qrCode);
+            state = state.copyWith(
+              paymentQrLoaderState:
+                  url == null ? LoaderState.noData : LoaderState.loaded,
+              paymentQrUrl: url,
+            );
+          },
+        )
+        .catchError((e) {
+          debugPrint('🔴 UNEXPECTED ERROR payment QR: $e');
+          if (!ref.mounted) return;
+          state = state.copyWith(paymentQrLoaderState: LoaderState.error);
+        });
+  }
+
+  void clearPaymentQr() {
+    state = state.copyWith(
+      paymentQrLoaderState: LoaderState.loaded,
+      paymentQrUrl: null,
+    );
   }
 }

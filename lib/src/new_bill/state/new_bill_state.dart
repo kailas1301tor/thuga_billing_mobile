@@ -33,6 +33,8 @@ sealed class NewBillState with _$NewBillState {
     @Default(0.0) double receivedAmount,
     DropdownCustomerModel? selectedCustomer,
     String? quantityPickerUnit,
+    @Default(LoaderState.loaded) LoaderState paymentQrLoaderState,
+    String? paymentQrUrl,
     String? errorMessage,
   }) = _NewBillState;
 }

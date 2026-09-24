@@ -7,11 +7,14 @@ import 'package:thuga/res/constants/string_constants.dart';
 import 'package:thuga/res/styles/color_palette.dart';
 import 'package:thuga/res/styles/font_palette.dart';
 import 'package:thuga/utils/common_widgets/bottomsheet_content.dart';
+import 'package:thuga/utils/common_widgets/common_bottom_sheet.dart';
 import 'package:thuga/utils/common_widgets/common_text_form_field.dart';
 import 'package:thuga/utils/common_widgets/primary_button.dart';
 import 'package:thuga/utils/helpers/extensions.dart';
 import '../../../main/model/dropdown_model.dart';
 import '../../../main/notifier/dropdowns_notifier.dart';
+import '../../notifier/new_bill_notifier.dart';
+import 'payment_qr_sheet.dart';
 
 class NewBillFooter extends ConsumerWidget {
   const NewBillFooter({
@@ -189,6 +192,47 @@ class NewBillFooter extends ConsumerWidget {
                 ),
               ),
             12.verticalSpace,
+
+            if (paymentMethod.toLowerCase() == 'upi') ...[
+              GestureDetector(
+                onTap: () async {
+                  HapticFeedback.lightImpact();
+                  await ref.read(newBillProvider.notifier).loadPaymentQr();
+                  if (!context.mounted) return;
+                  CommonBottomSheet.show(
+                    context: context,
+                    title: Strings.paymentQrSheetTitle,
+                    isScrollControlled: true,
+                    child: const PaymentQrSheet(),
+                  );
+                },
+                child: Container(
+                  height: 40.h,
+                  padding: EdgeInsets.symmetric(horizontal: 12.w),
+                  decoration: BoxDecoration(
+                    color: colors.primary.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(10.r),
+                    border: Border.all(color: colors.primary, width: 1.w),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.qr_code_2_rounded,
+                        size: 18.r,
+                        color: colors.primary,
+                      ),
+                      8.horizontalSpace,
+                      Text(
+                        Strings.showPaymentQr,
+                        style: FontPalette.base700(12, color: colors.primary),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              12.verticalSpace,
+            ],
 
             // Main Checkout Buttons row
             Row(
